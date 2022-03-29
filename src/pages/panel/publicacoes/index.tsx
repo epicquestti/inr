@@ -1,5 +1,4 @@
-import { local, Location, ViewPanel } from "@Components/Panel"
-import connect from "@lib/database"
+import { DataGrid, local, Location, ViewPanel } from "@Components/Panel"
 import HttpRequest from "@lib/RequestApi"
 import { ArrowBack, Close, PlusOne } from "@mui/icons-material"
 import {
@@ -15,8 +14,6 @@ import {
   TextField,
   Typography
 } from "@mui/material"
-import PublicacaoModel from "@schema/Publicacao"
-import { GetServerSideProps, GetServerSidePropsResult } from "next"
 import { useRouter } from "next/router"
 import React, { ChangeEvent, useState } from "react"
 const location: local[] = [
@@ -52,53 +49,6 @@ type serverSideResponse = {
   count: number
 }
 
-export const getServerSideProps: GetServerSideProps = async (): Promise<
-  GetServerSidePropsResult<serverSideResponse>
-> => {
-  console.time("Teste")
-  await connect()
-
-  const publicacaoCount = await PublicacaoModel.count({
-    type: {
-      id: 1,
-      text: "Boletim"
-    }
-  })
-
-  const publicacao = await PublicacaoModel.find({
-    type: {
-      id: 1,
-      text: "Boletim"
-    }
-  })
-    .limit(5)
-    .skip(0)
-
-  const pubList: publicacao[] = publicacao.map(item => ({
-    id: item._id.toString(),
-    title: item.title,
-    type: item.type.text,
-    createdAt: item.createdAt.toLocaleDateString(),
-    aproved: item.aproved ? "APROVADO" : "Ñ APROVADO",
-    published: item.published ? "PUBLICADO" : "Ñ PUBLICADO",
-    updatedAt: item.updatedAt,
-    aprovedAt: item.aprovedAt,
-    publishedAt: item.publishedAt
-  }))
-
-  console.timeEnd("Teste")
-  return {
-    // props: {
-    //   publicacaoList: [],
-    //   count: 0
-    // }
-    props: {
-      publicacaoList: pubList,
-      count: publicacaoCount
-    }
-  }
-}
-
 export default function SearchPublicacao(props: serverSideResponse) {
   const router = useRouter()
   const [loading, setLoading] = useState<boolean>()
@@ -107,7 +57,7 @@ export default function SearchPublicacao(props: serverSideResponse) {
 
   const [publicacaoList, setPublicacaoList] = useState<
     publicacao[] | undefined
-  >(props.publicacaoList)
+  >([])
   const [count, setCount] = useState<number>(props.count)
   const [page, setPage] = useState<number | undefined>(0)
   const [rowsperpage, setRowsperpage] = useState<number>(5)
@@ -241,7 +191,7 @@ export default function SearchPublicacao(props: serverSideResponse) {
             </Button>
           </Grid>
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-            {/* <DataGrid
+            <DataGrid
               onPageChange={changePage}
               onRowsPerPageChange={changeRowsPerPage}
               loading={loading}
@@ -275,7 +225,7 @@ export default function SearchPublicacao(props: serverSideResponse) {
                   align: "center"
                 }
               ]}
-            /> */}
+            />
           </Grid>
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
             <Box
