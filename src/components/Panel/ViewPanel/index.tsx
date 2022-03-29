@@ -83,8 +83,6 @@ const Drawer = styled(MuiDrawer, {
 const ListMenu: FC<ListMenuProps> = ({ ...props }) => {
   const router = useRouter()
   const goToFunction = (path?: string) => {
-    // console.log(router)
-
     if (path) router.push(path)
   }
   return (
