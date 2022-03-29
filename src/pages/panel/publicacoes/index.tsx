@@ -1,4 +1,5 @@
-import { DataGrid, local, Location, ViewPanel } from "@Components/Panel"
+import { local, Location, ViewPanel } from "@Components/Panel"
+import connect from "@lib/database"
 import HttpRequest from "@lib/RequestApi"
 import { ArrowBack, Close, PlusOne } from "@mui/icons-material"
 import {
@@ -14,6 +15,7 @@ import {
   TextField,
   Typography
 } from "@mui/material"
+import PublicacaoModel from "@schema/Publicacao"
 import { GetServerSideProps, GetServerSidePropsResult } from "next"
 import { useRouter } from "next/router"
 import React, { ChangeEvent, useState } from "react"
@@ -54,46 +56,46 @@ export const getServerSideProps: GetServerSideProps = async (): Promise<
   GetServerSidePropsResult<serverSideResponse>
 > => {
   console.time("Teste")
-  // await connect()
+  await connect()
 
-  // const publicacaoCount = await PublicacaoModel.count({
-  //   type: {
-  //     id: 1,
-  //     text: "Boletim"
-  //   }
-  // })
+  const publicacaoCount = await PublicacaoModel.count({
+    type: {
+      id: 1,
+      text: "Boletim"
+    }
+  })
 
-  // const publicacao = await PublicacaoModel.find({
-  //   type: {
-  //     id: 1,
-  //     text: "Boletim"
-  //   }
-  // })
-  //   .limit(5)
-  //   .skip(0)
+  const publicacao = await PublicacaoModel.find({
+    type: {
+      id: 1,
+      text: "Boletim"
+    }
+  })
+    .limit(5)
+    .skip(0)
 
-  // const pubList: publicacao[] = publicacao.map(item => ({
-  //   id: item._id.toString(),
-  //   title: item.title,
-  //   type: item.type.text,
-  //   createdAt: item.createdAt.toLocaleDateString(),
-  //   aproved: item.aproved ? "APROVADO" : "Ñ APROVADO",
-  //   published: item.published ? "PUBLICADO" : "Ñ PUBLICADO",
-  //   updatedAt: item.updatedAt,
-  //   aprovedAt: item.aprovedAt,
-  //   publishedAt: item.publishedAt
-  // }))
+  const pubList: publicacao[] = publicacao.map(item => ({
+    id: item._id.toString(),
+    title: item.title,
+    type: item.type.text,
+    createdAt: item.createdAt.toLocaleDateString(),
+    aproved: item.aproved ? "APROVADO" : "Ñ APROVADO",
+    published: item.published ? "PUBLICADO" : "Ñ PUBLICADO",
+    updatedAt: item.updatedAt,
+    aprovedAt: item.aprovedAt,
+    publishedAt: item.publishedAt
+  }))
 
   console.timeEnd("Teste")
   return {
-    props: {
-      publicacaoList: [],
-      count: 0
-    }
     // props: {
-    //   publicacaoList: pubList,
-    //   count: publicacaoCount
+    //   publicacaoList: [],
+    //   count: 0
     // }
+    props: {
+      publicacaoList: pubList,
+      count: publicacaoCount
+    }
   }
 }
 
@@ -239,7 +241,7 @@ export default function SearchPublicacao(props: serverSideResponse) {
             </Button>
           </Grid>
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-            <DataGrid
+            {/* <DataGrid
               onPageChange={changePage}
               onRowsPerPageChange={changeRowsPerPage}
               loading={loading}
@@ -273,7 +275,7 @@ export default function SearchPublicacao(props: serverSideResponse) {
                   align: "center"
                 }
               ]}
-            />
+            /> */}
           </Grid>
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
             <Box
