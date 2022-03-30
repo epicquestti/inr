@@ -62,6 +62,7 @@ export default async function Search(
         }
       ]
     })
+      .sort({ createdAt: -1 })
       .limit(parsedRowsPerPage)
       .skip(offset)
 
