@@ -23,7 +23,7 @@ const location: local[] = [
   {
     text: "Home",
     iconName: "home",
-    href: "/panel/home"
+    href: "/panel"
   },
   {
     text: "Boletim Eletrônico",

@@ -82,8 +82,13 @@ const Drawer = styled(MuiDrawer, {
 
 const ListMenu: FC<ListMenuProps> = ({ ...props }) => {
   const router = useRouter()
-  const goToFunction = (path?: string) => {
-    if (path) router.push(path)
+  const goToFunction = async (path?: string) => {
+    if (path) {
+      props.startBackDrop && props.startBackDrop()
+      const res = await router.push(path)
+
+      if (res) props.closeBackDrop && props.closeBackDrop()
+    }
   }
   return (
     <List
@@ -112,7 +117,6 @@ const ListMenu: FC<ListMenuProps> = ({ ...props }) => {
                       <ListItemButton
                         key={`${index}${Math.random() * (999999 - 1) + 1}`}
                         onClick={() => {
-                          if (props.startBackDrop) props.startBackDrop()
                           goToFunction(childrenItem.path)
                         }}
                       >
@@ -133,6 +137,7 @@ const ListMenu: FC<ListMenuProps> = ({ ...props }) => {
 }
 interface viewPanelProps {
   box?: boolean
+  loading?: boolean
 }
 
 const ViewPanel: FC<viewPanelProps> = ({ ...props }) => {
@@ -153,7 +158,7 @@ const ViewPanel: FC<viewPanelProps> = ({ ...props }) => {
     }
   ])
   const [open, setOpen] = useState(false)
-  const [openBackDrop, setOpenBackDrop] = useState(false)
+  const [openBackDrop, setOpenBackDrop] = useState(props.loading || false)
   const toggleDrawer = () => {
     setOpen(!open)
   }
@@ -225,6 +230,7 @@ const ViewPanel: FC<viewPanelProps> = ({ ...props }) => {
           toggleThis={opentest}
           drawerOpened={open}
           startBackDrop={startBackDrop}
+          closeBackDrop={handleClose}
         />
       </Drawer>
       <Box

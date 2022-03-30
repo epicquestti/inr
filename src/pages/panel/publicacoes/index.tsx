@@ -20,7 +20,7 @@ const location: local[] = [
   {
     text: "Home",
     iconName: "home",
-    href: "/"
+    href: "/panel"
   },
   {
     text: "Boletim Eletrônico",
@@ -239,6 +239,9 @@ export default function SearchPublicacao(props: serverSideResponse) {
                 disabled={loading}
                 variant="contained"
                 startIcon={<ArrowBack />}
+                onClick={() => {
+                  router.push("/panel")
+                }}
               >
                 Voltar
               </Button>

@@ -1,5 +1,4 @@
 import { local, Location, ViewPanel } from "@Components/Panel"
-import connect from "@lib/database"
 import RequestApi from "@lib/RequestApi"
 import {
   ArrowBack,
@@ -25,21 +24,14 @@ import {
   TextField,
   Typography
 } from "@mui/material"
-import PublicacaoModel from "@schema/Publicacao"
-import PublicacaoContentsModel from "@schema/PublicacaoContents"
-import {
-  GetServerSideProps,
-  GetServerSidePropsContext,
-  GetServerSidePropsResult
-} from "next"
 import { useRouter } from "next/router"
-import React, { ChangeEvent, useState } from "react"
+import React, { ChangeEvent, useEffect, useState } from "react"
 
 const location: local[] = [
   {
     text: "Home",
     iconName: "home",
-    href: "/panel/home"
+    href: "/panel"
   },
   {
     text: "Boletim Eletrônico",
@@ -52,63 +44,6 @@ const location: local[] = [
     href: "/panel/publicacoes/new"
   }
 ]
-
-type serverSideResponse = {
-  tipoBoletimList: { id: number; text: string }[]
-  publicacao: {
-    publicId?: number
-    titulo?: string
-    createdAt?: Date
-    aproved?: Boolean
-    aprovedAt?: Date
-    published?: Boolean
-    publishedAt?: Date
-    tipo: number
-  }
-  contents: content[]
-}
-
-export const getServerSideProps: GetServerSideProps = async (
-  context: GetServerSidePropsContext
-): Promise<GetServerSidePropsResult<serverSideResponse>> => {
-  await connect()
-  const tipoBoletimList = [
-    { id: 1, text: "Boletim eletrônico" },
-    { id: 2, text: "Classificador" }
-  ]
-
-  const id = context.params?.id
-  const selectedPublicacao = await PublicacaoModel.findById(id)
-  const contents = await PublicacaoContentsModel.find({
-    idBoletim: id
-  })
-
-  const c = await contents.map(item => {
-    return {
-      id: item._id,
-      titulo: item.title,
-      url: item.url,
-      tipo: item.tipo
-    } as content
-  })
-
-  return {
-    props: {
-      tipoBoletimList,
-      publicacao: {
-        titulo: selectedPublicacao?.title,
-        publicId: selectedPublicacao?.publicId,
-        createdAt: selectedPublicacao?.createdAt,
-        aproved: selectedPublicacao?.aproved,
-        aprovedAt: selectedPublicacao?.aprovedAt,
-        published: selectedPublicacao?.published,
-        publishedAt: selectedPublicacao?.publishedAt,
-        tipo: selectedPublicacao?.type.id || 0
-      },
-      contents: c
-    }
-  }
-}
 
 type content = {
   id?: string
@@ -142,19 +77,26 @@ const beTypeList = (t: string) => {
   return arr[i + 1]
 }
 
-export default function NovaPublicacao(props: serverSideResponse) {
+export default function NovaPublicacao() {
   const router = useRouter()
-  const id = router.query.id
   const [loading, setLoading] = useState<boolean>(false)
 
-  const [publicId] = useState<number | undefined>(props.publicacao.publicId)
-  const [titulo, setTitulo] = useState<string | undefined>(
-    props.publicacao.titulo
-  )
-  const [tipo, setTipo] = useState<number | undefined>(props.publicacao.tipo)
-  const [conteudoList, setConteudoList] = useState<content[]>(
-    props.contents || []
-  )
+  const tipoBoletimList = [
+    { id: 1, text: "Boletim eletrônico" },
+    { id: 2, text: "Classificador" }
+  ]
+
+  const [publicId, setPublicId] = useState<number | undefined>()
+  const [titulo, setTitulo] = useState<string | undefined>()
+  const [tipo, setTipo] = useState<number | undefined>()
+  const [conteudoList, setConteudoList] = useState<content[]>([])
+  const [showSave, setshowSave] = useState<boolean>(false)
+  const [showAprove, setshowAprove] = useState<boolean>(false)
+  const [showPublish, setshowPublish] = useState<boolean>(false)
+  const [showDelete, setshowDelete] = useState<boolean>()
+  const [createdAt, setCreatedAt] = useState<string | undefined>()
+  const [aprovedAt, setAprovedAt] = useState<string | undefined>()
+  const [publishAt, setPublishAt] = useState<string | undefined>()
 
   const [tipoContentClassificador, setTipoContentClassificador] =
     useState<string>("")
@@ -171,21 +113,49 @@ export default function NovaPublicacao(props: serverSideResponse) {
     setOpenDialog(false)
   }
 
-  const [showSave, setshowSave] = useState<boolean>(
-    props.publicacao.published ? false : true
-  )
+  useEffect(() => {
+    async function fatchApi() {
+      if (!router.isReady) return
 
-  const [showAprove, setshowAprove] = useState<boolean>(
-    props.publicacao.published ? false : true
-  )
+      setLoading(true)
 
-  const [showPublish, setshowPublish] = useState<boolean>(
-    !props.publicacao.published && props.publicacao.aproved ? true : false
-  )
+      const { id } = router.query
+      try {
+        const publicacao = await RequestApi.Get(
+          "/api/publicacoes/get-publish",
+          {
+            id
+          }
+        )
 
-  const [showDelete, setshowDelete] = useState<boolean>(
-    props.publicacao.published ? false : true
-  )
+        if (publicacao.success) {
+          setPublicId(publicacao.data.publicId)
+          setTitulo(publicacao.data.titulo)
+          setTipo(parseInt(publicacao.data.tipo))
+          setConteudoList(publicacao.data.contents)
+          setshowSave(publicacao.data.published ? false : true)
+          setshowAprove(publicacao.data.published ? false : true)
+          setshowPublish(
+            !publicacao.data.published && publicacao.data.aproved ? true : false
+          )
+          setCreatedAt(publicacao.data.createdAt)
+          setAprovedAt(publicacao.data.aprovedAt)
+          setPublishAt(publicacao.data.publishedAt)
+          setshowDelete(publicacao.data.published ? false : true)
+          setLoading(false)
+        } else {
+          setLoading(false)
+          throw new Error(publicacao.message)
+        }
+      } catch (error: any) {
+        setDialogText(error.toString())
+        setOpenDialog(true)
+        setLoading(false)
+      }
+    }
+
+    fatchApi()
+  }, [router.isReady])
 
   const SelectBoletimTipo = (e: SelectChangeEvent<number>) => {
     setConteudoList([])
@@ -326,6 +296,8 @@ export default function NovaPublicacao(props: serverSideResponse) {
       return
     }
 
+    const { id } = router.query
+
     setLoading(true)
 
     const requestResponse = await RequestApi.Put(
@@ -352,6 +324,7 @@ export default function NovaPublicacao(props: serverSideResponse) {
   }
 
   const aprove = async () => {
+    const { id } = router.query
     setLoading(true)
 
     const requestResponse = await RequestApi.Get(`/api/publicacoes/aprove`, {
@@ -371,6 +344,7 @@ export default function NovaPublicacao(props: serverSideResponse) {
   }
 
   const publish = async () => {
+    const { id } = router.query
     setLoading(true)
 
     const requestResponse = await RequestApi.Get(`/api/publicacoes/publish`, {
@@ -390,37 +364,38 @@ export default function NovaPublicacao(props: serverSideResponse) {
   }
 
   return (
-    <ViewPanel>
+    <ViewPanel loading={loading}>
       <Paper sx={{ padding: 3 }}>
         <Grid container spacing={2}>
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
             <Location location={location} />
           </Grid>
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-            <Typography variant="h6">{props.publicacao.titulo}</Typography>
+            <Typography variant="h6">
+              {titulo ? titulo : "Aguarde..."}
+            </Typography>
           </Grid>
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-            {props.publicacao.createdAt && (
+            {createdAt && (
               <Typography variant="caption">
                 <strong>criado em: </strong>
-                {new Date(props.publicacao.createdAt).toLocaleDateString() +
-                  " "}
+                {new Date(createdAt).toLocaleDateString()}
+                <strong>{"  |  "}</strong>
               </Typography>
             )}
 
-            {props.publicacao.aproved && props.publicacao.aprovedAt && (
+            {!showAprove && aprovedAt && (
               <Typography variant="caption">
                 <strong>aprovado em: </strong>
-                {new Date(props.publicacao.aprovedAt).toLocaleDateString() +
-                  " "}
+                {new Date(aprovedAt).toLocaleDateString()}
+                <strong>{"  |  "}</strong>
               </Typography>
             )}
 
-            {props.publicacao.published && props.publicacao.publishedAt && (
+            {!showPublish && publishAt && (
               <Typography variant="caption">
                 <strong>publicado em: </strong>
-                {new Date(props.publicacao.publishedAt).toLocaleDateString() +
-                  " "}
+                {new Date(publishAt).toLocaleDateString()}
               </Typography>
             )}
           </Grid>
@@ -428,7 +403,6 @@ export default function NovaPublicacao(props: serverSideResponse) {
             <TextField
               value={titulo}
               variant="outlined"
-              label="Título"
               fullWidth
               disabled={loading}
               onChange={(e: ChangeEvent<HTMLInputElement>) => {
@@ -446,10 +420,10 @@ export default function NovaPublicacao(props: serverSideResponse) {
                 labelId="tipo-boletim-label-id"
                 label="Tipo de Boletim"
                 onChange={SelectBoletimTipo}
-                value={tipo}
+                value={tipo ? tipo : 0}
               >
                 <MenuItem value={0}>Selecione um tipo de Publicação</MenuItem>
-                {props.tipoBoletimList.map(item => (
+                {tipoBoletimList.map(item => (
                   <MenuItem key={item.id} value={item.id}>
                     {item.text}
                   </MenuItem>
@@ -457,160 +431,168 @@ export default function NovaPublicacao(props: serverSideResponse) {
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-            <Typography variant="body1">
-              Insira os conteúdos da publicação.
-            </Typography>
-          </Grid>
-          {tipo === 1 && (
+          {showSave ? (
             <>
               <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-                <FormControl fullWidth>
-                  <InputLabel id="tipo-Item-label-classificador">
-                    Tipo de Item do boletim
-                  </InputLabel>
-                  <Select
-                    disabled={loading}
-                    labelId="tipo-Item-label-classificador"
-                    label="Tipo de Item do classificador"
-                    onChange={(e: SelectChangeEvent<string>) => {
-                      setTipoContentBoletim(e.target.value)
-                    }}
-                    value={tipoContentBoletim}
-                  >
-                    <MenuItem value={""}>
-                      Selecione o tipo de conteudo que voce ira criar
-                    </MenuItem>
-                    <MenuItem value={"MENSAGENSDOSEDITORES"}>
-                      Mensagens dos Editores
-                    </MenuItem>
-                    <MenuItem value={"OPNIAO"}>Opnião</MenuItem>
-                    <MenuItem value={"NOTICIAS"}>Noticias</MenuItem>
-                    <MenuItem value={"TVINR"}>TV INR</MenuItem>
-                    <MenuItem value={"JURISPRUDENCIA"}>Jurisprudência</MenuItem>
-                    <MenuItem value={"LEGISLACAO"}>Legislação</MenuItem>
-                    <MenuItem value={"PERGUNTAS"}>Perguntas</MenuItem>
-                    <MenuItem value={"SUPLEMENTOS"}>Suplementos</MenuItem>
-                    <MenuItem value={"PARECERESNAOPUBLICADOSPELACGJSP"}>
-                      Pareceres Não Publicados pela CGJ SP
-                    </MenuItem>
-                  </Select>
-                </FormControl>
+                <Typography variant="body1">
+                  Insira os conteúdos da publicação.
+                </Typography>
               </Grid>
-              <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-                <TextField
-                  disabled={loading}
-                  fullWidth
-                  variant="outlined"
-                  multiline
-                  minRows={3}
-                  maxRows={3}
-                  label="Título do item"
-                  value={tituloContentBoletim}
-                  onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                    setTituloContentBoletim(e.target.value)
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-                <TextField
-                  disabled={loading}
-                  fullWidth
-                  variant="outlined"
-                  multiline
-                  minRows={3}
-                  maxRows={3}
-                  label="Link do boletim"
-                  value={urlContentBoletim}
-                  onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                    setUrlContentBoletim(e.target.value)
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "right",
-                    width: "100%"
-                  }}
-                >
-                  <Button
-                    disabled={loading}
-                    onClick={addContent}
-                    variant="contained"
-                  >
-                    Inserir conteúdo ao boletim
-                  </Button>
-                </Box>
-              </Grid>
-            </>
-          )}
+              {tipo === 1 && (
+                <>
+                  <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                    <FormControl fullWidth>
+                      <InputLabel id="tipo-Item-label-classificador">
+                        Tipo de Item do boletim
+                      </InputLabel>
+                      <Select
+                        disabled={loading}
+                        labelId="tipo-Item-label-classificador"
+                        label="Tipo de Item do classificador"
+                        onChange={(e: SelectChangeEvent<string>) => {
+                          setTipoContentBoletim(e.target.value)
+                        }}
+                        value={tipoContentBoletim}
+                      >
+                        <MenuItem value={""}>
+                          Selecione o tipo de conteudo que voce ira criar
+                        </MenuItem>
+                        <MenuItem value={"MENSAGENSDOSEDITORES"}>
+                          Mensagens dos Editores
+                        </MenuItem>
+                        <MenuItem value={"OPNIAO"}>Opnião</MenuItem>
+                        <MenuItem value={"NOTICIAS"}>Noticias</MenuItem>
+                        <MenuItem value={"TVINR"}>TV INR</MenuItem>
+                        <MenuItem value={"JURISPRUDENCIA"}>
+                          Jurisprudência
+                        </MenuItem>
+                        <MenuItem value={"LEGISLACAO"}>Legislação</MenuItem>
+                        <MenuItem value={"PERGUNTAS"}>Perguntas</MenuItem>
+                        <MenuItem value={"SUPLEMENTOS"}>Suplementos</MenuItem>
+                        <MenuItem value={"PARECERESNAOPUBLICADOSPELACGJSP"}>
+                          Pareceres Não Publicados pela CGJ SP
+                        </MenuItem>
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                    <TextField
+                      disabled={loading}
+                      fullWidth
+                      variant="outlined"
+                      multiline
+                      minRows={3}
+                      maxRows={3}
+                      label="Título do item"
+                      value={tituloContentBoletim}
+                      onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                        setTituloContentBoletim(e.target.value)
+                      }}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                    <TextField
+                      disabled={loading}
+                      fullWidth
+                      variant="outlined"
+                      multiline
+                      minRows={3}
+                      maxRows={3}
+                      label="Link do boletim"
+                      value={urlContentBoletim}
+                      onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                        setUrlContentBoletim(e.target.value)
+                      }}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "right",
+                        width: "100%"
+                      }}
+                    >
+                      <Button
+                        disabled={loading}
+                        onClick={addContent}
+                        variant="contained"
+                      >
+                        Inserir conteúdo ao boletim
+                      </Button>
+                    </Box>
+                  </Grid>
+                </>
+              )}
 
-          {tipo === 2 && (
-            <>
-              <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-                <FormControl fullWidth>
-                  <InputLabel id="tipo-Item-label-classificador">
-                    Tipo de Item do classificador
-                  </InputLabel>
-                  <Select
-                    disabled={loading}
-                    labelId="tipo-Item-label-classificador"
-                    label="Tipo de Item do classificador"
-                    value={tipoContentClassificador}
-                    onChange={(e: SelectChangeEvent<string>) => {
-                      setTipoContentClassificador(e.target.value.toString())
-                    }}
-                  >
-                    <MenuItem value={""}>
-                      Selecione um tipo de Classificador
-                    </MenuItem>
-                    <MenuItem value={"SP"}>SP</MenuItem>
-                    <MenuItem value={"PR"}>PR</MenuItem>
-                    <MenuItem value={"RS"}>RS</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-                <TextField
-                  disabled={loading}
-                  fullWidth
-                  variant="outlined"
-                  multiline
-                  minRows={3}
-                  maxRows={3}
-                  label="Insira o link do classificador"
-                  value={urlContentClassificador}
-                  onChange={(e: ChangeEvent<HTMLTextAreaElement>) => {
-                    setUrlContentClassificador(e.target.value)
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "right",
-                    width: "100%"
-                  }}
-                >
-                  <Button
-                    disabled={loading}
-                    onClick={addContent}
-                    variant="contained"
-                  >
-                    Inserir Conteúdo ao classificador
-                  </Button>
-                </Box>
-              </Grid>
+              {tipo === 2 && (
+                <>
+                  <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                    <FormControl fullWidth>
+                      <InputLabel id="tipo-Item-label-classificador">
+                        Tipo de Item do classificador
+                      </InputLabel>
+                      <Select
+                        disabled={loading}
+                        labelId="tipo-Item-label-classificador"
+                        label="Tipo de Item do classificador"
+                        value={tipoContentClassificador}
+                        onChange={(e: SelectChangeEvent<string>) => {
+                          setTipoContentClassificador(e.target.value.toString())
+                        }}
+                      >
+                        <MenuItem value={""}>
+                          Selecione um tipo de Classificador
+                        </MenuItem>
+                        <MenuItem value={"SP"}>SP</MenuItem>
+                        <MenuItem value={"PR"}>PR</MenuItem>
+                        <MenuItem value={"RS"}>RS</MenuItem>
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                    <TextField
+                      disabled={loading}
+                      fullWidth
+                      variant="outlined"
+                      multiline
+                      minRows={3}
+                      maxRows={3}
+                      label="Insira o link do classificador"
+                      value={urlContentClassificador}
+                      onChange={(e: ChangeEvent<HTMLTextAreaElement>) => {
+                        setUrlContentClassificador(e.target.value)
+                      }}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "right",
+                        width: "100%"
+                      }}
+                    >
+                      <Button
+                        disabled={loading}
+                        onClick={addContent}
+                        variant="contained"
+                      >
+                        Inserir Conteúdo ao classificador
+                      </Button>
+                    </Box>
+                  </Grid>
+                </>
+              )}
             </>
+          ) : (
+            <></>
           )}
-
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
             <Typography variant="body1">Conteúdo da publicação</Typography>
           </Grid>
-          {conteudoList.length > 0 &&
+          {conteudoList &&
+            conteudoList.length > 0 &&
             conteudoList.map((item, index) => (
               <Grid key={index} item xs={12} sm={12} md={12} lg={12} xl={12}>
                 <Box
