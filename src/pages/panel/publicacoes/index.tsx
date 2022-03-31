@@ -250,6 +250,7 @@ export default function SearchPublicacao(props: serverSideResponse) {
                 disabled={loading}
                 variant="contained"
                 onClick={() => {
+                  setLoading(true)
                   router.push("/panel/publicacoes/new")
                 }}
                 startIcon={<PlusOne />}
