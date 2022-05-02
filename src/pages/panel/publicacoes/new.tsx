@@ -415,8 +415,26 @@ export default function NovaPublicacao(props: serverSideResponse) {
                       Selecione um tipo de Classificador
                     </MenuItem>
                     <MenuItem value={"SP"}>SP</MenuItem>
+                    <MenuItem value={"SP-NHP"}>
+                      [SP] Não houve publicação...
+                    </MenuItem>
+                    <MenuItem value={"SP-NHA"}>
+                      [SP] Não há atos de interesse...
+                    </MenuItem>
                     <MenuItem value={"PR"}>PR</MenuItem>
+                    <MenuItem value={"PR-NHP"}>
+                      [PR] Não houve publicação...
+                    </MenuItem>
+                    <MenuItem value={"PR-NHA"}>
+                      [PR] Não há atos de interesse...
+                    </MenuItem>
                     <MenuItem value={"RS"}>RS</MenuItem>
+                    <MenuItem value={"RS-NHP"}>
+                      [RS] Não houve publicação...
+                    </MenuItem>
+                    <MenuItem value={"RS-NHA"}>
+                      [RS] Não há atos de interesse...
+                    </MenuItem>
                   </Select>
                 </FormControl>
               </Grid>
