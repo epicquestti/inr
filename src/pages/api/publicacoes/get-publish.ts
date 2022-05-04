@@ -32,7 +32,7 @@ export default async function getPublicacaoById(
         type content = {
           id?: string
           titulo?: string
-          url: string
+          url?: string
           tipo: string
         }
 

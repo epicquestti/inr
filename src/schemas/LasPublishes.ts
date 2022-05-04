@@ -9,9 +9,7 @@ const lastPublishesSchema = new Schema({
   classificador: { type: Number, required: false }
 })
 
-const LastPublishes: Model<lastPublishesInterface> = models["LastPublishes"] || model(
-  "LastPublishes",
-  lastPublishesSchema
-)
+const LastPublishes: Model<lastPublishesInterface> =
+  models["LastPublishes"] || model("LastPublishes", lastPublishesSchema)
 
 export default LastPublishes

@@ -20,6 +20,7 @@ const UsuarioSchema = new Schema(
     timestamps: true
   }
 )
-const usuario: Model<UsuarioInterface> = models["Usuario"] || model("Usuario", UsuarioSchema)
+const usuario: Model<UsuarioInterface> =
+  models["Usuario"] || model("Usuario", UsuarioSchema)
 
 export default usuario

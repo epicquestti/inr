@@ -9,9 +9,8 @@ const publicIdentifiersSchema = new Schema({
   classificador: { type: Number, required: false }
 })
 
-const PublicIdentifierModel: Model<publicIdentifiersInterface> = models["PublicIdentifier"] || model(
-  "PublicIdentifier",
-  publicIdentifiersSchema
-)
+const PublicIdentifierModel: Model<publicIdentifiersInterface> =
+  models["PublicIdentifier"] ||
+  model("PublicIdentifier", publicIdentifiersSchema)
 
 export default PublicIdentifierModel

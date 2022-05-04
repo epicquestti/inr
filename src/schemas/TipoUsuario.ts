@@ -7,5 +7,6 @@ const tipoUsuarioSchema = new Schema({
   text: { type: String, required: true }
 })
 
-const tipoUsuario: Model<tipoUsuarioInterface> = models["TipoUsuario"] || model("TipoUsuario", tipoUsuarioSchema)
+const tipoUsuario: Model<tipoUsuarioInterface> =
+  models["TipoUsuario"] || model("TipoUsuario", tipoUsuarioSchema)
 export default tipoUsuario
