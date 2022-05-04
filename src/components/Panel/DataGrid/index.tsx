@@ -89,10 +89,9 @@ const DataGrid: FC<dataGridoptions> = ({ ...props }) => {
                       key={gridDataIndex + "data" + rnd()}
                       onClick={e => {
                         if (props.onSelectedRow) {
-                          if (typeof gridDataItem.id === 'number')
+                          if (typeof gridDataItem.id === "number")
                             props.onSelectedRow(parseInt(gridDataItem.id))
-                          else
-                            props.onSelectedRow(gridDataItem.id)
+                          else props.onSelectedRow(gridDataItem.id)
                         }
                       }}
                       hover
@@ -112,8 +111,8 @@ const DataGrid: FC<dataGridoptions> = ({ ...props }) => {
                               {gridHeaderItem.relation
                                 ? gridDataItem[gridHeaderItem.relation]
                                   ? gridDataItem[gridHeaderItem.relation][
-                                  gridHeaderItem.field
-                                  ]
+                                      gridHeaderItem.field
+                                    ]
                                   : ""
                                 : gridDataItem[gridHeaderItem.field]}
                             </TableCell>

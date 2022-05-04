@@ -9,7 +9,7 @@ export default async function GetClassificador(
 ): Promise<void> {
   type contentTypes = {
     tipo: string
-    url: string
+    url?: string
     text: string
   }
   let response: {

@@ -4,7 +4,7 @@ export interface IPublicacao extends Document {
   publicId: number
   title: string
   type: {
-    id: number,
+    id: number
     text: string
   }
   createdAt: Date
@@ -38,6 +38,7 @@ const PublicacaoSchema = new Schema({
   publishedBy: { type: Types.ObjectId, required: false }
 })
 
-const PublicacaoModel: Model<IPublicacao> = models["Publicacao"] || model("Publicacao", PublicacaoSchema)
+const PublicacaoModel: Model<IPublicacao> =
+  models["Publicacao"] || model("Publicacao", PublicacaoSchema)
 
-export default PublicacaoModel 
+export default PublicacaoModel

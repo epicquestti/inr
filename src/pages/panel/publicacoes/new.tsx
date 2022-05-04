@@ -16,9 +16,8 @@ import {
   TextField,
   Typography
 } from "@mui/material"
-import { GetServerSideProps, GetServerSidePropsResult } from "next"
 import { useRouter } from "next/router"
-import React, { ChangeEvent, useState } from "react"
+import React, { ChangeEvent, useEffect, useState } from "react"
 const location: local[] = [
   {
     text: "Home",
@@ -36,16 +35,67 @@ const location: local[] = [
     href: "/panel/publicacoes/new"
   }
 ]
-type serverSideResponse = {
-  tipoBoletimList: { id: number; text: string }[]
-}
 type content = {
   id?: string
   titulo?: string
   url: string
   tipo: string
 }
-
+type boletimType = {
+  id: number
+  text: string
+}
+enum countSessions {
+  MENSAGENSDOSEDITORES = "Mensagens dos Editores",
+  OPNIAO = "Opnião",
+  NOTICIAS = "Noticias",
+  TVINR = "TV INR",
+  JURISPRUDENCIA = "Jurisprudência",
+  LEGISLACAO = "Legislação",
+  PERGUNTAS = "Perguntas",
+  SUPLEMENTOS = "Suplementos",
+  PARECERESNAOPUBLICADOSPELACGJSP = "Pareceres",
+  SP = "São Paulo",
+  PR = "Paraná",
+  RS = "Rio Grande do Sul",
+  "SP-NHP" = "São Paulo - NHP",
+  "SP-NHA" = "São Paulo - NHA",
+  "PR-NHP" = "Paraná - NHP",
+  "PR-NHA" = "Paraná - NHA",
+  "RS-NHP" = "Rio Grande do Sul - NHP",
+  "RS-NHA" = "Rio Grande do Sul - NHA"
+}
+enum typeColors {
+  "Mensagens dos Editores" = "#FFCDD2",
+  "Opnião" = "#F8BBD0",
+  "Noticias" = "#E1BEE7",
+  "TV INR" = "#D1C4E9",
+  "Jurisprudência" = "#C5CAE9",
+  "Legislação" = "#BBDEFB",
+  "Perguntas" = "#B3E5FC",
+  "Suplementos" = "#84FFFF",
+  "Pareceres" = "#B2EBF2",
+  "São Paulo" = "#B2DFDB",
+  "Paraná" = "#DCEDC8",
+  "Rio Grande do Sul" = "#FFF9C4",
+  "São Paulo - NHP" = "#FFECB3",
+  "São Paulo - NHA" = "#FFE0B2",
+  "Paraná - NHP" = "#FFCCBC",
+  "Paraná - NHA" = "#D7CCC8",
+  "Rio Grande do Sul - NHP" = "#F5F5F5",
+  "Rio Grande do Sul - NHA" = "#CFD8DC"
+}
+enum classTypes {
+  SP = "Clique aqui e acesse o conteúdo desta edição.",
+  "SP-NHP" = "Não houve publicação do Diário da Justiça Eletrônico do Tribunal de Justiça do Estado de São Paulo na data de hoje.",
+  "SP-NHA" = "Não há atos de interesse no Diário da Justiça Eletrônico do Tribunal de Justiça do Estado de São Paulo.",
+  PR = "Clique aqui e acesse o conteúdo desta edição.",
+  "PR-NHP" = "Não houve publicação do Diário da Justiça Eletrônico do Tribunal de Justiça do Estado do Paraná na data de hoje.",
+  "PR-NHA" = "Não há atos de interesse no Diário da Justiça Eletrônico do Tribunal de Justiça do Estado do Paraná.",
+  RS = "Clique aqui e acesse o conteúdo desta edição.",
+  "RS-NHP" = "Não houve publicação do Diário da Justiça Eletrônico do Tribunal de Justiça do Estado do Rio Grande do Sul na data de hoje.",
+  "RS-NHA" = "Não há atos de interesse no Diário da Justiça Eletrônico do Tribunal de Justiça do Estado do Rio Grande do Sul."
+}
 const beTypeList = (t: string) => {
   const arr = [
     "MENSAGENSDOSEDITORES",
@@ -70,26 +120,21 @@ const beTypeList = (t: string) => {
   const i = arr.indexOf(t)
   return arr[i + 1]
 }
-
-export const getServerSideProps: GetServerSideProps = async (): Promise<
-  GetServerSidePropsResult<serverSideResponse>
-> => {
-  const tipoBoletimList = [
-    { id: 1, text: "Boletim eletrônico" },
-    { id: 2, text: "Classificador" }
-  ]
-  return {
-    props: {
-      tipoBoletimList
-    }
-  }
+type resumoList = {
+  type?: string
+  total?: number
 }
 
-export default function NovaPublicacao(props: serverSideResponse) {
+export default function NovaPublicacao() {
   const router = useRouter()
   const [loading, setLoading] = useState<boolean>(false)
+  const [blockLink, setBlockLink] = useState<boolean>(false)
 
   const [titulo, setTitulo] = useState<string>("")
+  const [tipoBoletim] = useState<boletimType[]>([
+    { id: 1, text: "Boletim eletrônico" },
+    { id: 2, text: "Classificador" }
+  ])
   const [tipo, setTipo] = useState<number | undefined>(undefined)
   const [conteudoList, setConteudoList] = useState<content[]>([])
 
@@ -102,13 +147,51 @@ export default function NovaPublicacao(props: serverSideResponse) {
   const [tituloContentBoletim, setTituloContentBoletim] = useState<string>("")
   const [urlContentBoletim, setUrlContentBoletim] = useState<string>("")
 
+  const [resumo, setResumo] = useState<resumoList[]>([])
+
   const [openDialog, setOpenDialog] = useState<boolean>(false)
   const [dialogText, setDialogText] = useState<string>("")
   const handleCloseDialog = () => {
     setOpenDialog(false)
   }
 
+  useEffect(() => {
+    if (conteudoList.length > 0) {
+      const tmp = [...conteudoList]
+      const typesArray = tmp.map(item => item.tipo)
+      const arrayResponse: resumoList[] = []
+
+      typesArray.sort()
+
+      var current = ""
+      var cnt = 0
+      for (var i = 0; i < typesArray.length; i++) {
+        if (typesArray[i] != current) {
+          if (cnt > 0) {
+            arrayResponse.push({
+              type: countSessions[current as keyof typeof countSessions],
+              total: cnt
+            })
+          }
+          current = typesArray[i]
+          cnt = 1
+        } else {
+          cnt++
+        }
+      }
+      if (cnt > 0) {
+        arrayResponse.push({
+          type: countSessions[current as keyof typeof countSessions],
+          total: cnt
+        })
+      }
+
+      setResumo(arrayResponse)
+    }
+  }, [conteudoList])
+
   const SelectBoletimTipo = (e: SelectChangeEvent<number>) => {
+    setConteudoList([])
     setConteudoList([])
     setTipo(parseInt(e.target.value.toString()))
   }
@@ -149,7 +232,7 @@ export default function NovaPublicacao(props: serverSideResponse) {
       setConteudoList(temp)
 
       setTituloContentBoletim("")
-      setTipoContentBoletim("")
+      // setTipoContentBoletim("")
       setUrlContentBoletim("")
     }
 
@@ -160,14 +243,22 @@ export default function NovaPublicacao(props: serverSideResponse) {
         return
       }
 
-      if (!urlContentClassificador) {
+      if (
+        (tipoContentClassificador === "" ||
+          tipoContentClassificador === "SP" ||
+          tipoContentClassificador === "PR" ||
+          tipoContentClassificador === "RS") &&
+        !urlContentClassificador
+      ) {
         setDialogText("insira o link do classificador.")
         setOpenDialog(true)
         return
       }
 
       const newClassificadoritem: content = {
-        titulo: `${new Date().toLocaleDateString()} – Clique aqui e acesse o conteúdo desta edição.`,
+        titulo: `${new Date().toLocaleDateString()} – ${
+          classTypes[tipoContentClassificador as keyof typeof classTypes]
+        }`,
         tipo: tipoContentClassificador,
         url: urlContentClassificador
       }
@@ -177,6 +268,7 @@ export default function NovaPublicacao(props: serverSideResponse) {
 
       setTipoContentClassificador("")
       setUrlContentClassificador("")
+      setBlockLink(false)
     }
   }
 
@@ -236,8 +328,15 @@ export default function NovaPublicacao(props: serverSideResponse) {
 
     if (tipo == 2) {
       for (let i = 0; i < conteudoList.length; i++) {
-        if (conteudoList[i].url === "") hasErrors = true
         if (conteudoList[i].tipo === "") hasErrors = true
+
+        if (
+          conteudoList[i].tipo === "SP" &&
+          conteudoList[i].tipo === "PR" &&
+          conteudoList[i].tipo === "RS"
+        ) {
+          if (conteudoList[i].url === "") hasErrors = true
+        }
       }
     }
 
@@ -297,7 +396,7 @@ export default function NovaPublicacao(props: serverSideResponse) {
                 onChange={SelectBoletimTipo}
               >
                 <MenuItem value={0}>Selecione um tipo de Publicação</MenuItem>
-                {props.tipoBoletimList.map(item => (
+                {tipoBoletim.map(item => (
                   <MenuItem key={item.id} value={item.id}>
                     {item.text}
                   </MenuItem>
@@ -408,6 +507,20 @@ export default function NovaPublicacao(props: serverSideResponse) {
                     label="Tipo de Item do classificador"
                     value={tipoContentClassificador}
                     onChange={(e: SelectChangeEvent<string>) => {
+                      const valueSelected = e.target.value.toString()
+
+                      if (
+                        valueSelected === "" ||
+                        valueSelected === "SP" ||
+                        valueSelected === "PR" ||
+                        valueSelected === "RS"
+                      ) {
+                        setBlockLink(false)
+                      } else {
+                        setUrlContentClassificador("")
+                        setBlockLink(true)
+                      }
+
                       setTipoContentClassificador(e.target.value.toString())
                     }}
                   >
@@ -415,14 +528,32 @@ export default function NovaPublicacao(props: serverSideResponse) {
                       Selecione um tipo de Classificador
                     </MenuItem>
                     <MenuItem value={"SP"}>SP</MenuItem>
+                    <MenuItem value={"SP-NHP"}>
+                      SP - Não houve publicação...
+                    </MenuItem>
+                    <MenuItem value={"SP-NHA"}>
+                      SP - Não há atos de interesse...
+                    </MenuItem>
                     <MenuItem value={"PR"}>PR</MenuItem>
+                    <MenuItem value={"PR-NHP"}>
+                      PR - Não houve publicação...
+                    </MenuItem>
+                    <MenuItem value={"PR-NHA"}>
+                      PR - Não há atos de interesse...
+                    </MenuItem>
                     <MenuItem value={"RS"}>RS</MenuItem>
+                    <MenuItem value={"RS-NHP"}>
+                      PR - Não houve publicação...
+                    </MenuItem>
+                    <MenuItem value={"RS-NHA"}>
+                      PR - Não há atos de interesse...
+                    </MenuItem>
                   </Select>
                 </FormControl>
               </Grid>
               <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
                 <TextField
-                  disabled={loading}
+                  disabled={loading || blockLink ? true : false}
                   fullWidth
                   variant="outlined"
                   multiline
@@ -456,6 +587,88 @@ export default function NovaPublicacao(props: serverSideResponse) {
           )}
 
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+            <Typography variant="body1">Resumo</Typography>
+          </Grid>
+
+          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+            {resumo.length <= 0 ? (
+              <Box
+                sx={{
+                  width: "100%",
+                  borderRadius: 2,
+                  border: "1px solid #2196F3",
+                  padding: 1,
+                  textAlign: "center"
+                }}
+              >
+                <Typography variant="caption" sx={{ color: "#78909C" }}>
+                  Adicione algum conteúdo ao boletim...
+                </Typography>
+              </Box>
+            ) : (
+              <Box
+                sx={{
+                  width: "100%",
+                  borderRadius: 2,
+                  border: "1px solid #2196F3",
+                  padding: 1,
+                  textAlign: "center"
+                }}
+              >
+                <Grid container spacing={2}>
+                  {resumo.map((item, index) => (
+                    <Grid
+                      key={`item-resumo-conteudo-${index}`}
+                      item
+                      xs={12}
+                      sm={12}
+                      md={2}
+                      lg={2}
+                      xl={2}
+                    >
+                      <Box
+                        sx={{
+                          width: "100%",
+                          borderRadius: 2,
+                          padding: 1,
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          background:
+                            typeColors[item.type as keyof typeof typeColors],
+                          textAlign: "center"
+                        }}
+                      >
+                        <Typography variant="caption">
+                          <strong>{item.type}</strong>
+                        </Typography>
+                        <Box
+                          sx={{
+                            width: "20px",
+                            height: "20px",
+                            background: "#37474F",
+                            marginLeft: 0.5,
+                            color: "white",
+                            borderRadius: "100%",
+                            fontSize: 10,
+                            p: 0.3,
+                            textAlign: "center",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            alignContent: "center"
+                          }}
+                        >
+                          {item.total}
+                        </Box>
+                      </Box>
+                    </Grid>
+                  ))}
+                </Grid>
+              </Box>
+            )}
+          </Grid>
+
+          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
             <Typography variant="body1">Conteúdo da publicação</Typography>
           </Grid>
           {conteudoList.length > 0 &&
@@ -482,15 +695,19 @@ export default function NovaPublicacao(props: serverSideResponse) {
                         <Box
                           sx={{
                             padding: "0px 4px 0px 4px",
-                            background: "#B0BEC5",
-                            border: "1.5px solid #424242",
+                            background:
+                              typeColors[
+                                beTypeList(
+                                  item.tipo.toString()
+                                ) as keyof typeof typeColors
+                              ],
                             borderRadius: 1,
                             marginLeft: 5
                           }}
                         >
                           <Typography
                             variant="caption"
-                            color="#424242"
+                            color="#000000"
                             fontSize={11}
                           >
                             {tipo === 1
@@ -502,14 +719,18 @@ export default function NovaPublicacao(props: serverSideResponse) {
                       <Box sx={{ width: "100%" }}>
                         <Typography variant="body1">{item.titulo}</Typography>
                       </Box>
-                      <Box sx={{ width: "100%" }}>
-                        <Typography variant="subtitle2">Link</Typography>
-                      </Box>
-                      <Box sx={{ width: "100%" }}>
-                        <a target="_blank" href={item.url} rel="noreferrer">
-                          link do item
-                        </a>
-                      </Box>
+                      {item.url && (
+                        <>
+                          <Box sx={{ width: "100%" }}>
+                            <Typography variant="subtitle2">Link</Typography>
+                          </Box>
+                          <Box sx={{ width: "100%" }}>
+                            <a target="_blank" href={item.url} rel="noreferrer">
+                              link do item
+                            </a>
+                          </Box>
+                        </>
+                      )}
                     </Grid>
                     <Grid item xs={12} sm={12} md={1} lg={1} xl={1}>
                       <Box

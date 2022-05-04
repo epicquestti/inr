@@ -4,23 +4,21 @@ import PublicacaoContentsModel from "@schema/PublicacaoContents"
 import { NextApiRequest, NextApiResponse } from "next"
 import { connect } from "src/lib"
 
+type sendModel = {
+  title: string
+  createdAt: Date
+  publishedAt: Date
+  contents: {
+    text: string
+    url?: string
+    tipo: string
+  }[]
+}
+
 export default async function getLastPublishes(
   req: NextApiRequest,
   res: NextApiResponse
 ): Promise<void> {
-  type sendModel = {
-    title: string
-    createdAt: Date
-    publishedAt: Date
-    contents: {
-      text: string
-      url: string
-      tipo: string
-    }[]
-  }
-
-  type classi = {}
-
   let response: {
     lastBeId: number
     lastClassId: number

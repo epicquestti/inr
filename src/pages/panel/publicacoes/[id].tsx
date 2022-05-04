@@ -45,6 +45,27 @@ const location: local[] = [
   }
 ]
 
+enum countSessions {
+  MENSAGENSDOSEDITORES = "Mensagens dos Editores",
+  OPNIAO = "Opnião",
+  NOTICIAS = "Noticias",
+  TVINR = "TV INR",
+  JURISPRUDENCIA = "Jurisprudência",
+  LEGISLACAO = "Legislação",
+  PERGUNTAS = "Perguntas",
+  SUPLEMENTOS = "Suplementos",
+  PARECERESNAOPUBLICADOSPELACGJSP = "Pareceres",
+  SP = "São Paulo",
+  PR = "Paraná",
+  RS = "Rio Grande do Sul",
+  "SP-NHP" = "São Paulo - NHP",
+  "SP-NHA" = "São Paulo - NHA",
+  "PR-NHP" = "Paraná - NHP",
+  "PR-NHA" = "Paraná - NHA",
+  "RS-NHP" = "Rio Grande do Sul - NHP",
+  "RS-NHA" = "Rio Grande do Sul - NHA"
+}
+
 type content = {
   id?: string
   titulo?: string
@@ -77,6 +98,32 @@ const beTypeList = (t: string) => {
   return arr[i + 1]
 }
 
+type resumoList = {
+  type?: string
+  total?: number
+}
+
+enum typeColors {
+  "Mensagens dos Editores" = "#FFCDD2",
+  "Opnião" = "#F8BBD0",
+  "Noticias" = "#E1BEE7",
+  "TV INR" = "#D1C4E9",
+  "Jurisprudência" = "#C5CAE9",
+  "Legislação" = "#BBDEFB",
+  "Perguntas" = "#B3E5FC",
+  "Suplementos" = "#84FFFF",
+  "Pareceres" = "#B2EBF2",
+  "São Paulo" = "#B2DFDB",
+  "Paraná" = "#DCEDC8",
+  "Rio Grande do Sul" = "#FFF9C4",
+  "São Paulo - NHP" = "#FFECB3",
+  "São Paulo - NHA" = "#FFE0B2",
+  "Paraná - NHP" = "#FFCCBC",
+  "Paraná - NHA" = "#D7CCC8",
+  "Rio Grande do Sul - NHP" = "#F5F5F5",
+  "Rio Grande do Sul - NHA" = "#CFD8DC"
+}
+
 export default function NovaPublicacao() {
   const router = useRouter()
   const [loading, setLoading] = useState<boolean>(false)
@@ -107,11 +154,48 @@ export default function NovaPublicacao() {
   const [tituloContentBoletim, setTituloContentBoletim] = useState<string>("")
   const [urlContentBoletim, setUrlContentBoletim] = useState<string>("")
 
+  const [resumo, setResumo] = useState<resumoList[]>([])
+
   const [openDialog, setOpenDialog] = useState<boolean>(false)
   const [dialogText, setDialogText] = useState<string>("")
   const handleCloseDialog = () => {
     setOpenDialog(false)
   }
+
+  useEffect(() => {
+    if (conteudoList.length > 0) {
+      const tmp = [...conteudoList]
+      const typesArray = tmp.map(item => item.tipo)
+      const arrayResponse: resumoList[] = []
+
+      typesArray.sort()
+
+      var current = ""
+      var cnt = 0
+      for (var i = 0; i < typesArray.length; i++) {
+        if (typesArray[i] != current) {
+          if (cnt > 0) {
+            arrayResponse.push({
+              type: countSessions[current as keyof typeof countSessions],
+              total: cnt
+            })
+          }
+          current = typesArray[i]
+          cnt = 1
+        } else {
+          cnt++
+        }
+      }
+      if (cnt > 0) {
+        arrayResponse.push({
+          type: countSessions[current as keyof typeof countSessions],
+          total: cnt
+        })
+      }
+
+      setResumo(arrayResponse)
+    }
+  }, [conteudoList])
 
   useEffect(() => {
     async function fatchApi() {
@@ -209,7 +293,13 @@ export default function NovaPublicacao() {
         return
       }
 
-      if (!urlContentClassificador) {
+      if (
+        (tipoContentClassificador === "" ||
+          tipoContentClassificador === "SP" ||
+          tipoContentClassificador === "PR" ||
+          tipoContentClassificador === "RS") &&
+        !urlContentClassificador
+      ) {
         setDialogText("insira o link do classificador.")
         setOpenDialog(true)
         return
@@ -285,8 +375,15 @@ export default function NovaPublicacao() {
 
     if (tipo == 2) {
       for (let i = 0; i < conteudoList.length; i++) {
-        if (conteudoList[i].url === "") hasErrors = true
         if (conteudoList[i].tipo === "") hasErrors = true
+
+        if (
+          conteudoList[i].tipo === "SP" &&
+          conteudoList[i].tipo === "PR" &&
+          conteudoList[i].tipo === "RS"
+        ) {
+          if (conteudoList[i].url === "") hasErrors = true
+        }
       }
     }
 
@@ -545,8 +642,26 @@ export default function NovaPublicacao() {
                           Selecione um tipo de Classificador
                         </MenuItem>
                         <MenuItem value={"SP"}>SP</MenuItem>
+                        <MenuItem value={"SP-NHP"}>
+                          SP - Não houve publicação...
+                        </MenuItem>
+                        <MenuItem value={"SP-NHA"}>
+                          SP - Não há atos de interesse...
+                        </MenuItem>
                         <MenuItem value={"PR"}>PR</MenuItem>
+                        <MenuItem value={"PR-NHP"}>
+                          PR - Não houve publicação...
+                        </MenuItem>
+                        <MenuItem value={"PR-NHA"}>
+                          PR - Não há atos de interesse...
+                        </MenuItem>
                         <MenuItem value={"RS"}>RS</MenuItem>
+                        <MenuItem value={"RS-NHP"}>
+                          PR - Não houve publicação...
+                        </MenuItem>
+                        <MenuItem value={"RS-NHA"}>
+                          PR - Não há atos de interesse...
+                        </MenuItem>
                       </Select>
                     </FormControl>
                   </Grid>
@@ -586,8 +701,91 @@ export default function NovaPublicacao() {
               )}
             </>
           ) : (
-            <></>
+            ""
           )}
+
+          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+            <Typography variant="body1">Resumo</Typography>
+          </Grid>
+
+          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+            {resumo.length <= 0 ? (
+              <Box
+                sx={{
+                  width: "100%",
+                  borderRadius: 2,
+                  border: "1px solid #2196F3",
+                  padding: 1,
+                  textAlign: "center"
+                }}
+              >
+                <Typography variant="caption" sx={{ color: "#78909C" }}>
+                  Adicione algum conteúdo ao boletim...
+                </Typography>
+              </Box>
+            ) : (
+              <Box
+                sx={{
+                  width: "100%",
+                  borderRadius: 2,
+                  border: "1px solid #2196F3",
+                  padding: 1,
+                  textAlign: "center"
+                }}
+              >
+                <Grid container spacing={2}>
+                  {resumo.map((item, index) => (
+                    <Grid
+                      key={`item-resumo-conteudo-${index}`}
+                      item
+                      xs={12}
+                      sm={12}
+                      md={2}
+                      lg={2}
+                      xl={2}
+                    >
+                      <Box
+                        sx={{
+                          width: "100%",
+                          borderRadius: 2,
+                          padding: 1,
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          background:
+                            typeColors[item.type as keyof typeof typeColors],
+                          textAlign: "center"
+                        }}
+                      >
+                        <Typography variant="caption">
+                          <strong>{item.type}</strong>
+                        </Typography>
+                        <Box
+                          sx={{
+                            width: "20px",
+                            height: "20px",
+                            background: "#37474F",
+                            marginLeft: 0.5,
+                            color: "white",
+                            borderRadius: "100%",
+                            fontSize: 10,
+                            p: 0.3,
+                            textAlign: "center",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            alignContent: "center"
+                          }}
+                        >
+                          {item.total}
+                        </Box>
+                      </Box>
+                    </Grid>
+                  ))}
+                </Grid>
+              </Box>
+            )}
+          </Grid>
+
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
             <Typography variant="body1">Conteúdo da publicação</Typography>
           </Grid>
@@ -616,15 +814,20 @@ export default function NovaPublicacao() {
                         <Box
                           sx={{
                             padding: "0px 4px 0px 4px",
-                            background: "#B0BEC5",
-                            border: "1.5px solid #424242",
+                            background:
+                              typeColors[
+                                beTypeList(
+                                  item.tipo.toString()
+                                ) as keyof typeof typeColors
+                              ],
+                            // border: "1.5px solid #424242",
                             borderRadius: 1,
                             marginLeft: 5
                           }}
                         >
                           <Typography
                             variant="caption"
-                            color="#424242"
+                            color="#000000"
                             fontSize={11}
                           >
                             {tipo === 1

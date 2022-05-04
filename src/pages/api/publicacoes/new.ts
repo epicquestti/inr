@@ -36,63 +36,66 @@ export default async function novoPublicacao(
         })
       }
 
-      const PublicIdentifier = await PublicIdentifierModel.findById(
-        "62326994a82afd8df5002a7e"
-      )
+      let hasPublicIdentifier = await PublicIdentifierModel.find()
 
-      if (PublicIdentifier) {
-        const newPublicId =
-          tipo === 1
-            ? PublicIdentifier.boletim + 1
-            : PublicIdentifier.classificador + 1
+      let publicIdentifier: any | null = null
 
-        const newPublic = await PublicacaoModel.create({
-          publicId: newPublicId,
-          title: titulo,
-          type: {
-            id: tipo,
-            text: tipo === 1 ? "Boletim" : "Classificador"
-          },
-          createdAt: new Date().setHours(new Date().getHours() - 3),
-          aproved: false,
-          published: false
-        })
-
-        for (let i = 0; i < conteudoList.length; i++) {
-          try {
-            await PublicacaoContentsModel.create({
-              title: conteudoList[i].titulo,
-              url: conteudoList[i].url,
-              tipo: conteudoList[i].tipo,
-              idBoletim: newPublic._id
-            })
-          } catch (error) {
-            console.log(error)
-          }
-        }
-
-        if (tipo === 1) PublicIdentifier.boletim = newPublicId
-        else PublicIdentifier.classificador = newPublicId
-
-        await PublicIdentifierModel.updateOne(
-          {
-            _id: "62326994a82afd8df5002a7e"
-          },
-          PublicIdentifier
-        )
-
-        res.status(200).send({
-          success: true,
-          message: "Publicacao Criada com sucesso.",
-          data: { id: newPublic._id }
+      if (hasPublicIdentifier.length <= 0) {
+        publicIdentifier = await PublicIdentifierModel.create({
+          boletim: 0,
+          classificador: 0
         })
       } else {
-        res.status(200).send({
-          success: false,
-          message:
-            "Configuração iniciais iniciais ausentes. acione um Administrador."
-        })
+        publicIdentifier = hasPublicIdentifier[0]
       }
+
+      const newPublicId =
+        tipo === 1
+          ? publicIdentifier.boletim + 1
+          : publicIdentifier.classificador + 1
+
+      console.log(newPublicId)
+
+      const newPublic = await PublicacaoModel.create({
+        publicId: newPublicId,
+        title: titulo,
+        type: {
+          id: tipo,
+          text: tipo === 1 ? "Boletim" : "Classificador"
+        },
+        createdAt: new Date().setHours(new Date().getHours() - 3),
+        aproved: false,
+        published: false
+      })
+
+      for (let i = 0; i < conteudoList.length; i++) {
+        try {
+          await PublicacaoContentsModel.create({
+            title: conteudoList[i].titulo,
+            url: conteudoList[i].url,
+            tipo: conteudoList[i].tipo,
+            idBoletim: newPublic._id
+          })
+        } catch (error) {
+          console.log(error)
+        }
+      }
+
+      if (tipo === 1) publicIdentifier.boletim = newPublicId
+      else publicIdentifier.classificador = newPublicId
+
+      await PublicIdentifierModel.updateOne(
+        {
+          _id: publicIdentifier._id
+        },
+        publicIdentifier
+      )
+
+      res.status(200).send({
+        success: true,
+        message: "Publicacao Criada com sucesso.",
+        data: { id: newPublic._id }
+      })
     } else {
       res.status(200).send({
         success: false,
