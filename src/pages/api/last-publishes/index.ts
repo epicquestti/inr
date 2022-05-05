@@ -69,6 +69,8 @@ export default async function getLastPublishes(
         }
 
         response.lastBeId = bl
+      } else if (bl === 0) {
+        response.lastBeId = 0
       }
 
       if (cl > 0) {
@@ -100,6 +102,8 @@ export default async function getLastPublishes(
           response.classificador = [sendCl]
         }
         response.lastClassId = cl
+      } else if (cl === 0) {
+        response.lastClassId = 0
       }
     }
 
