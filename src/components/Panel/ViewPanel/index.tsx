@@ -155,6 +155,20 @@ const ViewPanel: FC<viewPanelProps> = ({ ...props }) => {
           path: "/panel/publicacoes"
         }
       ]
+    },
+    {
+      text: "INR Leitor",
+      icon: "desktop_windows",
+      opened: false,
+      path: "",
+      childrens: [
+        {
+          text: "Atualizações",
+          icon: "system_update_alt",
+          opened: false,
+          path: "/panel/atualizacoes"
+        }
+      ]
     }
   ])
   const [open, setOpen] = useState(false)

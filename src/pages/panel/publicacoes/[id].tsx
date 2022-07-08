@@ -25,7 +25,7 @@ import {
   Typography
 } from "@mui/material"
 import { useRouter } from "next/router"
-import React, { ChangeEvent, useEffect, useState } from "react"
+import { ChangeEvent, useEffect, useState } from "react"
 
 const location: local[] = [
   {
@@ -41,7 +41,7 @@ const location: local[] = [
   {
     text: "Publicação",
     iconName: "forward_to_inbox",
-    href: "/panel/publicacoes/new"
+    href: ""
   }
 ]
 
@@ -124,7 +124,7 @@ enum typeColors {
   "Rio Grande do Sul - NHA" = "#CFD8DC"
 }
 
-export default function NovaPublicacao() {
+export default function GetPublicacaoById() {
   const router = useRouter()
   const [loading, setLoading] = useState<boolean>(false)
 

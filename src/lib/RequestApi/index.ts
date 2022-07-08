@@ -123,14 +123,23 @@ class HttpRequest {
   public async Post(
     url: string,
     body?: any,
-    param?: number
+    param?: number | any
   ): Promise<IResponse> {
     try {
       let responseHttpRequest: AxiosResponse<any>
 
-      if (param)
-        responseHttpRequest = await this.instance.post(`${url}/${param}`, body)
-      else responseHttpRequest = await this.instance.post(url, body)
+      if (param) {
+        if (typeof param === "number") {
+          responseHttpRequest = await this.instance.post(
+            `${url}/${param}`,
+            body
+          )
+        } else {
+          responseHttpRequest = await this.instance.post(url, body, param)
+        }
+      } else {
+        responseHttpRequest = await this.instance.post(url, body)
+      }
 
       if (responseHttpRequest.status === 200)
         return {

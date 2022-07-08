@@ -1,3 +1,4 @@
+import ApplicationVersions from "@schema/ApplicationVersions"
 import lastPublishes from "@schema/LasPublishes"
 import PublicacaoModel from "@schema/Publicacao"
 import PublicacaoContentsModel from "@schema/PublicacaoContents"
@@ -24,16 +25,33 @@ export default async function getLastPublishes(
     lastClassId: number
     boletim: sendModel[]
     classificador: sendModel[]
+    version: {
+      version?: number
+      major?: number
+      minor?: number
+      severity?: string
+      link?: string
+      vigent?: boolean
+    }
   } | null = {
     lastBeId: 0,
     lastClassId: 0,
     boletim: [],
-    classificador: []
+    classificador: [],
+    version: {
+      version: 0,
+      major: 0,
+      minor: 0,
+      severity: "",
+      link: "",
+      vigent: false
+    }
   }
 
   try {
     await connect()
     const lastPublishesResponse = await lastPublishes.find()
+    console.log("dasadsda")
 
     if (lastPublishesResponse.length > 0) {
       const bl = lastPublishesResponse[0].boletim
@@ -104,6 +122,19 @@ export default async function getLastPublishes(
         response.lastClassId = cl
       } else if (cl === 0) {
         response.lastClassId = 0
+      }
+
+      const version = await ApplicationVersions.findOne({
+        vigent: true
+      })
+
+      response.version = {
+        version: version?.version,
+        link: version?.link,
+        major: version?.major,
+        minor: version?.minor,
+        severity: version?.severity,
+        vigent: version?.vigent
       }
     }
 

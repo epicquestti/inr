@@ -34,7 +34,7 @@ export default async function deletePublicacao(
 
         res.status(200).send({
           success: true,
-          message: "Exluida com sucesso."
+          message: "Excluida com sucesso."
         })
       } else {
         res.status(200).send({
