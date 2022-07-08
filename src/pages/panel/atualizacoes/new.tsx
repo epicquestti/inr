@@ -256,8 +256,10 @@ export default function CreateAtualizacoes() {
           `/api/atualizacoes/upload/startMultpartUpload?fileName=${fileName}&size=${e.target.files[0].size}&fileName=${e.target.files[0].name}`
         )
 
-        if (startMultpartUploadResponse.success) setProcess("initiated")
-        else {
+        if (startMultpartUploadResponse.success) {
+          let totalChunks = 0
+          while (condition) {}
+        } else {
           setDialogText(startMultpartUploadResponse.message || "Erro")
           setOpenDialog(true)
         }
