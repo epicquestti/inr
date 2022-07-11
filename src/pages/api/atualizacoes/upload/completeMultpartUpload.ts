@@ -1,4 +1,6 @@
+import connect from "@lib/database"
 import { completeMultpartUpload } from "@lib/S3"
+import FileChunks from "@schema/FileChunks"
 import { NextApiRequest, NextApiResponse } from "next"
 
 export default async function completeMultpartUploadApi(
@@ -7,17 +9,33 @@ export default async function completeMultpartUploadApi(
 ): Promise<void> {
   try {
     const {
-      query: { key, uploadId },
-      body
+      query: { fileKey, fileId }
     } = req
 
-    if (!key) throw new Error("Key inválido.")
-    if (!uploadId) throw new Error("uploadId inválido")
+    if (!fileKey) throw new Error("fileKey inválido.")
+    if (!fileId) throw new Error("fileId inválido.")
+
+    await connect()
+
+    const fileList = await FileChunks.find({
+      FileId: fileId.toString()
+    })
+
+    if (fileList.length <= 0) throw new Error("Arquivo não possui partes")
+
+    const mapedArray: { ETag: string; PartNumber: number }[] = []
+
+    for (let i = 0; i < fileList.length; i++) {
+      mapedArray.push({
+        ETag: fileList[i].ETag,
+        PartNumber: fileList[i].PartNumber
+      })
+    }
 
     const cmpResult = await completeMultpartUpload(
-      key.toString(),
-      uploadId.toString(),
-      body
+      fileKey.toString(),
+      fileId.toString(),
+      mapedArray
     )
 
     if (!cmpResult.success)

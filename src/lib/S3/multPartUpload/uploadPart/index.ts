@@ -17,7 +17,7 @@ const uploadPart = async (
   partNumber: number,
   key: string,
   uploadId: string,
-  part: Uint8Array
+  part: Blob
 ): Promise<UploadPartOut> => {
   try {
     if (!partNumber || partNumber <= 0)
@@ -27,11 +27,12 @@ const uploadPart = async (
       throw new Error("uploadId não pode ser vazio.")
 
     const multpartUploadCommand = new UploadPartCommand({
-      PartNumber: partNumber,
-      Bucket: config.bucket,
-      Body: part,
+      Bucket: "harpy-bucket",
+      ContentLength: part.size,
       Key: key,
-      UploadId: uploadId
+      PartNumber: partNumber,
+      UploadId: uploadId,
+      Body: part
     })
 
     const response: UploadPartCommandOutput = await client.send(

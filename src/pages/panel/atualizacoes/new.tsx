@@ -1,6 +1,8 @@
+import { S3Client } from "@aws-sdk/client-s3"
+import { Upload } from "@aws-sdk/lib-storage"
 import { local, Location, ViewPanel } from "@Components/Panel"
 import styled from "@emotion/styled"
-import { ArrowBack, Close, FileUpload, Save } from "@mui/icons-material"
+import { ArrowBack, Check, Close, FileUpload, Save } from "@mui/icons-material"
 import {
   Box,
   Button,
@@ -20,8 +22,7 @@ import {
   Typography
 } from "@mui/material"
 import { useRouter } from "next/router"
-import { ChangeEvent, useEffect, useState } from "react"
-import HttpRequest from "../../../lib/RequestApi"
+import { ChangeEvent, useRef, useState } from "react"
 const location: local[] = [
   {
     text: "Home",
@@ -51,8 +52,9 @@ const Input = styled("input")({
 
 export default function CreateAtualizacoes() {
   // const chunkSize = 1048576 * 3
-  const chunkSize = 1048576
+  const chunkSize = 1048576 * 6
   const router = useRouter()
+  const inputRef = useRef<any>(null)
   const [version, setVersion] = useState<number>(0)
   const [major, setMajor] = useState<number>(0)
   const [minor, setMinor] = useState<number>(0)
@@ -72,197 +74,47 @@ export default function CreateAtualizacoes() {
   const [blockUpload, setBlockUpload] = useState<boolean>(false)
   const [blockFields, setBlockFields] = useState<boolean>(false)
   const [blockDeleteFile, setBlockDeleteFile] = useState<boolean>(false)
+  const [blockConfirmFile, setBlockConfirmFile] = useState<boolean>(true)
   const [showDeleteFile, setshowDeleteFile] = useState<boolean>(false)
-  const [uploadTextState, setUploadTextState] = useState<string>("")
 
-  const [fileExec, setFileExec] = useState<File>()
+  const [fileExec, setFileExec] = useState<File | null>(null)
   const [fileSize, setFileSize] = useState<number>(0)
   const [fileName, setFileName] = useState<string>("")
   const [progress, setProgress] = useState<number>(0)
-  const [inicioChunks, setInicioChunks] = useState<number>(0)
-  const [fimChunks, setFimChunks] = useState<number>(chunkSize)
-  const [process, setProcess] = useState<string>("stoped")
-
-  // const [fileToBeUpload, setFileToBeUpload] = useState<File>()
-  // const [showProgress, setShowProgress] = useState(false)
-  // const [counter, setCounter] = useState(1)
-  // const [beginingOfTheChunk, setBeginingOfTheChunk] = useState(0)
-  // const [endOfTheChunk, setEndOfTheChunk] = useState(chunkSize)
-  // const [progress, setProgress] = useState(0)
-  // const [fileGuid, setFileGuid] = useState("")
-  // const [fileSize, setFileSize] = useState(0)
-  // const [chunkCount, setChunkCount] = useState(0)
-
-  // Teste
-  // const [fileId, setFileId] = useState<string>("")
-  // const [fileKey, setFileKey] = useState<string>("")
-  // const [finalList, setFinalList] = useState<uploadPartResponse[]>([])
-  // const [block, setBlock] = useState<boolean>(true)
-
-  // useEffect(() => {
-  //   if (fileSize > 0) {
-  //     fileUpload()
-  //   }
-  // }, [fileToBeUpload, progress])
+  const [process, setProcess] = useState<string>("Parado")
 
   const handleCloseDialog = () => {
     setOpenDialog(false)
   }
 
-  useEffect(() => {
-    if (fileSize > 0) {
-      setshowDeleteFile(true)
-    } else {
-      setshowDeleteFile(false)
-    }
-  }, [fileSize])
-
-  // const fileUpload = () => {
-  //   setCounter(counter + 1)
-  //   if (finalList.length <= chunkCount) {
-  //     if (fileToBeUpload) {
-  //       const chunk = fileToBeUpload?.slice(beginingOfTheChunk, endOfTheChunk)
-  //       uploadChunk(chunk)
-  //     }
-  //   }
-  // }
-
-  // const resetChunkProperties = () => {
-  //   setShowProgress(true)
-  //   setProgress(0)
-  //   setFinalList([])
-  //   setBeginingOfTheChunk(0)
-  //   setEndOfTheChunk(chunkSize)
-  // }
-
-  // const uploadCompleted = async () => {
-  //   const response = await HttpRequest.Post(
-  //     `/api/atualizacoes/upload/completeMultpartUpload?key=${fileKey}&uploadId=${fileId}`,
-  //     finalList
-  //   )
-
-  //   if (response.success) {
-  //     console.log(`success ${response.success}`, response.data)
-  //     setProgress(100)
-  //   } else {
-  //     console.log(`success ${response.success}`)
-  //   }
-
-  //   setFileId("")
-  //   setFileKey("")
-  //   setFinalList([])
-  //   setBeginingOfTheChunk(0)
-  //   setEndOfTheChunk(chunkSize)
-  //   setFileGuid("")
-  //   setFileSize(0)
-  //   setChunkCount(0)
-  //   setCounter(1)
-
-  //   setTimeout(() => {
-  //     setShowProgress(false)
-  //     setProgress(0)
-  //   }, 3000)
-  // }
-
-  // const makeUploadChunkProcess = async (
-  //   fileKey: string,
-  //   fileId: string,
-  //   chunk: Blob
-  // ) => {
-  //   try {
-  //     const tmp = [...finalList]
-  //     const uploadPartRespose = await HttpRequest.Post(
-  //       `/api/atualizacoes/upload/uploadMultpart?partNumber=${counter}&key=${fileKey}&uploadId=${fileId}`,
-  //       chunk
-  //     )
-
-  //     if (uploadPartRespose.success) {
-  //       tmp.push({
-  //         ETag: uploadPartRespose.data.ETag,
-  //         partNumber: uploadPartRespose.data.partNumber
-  //       })
-
-  //       setFinalList(tmp)
-  //       setBeginingOfTheChunk(endOfTheChunk)
-  //       setEndOfTheChunk(endOfTheChunk + chunkSize)
-
-  //       console.log(tmp.length)
-
-  //       if (tmp.length === chunkCount) {
-  //         console.log("Process is complete, counter", tmp.length)
-  //         await uploadCompleted()
-  //       } else {
-  //         const percentage = (tmp.length / chunkCount) * 100
-  //         setProgress(percentage)
-  //       }
-  //     } else console.log("Error Occurred:", uploadPartRespose.message)
-  //   } catch (error: any) {
-  //     setDialogText(error.message)
-  //     setOpenDialog(true)
-  //     return
-  //   }
-  // }
-
-  // const uploadChunk = async (chunk: Blob) => {
-  //   try {
-  //     if (!fileId || fileId === "") {
-  //       const startMultpartUploadResponse = await HttpRequest.Get(
-  //         `/api/atualizacoes/upload/startMultpartUpload?fileName=${fileGuid}`
-  //       )
-
-  //       if (startMultpartUploadResponse.success) {
-  //         setFileId(startMultpartUploadResponse.data.fileId)
-  //         setFileKey(startMultpartUploadResponse.data.fileKey)
-
-  //         await makeUploadChunkProcess(
-  //           startMultpartUploadResponse.data.fileKey,
-  //           startMultpartUploadResponse.data.fileId,
-  //           chunk
-  //         )
-
-  //         // P1
-
-  //         return
-  //       } else {
-  //         setDialogText(startMultpartUploadResponse.message || "")
-  //         setOpenDialog(true)
-  //         return
-  //       }
-  //     }
-
-  //     await makeUploadChunkProcess(fileKey, fileId, chunk)
-  //     // P2
-  //   } catch (error: any) {
-  //     setDialogText(error.message)
-  //     setOpenDialog(true)
-  //   }
-  // }
-
-  useEffect(() => {
-    if (fileSize > 0) {
-    }
-  }, [process])
-
   const getFileContext = async (e: ChangeEvent<HTMLInputElement>) => {
     try {
       if (e.target.files) {
-        setUploadTextState("Iniciando.")
-        setBlockUpload(true)
-        setBlockSave(true)
-        setBlockBack(true)
         setFileExec(e.target.files[0])
+        setFileName(e.target.files[0].name)
+        setFileSize(e.target.files[0].size)
+        setProcess("preparando")
 
-        const startMultpartUploadResponse = await HttpRequest.Get(
-          `/api/atualizacoes/upload/startMultpartUpload?fileName=${fileName}&size=${e.target.files[0].size}&fileName=${e.target.files[0].name}`
-        )
+        setTimeout(() => {
+          setshowDeleteFile(true)
+          setBlockConfirmFile(false)
+          setBlockUpload(true)
+          setBlockSave(true)
+          setBlockBack(true)
+          setProcess("Arquivo selecionado.")
+        }, 1000)
+      } else {
+        setBlockUpload(false)
+        setBlockSave(false)
+        setBlockBack(false)
+        setFileExec(null)
+        setFileName("")
+        setFileSize(0)
+        setshowDeleteFile(false)
+        setBlockConfirmFile(true)
+        setProcess("Nenhum arquivo selecionado.")
 
-        if (startMultpartUploadResponse.success) {
-          let totalChunks = 0
-          while (condition) {}
-        } else {
-          setDialogText(startMultpartUploadResponse.message || "Erro")
-          setOpenDialog(true)
-        }
+        if (inputRef.current) inputRef.current.value = null
       }
     } catch (error: any) {
       setDialogText(error.message)
@@ -270,18 +122,56 @@ export default function CreateAtualizacoes() {
     }
   }
 
-  const abortMultpartUpload = async (fileKey: string, fileId: string) => {
+  const confirmUpload = async () => {
     try {
-      const res = await HttpRequest.Get(
-        `/api/atualizacoes/upload/abortMultpartUpload?key=${fileKey}&uploadId=${fileId}`
-      )
+      setProcess("iniciando upload.")
 
-      setFileExec(undefined)
-      setFileSize(0)
+      if (fileExec) {
+        const paralel = new Upload({
+          client: new S3Client({
+            region: "sa-east-1",
+            credentials: {
+              accessKeyId: "AKIAXQT5JNASE2YZFCDL",
+              secretAccessKey: "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"
+            }
+          }),
+          leavePartsOnError: false,
+          params: {
+            Bucket: "harpy-bucket",
+            Key: `INR/realease/${fileName}`,
+            Body: fileExec
+          }
+        })
+
+        paralel.on("httpUploadProgress", prog => {
+          if (prog.loaded && prog.total) {
+            const p = Math.floor((prog.loaded / prog.total) * 100)
+            setProgress(p)
+          }
+        })
+
+        console.log(await paralel.done())
+      }
+    } catch (error: any) {
+      console.log(error)
+      setDialogText(error.message)
+      setOpenDialog(true)
+    }
+  }
+
+  const cancelFile = async () => {
+    try {
+      setBlockUpload(false)
+      setBlockSave(false)
+      setBlockBack(false)
+      setFileExec(null)
       setFileName("")
-      setProgress(0)
-      setInicioChunks(0)
-      setFimChunks(chunkSize)
+      setFileSize(0)
+      setshowDeleteFile(false)
+      setBlockConfirmFile(true)
+      setProcess("Parado.")
+
+      if (inputRef.current) inputRef.current.value = null
     } catch (error: any) {
       setDialogText(error.message)
       setOpenDialog(true)
@@ -429,6 +319,7 @@ export default function CreateAtualizacoes() {
                 <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
                   <label htmlFor="icon-button-file">
                     <Input
+                      ref={inputRef}
                       id="icon-button-file"
                       type="file"
                       onChange={getFileContext}
@@ -454,12 +345,28 @@ export default function CreateAtualizacoes() {
                   </Typography>
                 </Grid>
 
+                <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
+                  <Typography variant="caption">
+                    Tamanho:{" "}
+                    <strong>
+                      {fileSize <= 0
+                        ? 0
+                        : `${
+                            fileSize % 1048576 == 0
+                              ? fileSize / 1048576
+                              : Math.floor(fileSize / 1048576) + 1
+                          }mb(s)`}
+                    </strong>
+                  </Typography>
+                </Grid>
+
                 <Grid item xs={12} sm={12} md={1} lg={1} xl={1}>
                   {showDeleteFile && (
                     <IconButton
                       size="small"
                       color="error"
                       disabled={blockDeleteFile}
+                      onClick={cancelFile}
                     >
                       <Icon>highlight_off</Icon>
                     </IconButton>
@@ -468,35 +375,34 @@ export default function CreateAtualizacoes() {
 
                 <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
                   <Typography variant="caption">
-                    Tamanho:{" "}
-                    <strong>
-                      {fileSize <= 0
-                        ? 0
-                        : `${
-                            fileSize % chunkSize == 0
-                              ? fileSize / chunkSize
-                              : Math.floor(fileSize / chunkSize) + 1
-                          }mb(s)`}
-                    </strong>
+                    Status: <strong>{process}</strong>
                   </Typography>
                 </Grid>
 
-                <Grid item xs={12} sm={12} md={1} lg={1} xl={1}>
+                <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
+                  <Button
+                    disabled={blockConfirmFile}
+                    fullWidth
+                    color="success"
+                    variant="contained"
+                    component="span"
+                    startIcon={<Check />}
+                    onClick={confirmUpload}
+                  >
+                    Confirmar
+                  </Button>
+                </Grid>
+
+                <Grid item xs={12} sm={12} md={11} lg={11} xl={11}>
                   <LinearProgress value={progress} variant="determinate" />
                 </Grid>
-
                 <Grid item xs={12} sm={12} md={1} lg={1} xl={1}>
                   <Typography variant="body2">{progress} %</Typography>
-                  {/* <Icon sx={{ color: "#4CAF50" }}>check_circle_outline</Icon> */}
-                </Grid>
-
-                <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
-                  <Typography variant="caption">{uploadTextState}</Typography>
                 </Grid>
               </Grid>
             </Paper>
           </Grid>
-
+          {JSON.stringify({})}
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
             <Box
               sx={{

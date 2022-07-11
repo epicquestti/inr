@@ -12,26 +12,26 @@ const client = new S3Client({
   }
 })
 
-client.middlewareStack.add(
-  (next, _context) => (args: any) => {
-    if (
-      "string" === typeof args.request?.body &&
-      args.request.body.includes("CompletedMultipartUpload")
-    ) {
-      console.log("AQUI==>", args.request.body)
+// client.middlewareStack.add(
+//   (next, _context) => (args: any) => {
+//     if (
+//       "string" === typeof args.request?.body &&
+//       args.request.body.includes("CompletedMultipartUpload")
+//     ) {
+//       console.log("AQUI==>", args.request.body)
 
-      args.request.body = args.request.body.replace(
-        /CompletedMultipartUpload/g,
-        "CompleteMultipartUpload"
-      )
-    }
-    return next(args)
-  },
-  {
-    step: "build",
-    priority: "high"
-  }
-)
+//       args.request.body = args.request.body.replace(
+//         /CompletedMultipartUpload/g,
+//         "CompleteMultipartUpload"
+//       )
+//     }
+//     return next(args)
+//   },
+//   {
+//     step: "build",
+//     priority: "high"
+//   }
+// )
 
 type lt = {
   ETag: string
@@ -49,7 +49,7 @@ const completeMultpartUpload = async (
       throw new Error("uploadId não pode ser vazio.")
 
     const completeMultipartUploadCommand = new CompleteMultipartUploadCommand({
-      Bucket: config.bucket,
+      Bucket: "harpy-bucket",
       Key: key,
       UploadId: uploadId,
       MultipartUpload: {
@@ -76,12 +76,10 @@ const completeMultpartUpload = async (
         location: undefined
       }
     }
-  } catch (error) {
+  } catch (error: any) {
     return {
       success: false,
-      key: undefined,
-      ETag: undefined,
-      location: undefined
+      message: error.message
     }
   }
 }

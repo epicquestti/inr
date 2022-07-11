@@ -12,11 +12,6 @@ const client = new S3Client({
   }
 })
 
-type lt = {
-  ETag: string
-  PartNumber: number
-}
-
 const completeMultpartUpload = async (key: string, uploadId: string) => {
   try {
     if (!key || key === "") throw new Error("key não pode ser vazio.")
@@ -24,7 +19,7 @@ const completeMultpartUpload = async (key: string, uploadId: string) => {
       throw new Error("uploadId não pode ser vazio.")
 
     const completeMultipartUploadCommand = new AbortMultipartUploadCommand({
-      Bucket: config.bucket,
+      Bucket: "harpy-bucket",
       Key: key,
       UploadId: uploadId
     })

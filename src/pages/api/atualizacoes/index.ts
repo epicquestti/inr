@@ -29,7 +29,7 @@ export default async function searchAtualizacoes(
     if (severity) filter.$and?.push({ severity })
 
     const count = await ApplicationVersions.count(filter)
-    const updateList = await ApplicationVersions.count(filter)
+    const updateList = await ApplicationVersions.find(filter)
       .sort({ version: "asc", major: "asc", minor: "asc" })
       .limit(parsedRowsPerPage)
       .skip(offset)

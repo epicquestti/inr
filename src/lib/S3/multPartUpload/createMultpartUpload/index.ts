@@ -20,7 +20,7 @@ const createMultpartUpload = async (
     if (!name || name === "") throw new Error("name não pode ser vazio.")
 
     const multpartUploadCommand = new CreateMultipartUploadCommand({
-      Bucket: config.bucket,
+      Bucket: "harpy-bucket",
       Key: `INR/realease/${name}`,
       ACL: "public-read"
     })
