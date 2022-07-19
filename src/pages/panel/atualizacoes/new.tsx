@@ -1,28 +1,24 @@
-import { S3Client } from "@aws-sdk/client-s3"
-import { Upload } from "@aws-sdk/lib-storage"
 import { local, Location, ViewPanel } from "@Components/Panel"
-import styled from "@emotion/styled"
-import { ArrowBack, Check, Close, FileUpload, Save } from "@mui/icons-material"
+import { onlyNumbers } from "@lib/masks"
+import { ArrowBack, Close, Save } from "@mui/icons-material"
 import {
   Box,
   Button,
   FormControl,
   Grid,
-  Icon,
   IconButton,
   InputLabel,
-  LinearProgress,
   MenuItem,
   Paper,
   Select,
   SelectChangeEvent,
   Snackbar,
-  Switch,
   TextField,
   Typography
 } from "@mui/material"
 import { useRouter } from "next/router"
-import { ChangeEvent, useRef, useState } from "react"
+import { ChangeEvent, useState } from "react"
+import RequestApi from "../../../lib/RequestApi"
 const location: local[] = [
   {
     text: "Home",
@@ -41,169 +37,105 @@ const location: local[] = [
   }
 ]
 
-type uploadPartResponse = {
-  ETag: string
-  partNumber: number
-}
-
-const Input = styled("input")({
-  display: "none"
-})
-
 export default function CreateAtualizacoes() {
-  // const chunkSize = 1048576 * 3
-  const chunkSize = 1048576 * 6
+  const [loading, setLoading] = useState<boolean>(false)
   const router = useRouter()
-  const inputRef = useRef<any>(null)
-  const [version, setVersion] = useState<number>(0)
-  const [major, setMajor] = useState<number>(0)
-  const [minor, setMinor] = useState<number>(0)
+  const [version, setVersion] = useState<string>("")
+  const [major, setMajor] = useState<string>("")
+  const [minor, setMinor] = useState<string>("")
   const [severity, setSeverity] = useState<string>("")
-  const [vigente, setVigente] = useState<boolean>(true)
+  const [link, setLink] = useState<string>("")
   const [openDialog, setOpenDialog] = useState<boolean>(false)
   const [dialogText, setDialogText] = useState<string>("")
   const [errorList, setErrorList] = useState<boolean[]>([
     false,
     false,
     false,
+    false,
     false
   ])
-
-  const [blockSave, setBlockSave] = useState<boolean>(true)
-  const [blockBack, setBlockBack] = useState<boolean>(false)
-  const [blockUpload, setBlockUpload] = useState<boolean>(false)
-  const [blockFields, setBlockFields] = useState<boolean>(false)
-  const [blockDeleteFile, setBlockDeleteFile] = useState<boolean>(false)
-  const [blockConfirmFile, setBlockConfirmFile] = useState<boolean>(true)
-  const [showDeleteFile, setshowDeleteFile] = useState<boolean>(false)
-
-  const [fileExec, setFileExec] = useState<File | null>(null)
-  const [fileSize, setFileSize] = useState<number>(0)
-  const [fileName, setFileName] = useState<string>("")
-  const [progress, setProgress] = useState<number>(0)
-  const [process, setProcess] = useState<string>("Parado")
 
   const handleCloseDialog = () => {
     setOpenDialog(false)
   }
 
-  const getFileContext = async (e: ChangeEvent<HTMLInputElement>) => {
+  const saveThisUpdate = async () => {
     try {
-      if (e.target.files) {
-        setFileExec(e.target.files[0])
-        setFileName(e.target.files[0].name)
-        setFileSize(e.target.files[0].size)
-        setProcess("preparando")
-
-        setTimeout(() => {
-          setshowDeleteFile(true)
-          setBlockConfirmFile(false)
-          setBlockUpload(true)
-          setBlockSave(true)
-          setBlockBack(true)
-          setProcess("Arquivo selecionado.")
-        }, 1000)
-      } else {
-        setBlockUpload(false)
-        setBlockSave(false)
-        setBlockBack(false)
-        setFileExec(null)
-        setFileName("")
-        setFileSize(0)
-        setshowDeleteFile(false)
-        setBlockConfirmFile(true)
-        setProcess("Nenhum arquivo selecionado.")
-
-        if (inputRef.current) inputRef.current.value = null
-      }
-    } catch (error: any) {
-      setDialogText(error.message)
-      setOpenDialog(true)
-    }
-  }
-
-  const confirmUpload = async () => {
-    try {
-      setProcess("iniciando upload.")
-
-      if (fileExec) {
-        const paralel = new Upload({
-          client: new S3Client({
-            region: "sa-east-1",
-            credentials: {
-              accessKeyId: "AKIAXQT5JNASE2YZFCDL",
-              secretAccessKey: "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"
-            }
-          }),
-          leavePartsOnError: false,
-          params: {
-            Bucket: "harpy-bucket",
-            Key: `INR/realease/${fileName}`,
-            Body: fileExec
-          }
-        })
-
-        paralel.on("httpUploadProgress", prog => {
-          if (prog.loaded && prog.total) {
-            const p = Math.floor((prog.loaded / prog.total) * 100)
-            setProgress(p)
-          }
-        })
-
-        console.log(await paralel.done())
-      }
-    } catch (error: any) {
-      console.log(error)
-      setDialogText(error.message)
-      setOpenDialog(true)
-    }
-  }
-
-  const cancelFile = async () => {
-    try {
-      setBlockUpload(false)
-      setBlockSave(false)
-      setBlockBack(false)
-      setFileExec(null)
-      setFileName("")
-      setFileSize(0)
-      setshowDeleteFile(false)
-      setBlockConfirmFile(true)
-      setProcess("Parado.")
-
-      if (inputRef.current) inputRef.current.value = null
-    } catch (error: any) {
-      setDialogText(error.message)
-      setOpenDialog(true)
-    }
-  }
-
-  const saveThisUpdate = () => {
-    try {
-      if (version <= 0) {
+      if (!version) {
         const tmp = [...errorList]
         tmp[0] = true
         setErrorList(tmp)
+        setDialogText("Vesão não pode ser nula.")
+        setOpenDialog(true)
+        return
       }
 
-      if (major <= 0) {
+      if (!major) {
         const tmp = [...errorList]
         tmp[1] = true
         setErrorList(tmp)
+        setDialogText("Major não pdoe ser nulo")
+        setOpenDialog(true)
+        return
       }
 
-      if (minor <= 0) {
+      if (!minor) {
         const tmp = [...errorList]
         tmp[2] = true
         setErrorList(tmp)
+        setDialogText("Minor não pode ser nulo.")
+        setOpenDialog(true)
+        return
       }
 
       if (!severity && severity === "") {
         const tmp = [...errorList]
         tmp[3] = true
         setErrorList(tmp)
+        setDialogText("Seleciona a severidade.")
+        setOpenDialog(true)
+        return
       }
-    } catch (error) {}
+
+      if (!link && link === "") {
+        const tmp = [...errorList]
+        tmp[4] = true
+        setErrorList(tmp)
+        setDialogText("Link não pode ser vazio.")
+        setOpenDialog(true)
+        return
+      }
+
+      setLoading(true)
+
+      const body = {
+        version,
+        major,
+        minor,
+        severity,
+        link
+      }
+
+      const newAtualizacao = await RequestApi.Post(
+        "/api/atualizacoes/save",
+        body
+      )
+
+      console.log(newAtualizacao)
+
+      if (!newAtualizacao.success) throw new Error(newAtualizacao.message)
+
+      setDialogText("Versão salva com sucesso. direcionando.")
+      setOpenDialog(true)
+
+      setTimeout(() => {
+        router.push(`/panel/atualizacoes/${newAtualizacao.data._id}`)
+      }, 2000)
+    } catch (error: any) {
+      setDialogText(error.message)
+      setOpenDialog(true)
+      setLoading(false)
+    }
   }
 
   return (
@@ -220,189 +152,107 @@ export default function CreateAtualizacoes() {
 
           <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
             <TextField
+              disabled={loading}
               value={version}
               onChange={(e: ChangeEvent<HTMLInputElement>) => {
                 const tmp = [...errorList]
                 tmp[0] = false
                 setErrorList(tmp)
-                setVersion(parseInt(e.target.value))
+                setVersion(onlyNumbers(e.target.value))
               }}
               error={errorList[0]}
-              disabled={blockFields}
               label="Versão"
               fullWidth
+              inputProps={{
+                maxLength: 2
+              }}
             />
           </Grid>
 
           <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
             <TextField
+              disabled={loading}
               value={major}
               onChange={(e: ChangeEvent<HTMLInputElement>) => {
                 const tmp = [...errorList]
                 tmp[1] = false
                 setErrorList(tmp)
-                setMajor(parseInt(e.target.value))
+                setMajor(onlyNumbers(e.target.value))
               }}
               error={errorList[1]}
-              disabled={blockFields}
               label="Major"
               fullWidth
+              inputProps={{
+                maxLength: 3
+              }}
             />
           </Grid>
 
           <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
             <TextField
+              disabled={loading}
               value={minor}
               onChange={(e: ChangeEvent<HTMLInputElement>) => {
                 const tmp = [...errorList]
-                tmp[2] = true
+                tmp[2] = false
                 setErrorList(tmp)
-                setMinor(parseInt(e.target.value))
+                setMinor(onlyNumbers(e.target.value))
               }}
               error={errorList[2]}
-              disabled={blockFields}
               label="Minor"
               fullWidth
+              inputProps={{
+                maxLength: 3
+              }}
             />
           </Grid>
 
-          <Grid item xs={12} sm={12} md={4} lg={4} xl={4}>
+          <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
             <FormControl fullWidth>
               <InputLabel id="severity">Severidade</InputLabel>
               <Select
+                disabled={loading}
                 value={severity}
                 onChange={(event: SelectChangeEvent<string>) => {
                   const tmp = [...errorList]
-                  tmp[3] = true
+                  tmp[3] = false
                   setErrorList(tmp)
                   setSeverity(event.target.value)
                 }}
                 error={errorList[3]}
                 fullWidth
-                disabled={blockFields}
                 labelId="severity"
                 label="Severidade"
               >
-                <MenuItem value="">Selecione</MenuItem>
-                <MenuItem value={"normal"}>Normal</MenuItem>
-                <MenuItem value={"urgent"}>Urgente</MenuItem>
+                <MenuItem disabled={loading} value="">
+                  Selecione
+                </MenuItem>
+                <MenuItem disabled={loading} value={"normal"}>
+                  Normal
+                </MenuItem>
+                <MenuItem disabled={loading} value={"urgent"}>
+                  Urgente
+                </MenuItem>
               </Select>
             </FormControl>
           </Grid>
 
-          <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
-            <InputLabel>Vigente</InputLabel>
-            <Switch
-              disabled={blockFields}
-              checked={vigente}
-              onChange={(
-                _: React.ChangeEvent<HTMLInputElement>,
-                checked: boolean
-              ) => setVigente(checked)}
+          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+            <TextField
+              value={link}
+              disabled={loading}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                const tmp = [...errorList]
+                tmp[4] = false
+                setErrorList(tmp)
+                setLink(e.target.value)
+              }}
+              error={errorList[4]}
+              label="Link do executável."
+              fullWidth
             />
           </Grid>
 
-          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-            <Paper sx={{ background: "#ECEFF1", p: 2 }}>
-              <Grid
-                container
-                spacing={2}
-                alignItems="center"
-                justifyContent="center"
-              >
-                <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-                  <Typography variant="body1">
-                    <strong>.EXE</strong>
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
-                  <label htmlFor="icon-button-file">
-                    <Input
-                      ref={inputRef}
-                      id="icon-button-file"
-                      type="file"
-                      onChange={getFileContext}
-                    />
-                    <Button
-                      disabled={blockUpload}
-                      fullWidth
-                      variant="contained"
-                      component="span"
-                      startIcon={<FileUpload />}
-                    >
-                      arquivo
-                    </Button>
-                  </label>
-                </Grid>
-
-                <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
-                  <Typography variant="caption">
-                    Nome:{" "}
-                    <strong>
-                      {fileName !== "" ? fileName : "Selecione o executável."}
-                    </strong>
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
-                  <Typography variant="caption">
-                    Tamanho:{" "}
-                    <strong>
-                      {fileSize <= 0
-                        ? 0
-                        : `${
-                            fileSize % 1048576 == 0
-                              ? fileSize / 1048576
-                              : Math.floor(fileSize / 1048576) + 1
-                          }mb(s)`}
-                    </strong>
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={12} sm={12} md={1} lg={1} xl={1}>
-                  {showDeleteFile && (
-                    <IconButton
-                      size="small"
-                      color="error"
-                      disabled={blockDeleteFile}
-                      onClick={cancelFile}
-                    >
-                      <Icon>highlight_off</Icon>
-                    </IconButton>
-                  )}
-                </Grid>
-
-                <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
-                  <Typography variant="caption">
-                    Status: <strong>{process}</strong>
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
-                  <Button
-                    disabled={blockConfirmFile}
-                    fullWidth
-                    color="success"
-                    variant="contained"
-                    component="span"
-                    startIcon={<Check />}
-                    onClick={confirmUpload}
-                  >
-                    Confirmar
-                  </Button>
-                </Grid>
-
-                <Grid item xs={12} sm={12} md={11} lg={11} xl={11}>
-                  <LinearProgress value={progress} variant="determinate" />
-                </Grid>
-                <Grid item xs={12} sm={12} md={1} lg={1} xl={1}>
-                  <Typography variant="body2">{progress} %</Typography>
-                </Grid>
-              </Grid>
-            </Paper>
-          </Grid>
-          {JSON.stringify({})}
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
             <Box
               sx={{
@@ -412,7 +262,7 @@ export default function CreateAtualizacoes() {
               }}
             >
               <Button
-                disabled={blockBack}
+                disabled={loading}
                 variant="contained"
                 startIcon={<ArrowBack />}
                 onClick={() => {
@@ -422,7 +272,7 @@ export default function CreateAtualizacoes() {
                 Voltar
               </Button>
               <Button
-                disabled={blockSave}
+                disabled={loading}
                 variant="contained"
                 startIcon={<Save />}
                 onClick={saveThisUpdate}

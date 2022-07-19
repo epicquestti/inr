@@ -47,9 +47,9 @@ type atualizacaoList = {
 export default function SearchAtualizacoes() {
   const router = useRouter()
   const [loading, setLoading] = useState<boolean>(false)
-  const [version, setversion] = useState<number>(0)
-  const [major, setMajor] = useState<number>(0)
-  const [minor, setMinor] = useState<number>(0)
+  const [version, setversion] = useState<string>("")
+  const [major, setMajor] = useState<string>("")
+  const [minor, setMinor] = useState<string>("")
   const [severity, setSeverity] = useState<string>("")
   const [atualizacaoList, setAtualizacaoList] = useState<atualizacaoList[]>([])
   const [count, setCount] = useState<number>(0)
@@ -110,7 +110,7 @@ export default function SearchAtualizacoes() {
             <TextField
               value={version}
               onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                setversion(parseInt(e.target.value))
+                setversion(e.target.value)
               }}
               onKeyPress={searchByEnterKeyPress}
               disabled={loading}
@@ -122,7 +122,7 @@ export default function SearchAtualizacoes() {
             <TextField
               value={major}
               onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                setMajor(parseInt(e.target.value))
+                setMajor(e.target.value)
               }}
               onKeyPress={searchByEnterKeyPress}
               disabled={loading}
@@ -134,7 +134,7 @@ export default function SearchAtualizacoes() {
             <TextField
               value={minor}
               onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                setMinor(parseInt(e.target.value))
+                setMinor(e.target.value)
               }}
               onKeyPress={searchByEnterKeyPress}
               disabled={loading}

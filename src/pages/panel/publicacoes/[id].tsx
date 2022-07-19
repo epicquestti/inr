@@ -10,8 +10,10 @@ import {
   Save
 } from "@mui/icons-material"
 import {
+  Backdrop,
   Box,
   Button,
+  CircularProgress,
   FormControl,
   Grid,
   IconButton,
@@ -158,8 +160,12 @@ export default function GetPublicacaoById() {
 
   const [openDialog, setOpenDialog] = useState<boolean>(false)
   const [dialogText, setDialogText] = useState<string>("")
+  const [openBackDrop, setOpenBackDrop] = useState<boolean>(false)
   const handleCloseDialog = () => {
     setOpenDialog(false)
+  }
+  const handleCloseBackDrop = () => {
+    setOpenBackDrop(false)
   }
 
   useEffect(() => {
@@ -202,7 +208,7 @@ export default function GetPublicacaoById() {
       if (!router.isReady) return
 
       setLoading(true)
-
+      setOpenBackDrop(true)
       const { id } = router.query
       try {
         const publicacao = await RequestApi.Get(
@@ -227,14 +233,13 @@ export default function GetPublicacaoById() {
           setPublishAt(publicacao.data.publishedAt)
           setshowDelete(publicacao.data.published ? false : true)
           setLoading(false)
-        } else {
-          setLoading(false)
-          throw new Error(publicacao.message)
-        }
+          setOpenBackDrop(false)
+        } else throw new Error(publicacao.message)
       } catch (error: any) {
         setDialogText(error.toString())
         setOpenDialog(true)
         setLoading(false)
+        setOpenBackDrop(false)
       }
     }
 
@@ -951,6 +956,13 @@ export default function GetPublicacaoById() {
             </Box>
           </Grid>
         </Grid>
+        <Backdrop
+          sx={{ color: "#fff", zIndex: theme => theme.zIndex.drawer + 1 }}
+          open={openBackDrop}
+          onClick={handleCloseBackDrop}
+        >
+          <CircularProgress color="inherit" />
+        </Backdrop>
         <Snackbar
           open={openDialog}
           autoHideDuration={6000}

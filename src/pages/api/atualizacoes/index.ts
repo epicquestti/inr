@@ -1,9 +1,19 @@
 import connect from "@lib/database"
-import ApplicationVersions, {
-  applicationVersions
-} from "@schema/ApplicationVersions"
+import Updates from "@schema/Updates"
+
 import { FilterQuery } from "mongoose"
 import { NextApiRequest, NextApiResponse } from "next"
+
+interface applicationVersionsInterface {
+  version: number
+  major: number
+  minor: number
+  severity: "normal" | "urgent"
+  link: string
+  vigent: boolean
+  publishAt?: Date
+  createdAt?: Date
+}
 
 export default async function searchAtualizacoes(
   req: NextApiRequest,
@@ -11,7 +21,6 @@ export default async function searchAtualizacoes(
 ): Promise<void> {
   try {
     const {
-      method,
       query: { version, major, minor, severity, rowsPerPage, page }
     } = req
 
@@ -20,25 +29,38 @@ export default async function searchAtualizacoes(
     const offset = parsedRowsPerPage * parsedPage
     await connect()
 
-    const filter: FilterQuery<applicationVersions> = {}
+    const filter: FilterQuery<applicationVersionsInterface> = {}
 
-    if (typeof version === "number" && version > 0)
-      filter.$and?.push({ version })
-    if (typeof major === "number" && major > 0) filter.$and?.push({ major })
-    if (typeof minor === "number" && minor > 0) filter.$and?.push({ minor })
+    if (version || major || minor || severity) filter.$and = []
+    if (version) filter.$and?.push({ version: parseInt(version.toString()) })
+    if (major) filter.$and?.push({ major: parseInt(major.toString()) })
+    if (minor) filter.$and?.push({ minor: parseInt(minor.toString()) })
     if (severity) filter.$and?.push({ severity })
 
-    const count = await ApplicationVersions.count(filter)
-    const updateList = await ApplicationVersions.find(filter)
+    const count = await Updates.count(filter)
+    const updateList = await Updates.find(filter)
       .sort({ version: "asc", major: "asc", minor: "asc" })
       .limit(parsedRowsPerPage)
       .skip(offset)
+
+    const response: any[] = []
+
+    for (let i = 0; i < updateList.length; i++) {
+      response.push({
+        id: updateList[i]._id,
+        version: updateList[i].version,
+        major: updateList[i].major,
+        minor: updateList[i].minor,
+        severity: updateList[i].severity,
+        link: updateList[i].link
+      })
+    }
 
     res.status(200).send({
       success: true,
       message: "Atualizações encontradas:",
       data: {
-        atualizacoes: updateList,
+        atualizacoes: response,
         count
       }
     })

@@ -1,7 +1,7 @@
-import ApplicationVersions from "@schema/ApplicationVersions"
 import lastPublishes from "@schema/LasPublishes"
 import PublicacaoModel from "@schema/Publicacao"
 import PublicacaoContentsModel from "@schema/PublicacaoContents"
+import Updates from "@schema/Updates"
 import { NextApiRequest, NextApiResponse } from "next"
 import { connect } from "src/lib"
 
@@ -51,8 +51,6 @@ export default async function getLastPublishes(
   try {
     await connect()
     const lastPublishesResponse = await lastPublishes.find()
-    console.log("dasadsda")
-
     if (lastPublishesResponse.length > 0) {
       const bl = lastPublishesResponse[0].boletim
       const cl = lastPublishesResponse[0].classificador
@@ -124,7 +122,7 @@ export default async function getLastPublishes(
         response.lastClassId = 0
       }
 
-      const version = await ApplicationVersions.findOne({
+      const version = await Updates.findOne({
         vigent: true
       })
 

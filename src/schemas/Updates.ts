@@ -1,5 +1,6 @@
 import { Document, model, Model, models, Schema } from "mongoose"
-export interface applicationVersions extends Document {
+
+interface updatesInterface extends Document {
   version: number
   major: number
   minor: number
@@ -8,7 +9,7 @@ export interface applicationVersions extends Document {
   vigent: boolean
 }
 
-const applicationVersionsSchema = new Schema({
+const updatesSchema = new Schema({
   version: { type: Number, required: true },
   major: { type: Number, required: true },
   minor: { type: Number, required: true },
@@ -17,8 +18,7 @@ const applicationVersionsSchema = new Schema({
   vigent: { type: Boolean, required: true }
 })
 
-const ApplicationVersions: Model<applicationVersions> =
-  models["ApplicationVersions"] ||
-  model("ApplicationVersions", applicationVersionsSchema)
+const Updates: Model<updatesInterface> =
+  models["Updates"] || model("Updates", updatesSchema)
 
-export default ApplicationVersions
+export default Updates
