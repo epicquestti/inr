@@ -1,5 +1,10 @@
 module.exports = {
   reactStrictMode: true,
+  api: {
+    bodyParser: {
+      sizeLimit: "5mb"
+    }
+  },
   async headers() {
     return [
       {
@@ -14,7 +19,7 @@ module.exports = {
           {
             key: "Access-Control-Allow-Headers",
             value:
-              "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version"
+              "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, amz-sdk-request, amz-sdk-invocation-id, authorization, x-amz-content-sha256, x-amz-date, x-amz-user-agent"
           }
         ]
       }
