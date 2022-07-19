@@ -15,7 +15,7 @@ import {
   Typography
 } from "@mui/material"
 import { useRouter } from "next/router"
-import React, { ChangeEvent, useState } from "react"
+import { ChangeEvent, useState } from "react"
 const location: local[] = [
   {
     text: "Home",
@@ -25,7 +25,7 @@ const location: local[] = [
   {
     text: "Boletim Eletrônico",
     iconName: "auto_stories",
-    href: "/panel/publicacoes"
+    href: ""
   },
   {
     text: "Publicações",
@@ -44,24 +44,18 @@ type publicacao = {
   aprovedAt: Date | undefined
   publishedAt: Date | undefined
 }
-type serverSideResponse = {
-  publicacaoList?: publicacao[]
-  count: number
-}
 
-export default function SearchPublicacao(props: serverSideResponse) {
+export default function SearchPublicacao() {
   const router = useRouter()
   const [loading, setLoading] = useState<boolean>()
   const [searchText, setSearchText] = useState<string>("")
   const [type, setType] = useState<string>("Boletim")
-
   const [publicacaoList, setPublicacaoList] = useState<
     publicacao[] | undefined
   >([])
-  const [count, setCount] = useState<number>(props.count)
+  const [count, setCount] = useState<number>(0)
   const [page, setPage] = useState<number | undefined>(0)
   const [rowsperpage, setRowsperpage] = useState<number>(5)
-
   const [openDialog, setOpenDialog] = useState<boolean>(false)
   const [dialogText, setDialogText] = useState<string>("")
   const handleCloseDialog = () => {
@@ -144,6 +138,7 @@ export default function SearchPublicacao(props: serverSideResponse) {
   const searchByEnterKeyPress = async (e: any) => {
     if (e.key === "Enter") await makeSearch()
   }
+
   return (
     <ViewPanel>
       <Paper sx={{ padding: 3 }}>
