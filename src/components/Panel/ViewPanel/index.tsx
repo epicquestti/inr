@@ -167,6 +167,12 @@ const ViewPanel: FC<viewPanelProps> = ({ ...props }) => {
           icon: "system_update_alt",
           opened: false,
           path: "/panel/atualizacoes"
+        },
+        {
+          text: "Bugs reportados",
+          icon: "report_problem",
+          opened: false,
+          path: "/panel/reportes"
         }
       ]
     }
