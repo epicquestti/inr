@@ -4,7 +4,7 @@ import { CssBaseline, ThemeProvider } from "@mui/material"
 import { ObjectId } from "bson"
 import { AppProps } from "next/app"
 import Head from "next/head"
-import React, { FC } from "react"
+import { FC } from "react"
 import { CookiesProvider } from "react-cookie"
 import SuperJSON from "superjson"
 import theme from "../styles/theme"
@@ -28,31 +28,29 @@ const App: FC<AppProps> = ({ Component, pageProps }) => {
         <link
           rel="icon"
           type="image/png"
-          sizes="32x32"
-          href="/favicon-32x32.png"
-        />
-        <link
-          rel="icon"
-          type="image/png"
           sizes="16x16"
-          href="/favicon-16x16.png"
+          href="https://inrpublicacoes.com.br/site/img/favicons/favicon_16.png"
         />
-
+        {/* <link
+          rel="icon"
+          // type="image/png"
+          sizes="16x16"
+          href="/favicon_16x16.png"
+        /> */}
+        <link rel="icon" type="image/png" href="/favicon-32x32.png" />
         <link
           rel="apple-touch-icon"
-          sizes="76x76"
+          type="image/png"
           href="/apple-touch-icon-76x76.png"
         />
-
         <link
           rel="apple-touch-icon"
-          sizes="120x120"
+          type="image/png"
           href="/apple-touch-icon-120x120.png"
         />
-
         <link
           rel="apple-touch-icon"
-          sizes="152x152"
+          type="image/png"
           href="/apple-touch-icon-152x152.png"
         />
       </Head>
