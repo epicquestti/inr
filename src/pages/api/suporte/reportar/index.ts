@@ -1,7 +1,7 @@
 import ReportesLifeCicle from "@schema/ReportesLifeCicle"
 import { NextApiRequest, NextApiResponse } from "next"
 import connect from "../../../../lib/database"
-import Reportes from "../../../../schemas/reportes"
+import Reportes from "../../../../schemas/Reportes"
 
 export default async function searchAtualizacoes(
   req: NextApiRequest,
