@@ -1,6 +1,7 @@
 /* eslint-disable no-use-before-define */
 import {
   ChevronLeft,
+  Close,
   ExpandLess,
   ExpandMore,
   Menu as MenuIcon
@@ -8,18 +9,21 @@ import {
 import {
   Backdrop,
   Box,
+  Button,
+  ButtonTypeMap,
   CircularProgress,
   Collapse,
   Container,
   CssBaseline,
   Divider,
+  Grid,
   Icon,
   IconButton,
   List,
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  Paper,
+  Snackbar,
   Toolbar,
   Typography
 } from "@mui/material"
@@ -27,15 +31,14 @@ import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar"
 import MuiDrawer from "@mui/material/Drawer"
 import { styled } from "@mui/material/styles"
 import { useRouter } from "next/router"
-import React, { FC, useState } from "react"
+import React, { FC, ReactElement, useState } from "react"
+import Location from "../Location"
+import { local } from "../Location/props"
 import { IAccessItem, ListMenuProps } from "./props"
-
 const drawerWidth: number = 260
-
 interface AppBarProps extends MuiAppBarProps {
   open?: boolean
 }
-
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: prop => prop !== "open"
 })<AppBarProps>(({ theme, open }) => ({
@@ -84,10 +87,7 @@ const ListMenu: FC<ListMenuProps> = ({ ...props }) => {
   const router = useRouter()
   const goToFunction = async (path?: string) => {
     if (path) {
-      props.startBackDrop && props.startBackDrop()
-      const res = await router.push(path)
-
-      if (res) props.closeBackDrop && props.closeBackDrop()
+      await router.push(path)
     }
   }
   return (
@@ -104,7 +104,7 @@ const ListMenu: FC<ListMenuProps> = ({ ...props }) => {
               }}
             >
               <ListItemIcon>
-                <Icon>{access.icon}</Icon>
+                <Icon fontSize="small">{access.icon}</Icon>
               </ListItemIcon>
               <ListItemText primary={access.text} />
               {access.opened ? <ExpandLess /> : <ExpandMore />}
@@ -121,7 +121,7 @@ const ListMenu: FC<ListMenuProps> = ({ ...props }) => {
                         }}
                       >
                         <ListItemIcon>
-                          <Icon>{childrenItem.icon}</Icon>
+                          <Icon fontSize="small">{childrenItem.icon}</Icon>
                         </ListItemIcon>
                         <ListItemText primary={childrenItem.text} />
                       </ListItemButton>
@@ -135,9 +135,21 @@ const ListMenu: FC<ListMenuProps> = ({ ...props }) => {
     </List>
   )
 }
+
 interface viewPanelProps {
-  box?: boolean
-  loading?: boolean
+  title?: string
+  location: local[]
+  addButton?: ReactElement<ButtonTypeMap>
+  bottonButtons?: ReactElement<ButtonTypeMap>[]
+  loading?: {
+    isLoading?: boolean
+    onClose?: () => void
+  }
+  snack?: {
+    open?: boolean
+    message?: string
+    onClose?: () => void
+  }
 }
 
 const ViewPanel: FC<viewPanelProps> = ({ ...props }) => {
@@ -178,7 +190,6 @@ const ViewPanel: FC<viewPanelProps> = ({ ...props }) => {
     }
   ])
   const [open, setOpen] = useState(false)
-  const [openBackDrop, setOpenBackDrop] = useState(props.loading || false)
   const toggleDrawer = () => {
     setOpen(!open)
   }
@@ -191,13 +202,27 @@ const ViewPanel: FC<viewPanelProps> = ({ ...props }) => {
     setMenuList(temp)
   }
 
-  const startBackDrop = () => {
-    setOpenBackDrop(true)
-  }
-
-  const handleClose = () => {
-    setOpenBackDrop(false)
-  }
+  const action = (
+    <>
+      <Button
+        color="secondary"
+        size="small"
+        onClick={props.snack?.onClose}
+        disabled={props.loading?.isLoading}
+      >
+        Fechar
+      </Button>
+      <IconButton
+        disabled={props.loading?.isLoading}
+        size="small"
+        aria-label="close"
+        color="inherit"
+        onClick={props.snack?.onClose}
+      >
+        <Close fontSize="small" />
+      </IconButton>
+    </>
+  )
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -236,7 +261,7 @@ const ViewPanel: FC<viewPanelProps> = ({ ...props }) => {
           sx={{
             display: "flex",
             alignItems: "center",
-            justifyContent: "flex-end",
+            justifyContent: "center",
             px: [1]
           }}
         >
@@ -249,17 +274,12 @@ const ViewPanel: FC<viewPanelProps> = ({ ...props }) => {
           userAccess={menuList}
           toggleThis={opentest}
           drawerOpened={open}
-          startBackDrop={startBackDrop}
-          closeBackDrop={handleClose}
         />
       </Drawer>
       <Box
         component="main"
         sx={{
-          backgroundColor: theme =>
-            theme.palette.mode === "light"
-              ? theme.palette.grey[100]
-              : theme.palette.grey[900],
+          backgroundColor: theme => theme.palette.secondary.main,
           flexGrow: 1,
           height: "100vh",
           overflow: "auto"
@@ -267,23 +287,77 @@ const ViewPanel: FC<viewPanelProps> = ({ ...props }) => {
       >
         <Toolbar />
         <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-          {props.box ? (
-            <Paper
-              sx={{
-                p: 3
-              }}
-            >
+          <Grid
+            container
+            spacing={2}
+            justifyContent="center"
+            alignItems="center"
+          >
+            <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+              <Location location={props.location} />
+            </Grid>
+
+            {props.addButton ? (
+              <>
+                <Grid item xs={12} sm={12} md={10} lg={10} xl={10}>
+                  <Typography variant="h6">
+                    {props.title && props.title}
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} sm={12} md={2} lg={2} xl={1}>
+                  {props.addButton}
+                </Grid>
+              </>
+            ) : (
+              <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                <Typography variant="h6">
+                  {props.title && props.title}
+                </Typography>
+              </Grid>
+            )}
+
+            <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
               {props.children}
-            </Paper>
-          ) : (
-            props.children
-          )}
+            </Grid>
+
+            {props.bottonButtons && props.bottonButtons.length > 0 && (
+              <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                <Grid
+                  container
+                  spacing={3}
+                  justifyContent="flex-end"
+                  alignItems="center"
+                >
+                  {props.bottonButtons.map((bottonButtonItem, index) => (
+                    <Grid
+                      key={`item-button-added-per-user-${index}`}
+                      item
+                      xs={2}
+                      sm={2}
+                      md={2}
+                      lg={2}
+                      xl={2}
+                    >
+                      {bottonButtonItem}
+                    </Grid>
+                  ))}
+                </Grid>
+              </Grid>
+            )}
+          </Grid>
         </Container>
       </Box>
+      <Snackbar
+        open={props.snack?.open}
+        autoHideDuration={5000}
+        onClose={props.snack?.onClose}
+        message={props.snack?.message}
+        action={action}
+      />
       <Backdrop
         sx={{ color: "#fff", zIndex: theme => theme.zIndex.drawer + 1 }}
-        open={openBackDrop}
-        onClick={handleClose}
+        open={props.loading && props.loading.isLoading ? true : false}
+        onClick={props.loading?.onClose}
       >
         <CircularProgress color="inherit" />
       </Backdrop>

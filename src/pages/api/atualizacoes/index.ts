@@ -1,4 +1,4 @@
-import connect from "@lib/database"
+import connect from "@lib/backend/database"
 import Updates from "@schema/Updates"
 
 import { FilterQuery } from "mongoose"
@@ -47,7 +47,7 @@ export default async function searchAtualizacoes(
 
     for (let i = 0; i < updateList.length; i++) {
       response.push({
-        id: updateList[i]._id,
+        _id: updateList[i]._id,
         version: updateList[i].version,
         major: updateList[i].major,
         minor: updateList[i].minor,

@@ -1,38 +1,18 @@
-import { DataGrid, local, Location, ViewPanel } from "@Components/Panel"
-import HttpRequest from "@lib/RequestApi"
-import { ArrowBack, Close, PlusOne } from "@mui/icons-material"
+import { DataGridV2, ViewPanel } from "@Components/Panel"
+import HttpRequest from "@lib/frontend/RequestApi"
+import { ArrowBack, PlusOne, Visibility } from "@mui/icons-material"
 import {
-  Box,
   Button,
   FormControlLabel,
   Grid,
-  IconButton,
   Paper,
   Radio,
   RadioGroup,
-  Snackbar,
-  TextField,
-  Typography
+  TextField
 } from "@mui/material"
 import { useRouter } from "next/router"
 import { ChangeEvent, useState } from "react"
-const location: local[] = [
-  {
-    text: "Home",
-    iconName: "home",
-    href: "/panel"
-  },
-  {
-    text: "Boletim Eletrônico",
-    iconName: "auto_stories",
-    href: ""
-  },
-  {
-    text: "Publicações",
-    iconName: "forward_to_inbox",
-    href: "/panel/publicacoes"
-  }
-]
+
 type publicacao = {
   id: any
   title: string
@@ -47,25 +27,17 @@ type publicacao = {
 
 export default function SearchPublicacao() {
   const router = useRouter()
-  const [loading, setLoading] = useState<boolean>()
+  const [loading, setLoading] = useState<boolean>(false)
   const [searchText, setSearchText] = useState<string>("")
   const [type, setType] = useState<string>("Boletim")
   const [publicacaoList, setPublicacaoList] = useState<
     publicacao[] | undefined
   >([])
   const [count, setCount] = useState<number>(0)
-  const [page, setPage] = useState<number | undefined>(0)
+  const [page, setPage] = useState<number>(0)
   const [rowsperpage, setRowsperpage] = useState<number>(5)
   const [openDialog, setOpenDialog] = useState<boolean>(false)
   const [dialogText, setDialogText] = useState<string>("")
-  const handleCloseDialog = () => {
-    setOpenDialog(false)
-  }
-
-  const onSelect = (id: string) => {
-    setLoading(true)
-    router.push(`/panel/publicacoes/${id}`)
-  }
 
   const changeRowsPerPage = async (rpp: number) => {
     setRowsperpage(rpp)
@@ -139,16 +111,82 @@ export default function SearchPublicacao() {
     if (e.key === "Enter") await makeSearch()
   }
 
+  const newPublication = (
+    <Button
+      fullWidth
+      disabled={loading}
+      variant="contained"
+      onClick={() => {
+        setLoading(true)
+        router.push("/panel/publicacoes/new")
+      }}
+      startIcon={<PlusOne />}
+    >
+      Novo
+    </Button>
+  )
+
+  const voltarBotton = (
+    <Button
+      fullWidth
+      disabled={loading}
+      variant="contained"
+      startIcon={<ArrowBack />}
+      onClick={() => {
+        router.push("/panel")
+      }}
+    >
+      Voltar
+    </Button>
+  )
+
+  const actionExecution = (id: string, actionName: string) => {
+    try {
+      switch (actionName) {
+        case "getById":
+          setLoading(true)
+          router.push(`/panel/publicacoes/${id}`)
+          break
+        case "deleteById":
+          break
+      }
+    } catch (error: any) {
+      setDialogText(error.message)
+      setOpenDialog(true)
+    }
+  }
+
   return (
-    <ViewPanel>
+    <ViewPanel
+      title="Publicações"
+      location={[
+        {
+          text: "Home",
+          iconName: "home",
+          href: "/panel"
+        },
+        {
+          text: "Boletim Eletrônico",
+          iconName: "auto_stories",
+          href: ""
+        },
+        {
+          text: "Publicações",
+          iconName: "forward_to_inbox",
+          href: "/panel/publicacoes"
+        }
+      ]}
+      snack={{
+        message: dialogText,
+        onClose: () => {
+          setOpenDialog(false)
+        },
+        open: openDialog
+      }}
+      bottonButtons={[voltarBotton, newPublication]}
+    >
       <Paper sx={{ padding: 3 }}>
         <Grid container spacing={2} justifyContent="center" alignItems="center">
-          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-            <Location location={location} />
-          </Grid>
-          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-            <Typography variant="h6">Publicações</Typography>
-          </Grid>
           <Grid item xs={12} sm={12} md={7} lg={7} xl={7}>
             <TextField
               value={searchText}
@@ -186,100 +224,55 @@ export default function SearchPublicacao() {
             </Button>
           </Grid>
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-            <DataGrid
-              onPageChange={changePage}
-              onRowsPerPageChange={changeRowsPerPage}
+            <DataGridV2
               loading={loading}
-              rowsPerPageOptions={[5, 10, 20, 30, 40, 50, 100]}
-              rowsPerPage={rowsperpage}
-              page={page}
-              count={count}
-              onSelectedRow={(id: string | number) => {
-                onSelect(id.toString())
+              // selectable
+              hasActions
+              actionTrigger={actionExecution}
+              // groupActions={[
+              //   {
+              //     text: "Excluir",
+              //     name: "groupDelete",
+              //     icon: "delete"
+              //   }
+              // ]}
+              actions={[
+                {
+                  text: "Vizualizar",
+                  name: "getById",
+                  icon: <Visibility />
+                }
+              ]}
+              pagination={{
+                count: count,
+                page: page,
+                rowsPerPage: rowsperpage,
+                onPageChange: changePage,
+                onRowsPerPageChange: changeRowsPerPage,
+                rowsPerPageOptions: [5, 10, 20, 30, 40, 50, 100]
               }}
-              gridData={publicacaoList}
-              gridHeaders={[
+              data={publicacaoList}
+              headers={[
                 {
-                  headerName: "Título",
-                  field: "title",
-                  align: "left"
+                  text: "Título",
+                  attrName: "title"
                 },
                 {
-                  headerName: "Tipo",
-                  field: "type",
-                  align: "center"
+                  text: "Tipo",
+                  attrName: "type"
                 },
                 {
-                  headerName: "Aprovação",
-                  field: "aproved",
-                  align: "center"
+                  text: "Aprovação",
+                  attrName: "aproved"
                 },
                 {
-                  headerName: "Publicação",
-                  field: "published",
-                  align: "center"
+                  text: "Publicação",
+                  attrName: "published"
                 }
               ]}
             />
           </Grid>
-          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-            <Box
-              sx={{
-                width: "100%",
-                display: "flex",
-                justifyContent: "space-around"
-              }}
-            >
-              <Button
-                disabled={loading}
-                variant="contained"
-                startIcon={<ArrowBack />}
-                onClick={() => {
-                  router.push("/panel")
-                }}
-              >
-                Voltar
-              </Button>
-
-              <Button
-                disabled={loading}
-                variant="contained"
-                onClick={() => {
-                  setLoading(true)
-                  router.push("/panel/publicacoes/new")
-                }}
-                startIcon={<PlusOne />}
-              >
-                Novo
-              </Button>
-            </Box>
-          </Grid>
         </Grid>
-        <Snackbar
-          open={openDialog}
-          autoHideDuration={6000}
-          onClose={handleCloseDialog}
-          message={dialogText}
-          action={
-            <>
-              <Button
-                color="secondary"
-                size="small"
-                onClick={handleCloseDialog}
-              >
-                Fechar
-              </Button>
-              <IconButton
-                size="small"
-                aria-label="close"
-                color="inherit"
-                onClick={handleCloseDialog}
-              >
-                <Close fontSize="small" />
-              </IconButton>
-            </>
-          }
-        />
       </Paper>
     </ViewPanel>
   )

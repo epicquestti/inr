@@ -1,9 +1,9 @@
-import connect from "@lib/database"
+import connect from "@lib/backend/database"
 import PublicacaoModel from "@schema/Publicacao"
 import { NextApiRequest, NextApiResponse } from "next"
 
 type publicacoesSerialisedList = {
-  id: any
+  _id: any
   title: string
   type: string
   createdAt: string
@@ -70,7 +70,7 @@ export default async function Search(
 
     for (let i = 0; i < publicacaoList.length; i++) {
       response.push({
-        id: publicacaoList[i]._id.toString(),
+        _id: publicacaoList[i]._id,
         title: publicacaoList[i].title,
         type: publicacaoList[i].type.text,
         createdAt: publicacaoList[i].createdAt.toLocaleDateString(),

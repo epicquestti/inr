@@ -1,6 +1,6 @@
+import { connect } from "@lib/backend"
 import ReportesLifeCicle from "@schema/ReportesLifeCicle"
 import { NextApiRequest, NextApiResponse } from "next"
-import connect from "../../../../lib/database"
 import Reportes from "../../../../schemas/Reportes"
 
 export default async function searchAtualizacoes(

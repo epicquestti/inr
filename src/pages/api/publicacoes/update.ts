@@ -1,4 +1,4 @@
-import connect from "@lib/database"
+import connect from "@lib/backend/database"
 import PublicacaoModel from "@schema/Publicacao"
 import PublicacaoContentsModel from "@schema/PublicacaoContents"
 import { NextApiRequest, NextApiResponse } from "next"

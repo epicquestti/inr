@@ -1,19 +1,17 @@
-import { local, Location, ViewPanel } from "@Components/Panel"
-import RequestApi from "@lib/RequestApi"
+import { ViewPanel } from "@Components/Panel"
+import RequestApi from "@lib/frontend/RequestApi"
 import {
   ArrowBack,
   Check,
-  Close,
   Delete,
   Edit,
   Publish,
   Save
 } from "@mui/icons-material"
 import {
-  Backdrop,
   Box,
   Button,
-  CircularProgress,
+  ButtonTypeMap,
   FormControl,
   Grid,
   IconButton,
@@ -22,30 +20,11 @@ import {
   Paper,
   Select,
   SelectChangeEvent,
-  Snackbar,
   TextField,
   Typography
 } from "@mui/material"
 import { useRouter } from "next/router"
-import { ChangeEvent, useEffect, useState } from "react"
-
-const location: local[] = [
-  {
-    text: "Home",
-    iconName: "home",
-    href: "/panel"
-  },
-  {
-    text: "Boletim Eletrônico",
-    iconName: "auto_stories",
-    href: ""
-  },
-  {
-    text: "Publicação",
-    iconName: "forward_to_inbox",
-    href: ""
-  }
-]
+import { ChangeEvent, ReactElement, useEffect, useState } from "react"
 
 enum countSessions {
   MENSAGENSDOSEDITORES = "Mensagens dos Editores",
@@ -129,12 +108,10 @@ enum typeColors {
 export default function GetPublicacaoById() {
   const router = useRouter()
   const [loading, setLoading] = useState<boolean>(false)
-
   const tipoBoletimList = [
     { id: 1, text: "Boletim eletrônico" },
     { id: 2, text: "Classificador" }
   ]
-
   const [publicId, setPublicId] = useState<number | undefined>()
   const [titulo, setTitulo] = useState<string | undefined>()
   const [tipo, setTipo] = useState<number | undefined>()
@@ -146,27 +123,17 @@ export default function GetPublicacaoById() {
   const [createdAt, setCreatedAt] = useState<string | undefined>()
   const [aprovedAt, setAprovedAt] = useState<string | undefined>()
   const [publishAt, setPublishAt] = useState<string | undefined>()
-
   const [tipoContentClassificador, setTipoContentClassificador] =
     useState<string>("")
   const [urlContentClassificador, setUrlContentClassificador] =
     useState<string>("")
-
   const [tipoContentBoletim, setTipoContentBoletim] = useState<string>("")
   const [tituloContentBoletim, setTituloContentBoletim] = useState<string>("")
   const [urlContentBoletim, setUrlContentBoletim] = useState<string>("")
-
   const [resumo, setResumo] = useState<resumoList[]>([])
-
   const [openDialog, setOpenDialog] = useState<boolean>(false)
   const [dialogText, setDialogText] = useState<string>("")
   const [openBackDrop, setOpenBackDrop] = useState<boolean>(false)
-  const handleCloseDialog = () => {
-    setOpenDialog(false)
-  }
-  const handleCloseBackDrop = () => {
-    setOpenBackDrop(false)
-  }
 
   useEffect(() => {
     if (conteudoList.length > 0) {
@@ -465,18 +432,120 @@ export default function GetPublicacaoById() {
     setLoading(false)
   }
 
+  const buttonsList = (): ReactElement<ButtonTypeMap>[] => {
+    const l: ReactElement<ButtonTypeMap>[] = []
+
+    l.push(
+      <Button
+        fullWidth
+        disabled={loading}
+        variant="contained"
+        onClick={() => {
+          router.push("/panel/publicacoes")
+        }}
+        startIcon={<ArrowBack />}
+      >
+        Voltar
+      </Button>
+    )
+
+    if (showSave) {
+      l.push(
+        <Button
+          fullWidth
+          disabled={loading}
+          variant="contained"
+          startIcon={<Save />}
+          onClick={saveThisPublication}
+        >
+          Salvar
+        </Button>
+      )
+    }
+
+    if (showAprove) {
+      l.push(
+        <Button
+          fullWidth
+          disabled={loading}
+          variant="contained"
+          startIcon={<Check />}
+          onClick={aprove}
+        >
+          Aprovar
+        </Button>
+      )
+    }
+
+    if (showPublish) {
+      l.push(
+        <Button
+          fullWidth
+          disabled={loading}
+          variant="contained"
+          startIcon={<Publish />}
+          onClick={publish}
+        >
+          Publicar
+        </Button>
+      )
+    }
+
+    if (showDelete) {
+      l.push(
+        <Button
+          fullWidth
+          disabled={loading}
+          variant="contained"
+          startIcon={<Delete />}
+        >
+          Excluir
+        </Button>
+      )
+    }
+
+    return l
+  }
+
+  const btnList = buttonsList()
+
   return (
-    <ViewPanel loading={loading}>
+    <ViewPanel
+      title={titulo ? titulo : "Aguarde..."}
+      location={[
+        {
+          text: "Home",
+          iconName: "home",
+          href: "/panel"
+        },
+        {
+          text: "Boletim Eletrônico",
+          iconName: "auto_stories",
+          href: ""
+        },
+        {
+          text: "Publicação",
+          iconName: "forward_to_inbox",
+          href: ""
+        }
+      ]}
+      snack={{
+        open: openDialog,
+        message: dialogText,
+        onClose: () => {
+          setOpenDialog(false)
+        }
+      }}
+      loading={{
+        isLoading: openBackDrop,
+        onClose: () => {
+          setOpenBackDrop(false)
+        }
+      }}
+      bottonButtons={btnList}
+    >
       <Paper sx={{ padding: 3 }}>
         <Grid container spacing={2}>
-          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-            <Location location={location} />
-          </Grid>
-          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-            <Typography variant="h6">
-              {titulo ? titulo : "Aguarde..."}
-            </Typography>
-          </Grid>
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
             {createdAt && (
               <Typography variant="caption">
@@ -891,103 +960,7 @@ export default function GetPublicacaoById() {
                 </Box>
               </Grid>
             ))}
-
-          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-            <Box
-              sx={{
-                width: "100%",
-                display: "flex",
-                justifyContent: "space-around"
-              }}
-            >
-              <Button
-                disabled={loading}
-                variant="contained"
-                onClick={() => {
-                  router.push("/panel/publicacoes")
-                }}
-                startIcon={<ArrowBack />}
-              >
-                Voltar
-              </Button>
-
-              {showSave && (
-                <Button
-                  disabled={loading}
-                  variant="contained"
-                  startIcon={<Save />}
-                  onClick={saveThisPublication}
-                >
-                  Salvar
-                </Button>
-              )}
-
-              {showAprove && (
-                <Button
-                  disabled={loading}
-                  variant="contained"
-                  startIcon={<Check />}
-                  onClick={aprove}
-                >
-                  Aprovar
-                </Button>
-              )}
-
-              {showPublish && (
-                <Button
-                  disabled={loading}
-                  variant="contained"
-                  startIcon={<Publish />}
-                  onClick={publish}
-                >
-                  Publicar
-                </Button>
-              )}
-
-              {showDelete && (
-                <Button
-                  disabled={loading}
-                  variant="contained"
-                  startIcon={<Delete />}
-                >
-                  Excluir
-                </Button>
-              )}
-            </Box>
-          </Grid>
         </Grid>
-        <Backdrop
-          sx={{ color: "#fff", zIndex: theme => theme.zIndex.drawer + 1 }}
-          open={openBackDrop}
-          onClick={handleCloseBackDrop}
-        >
-          <CircularProgress color="inherit" />
-        </Backdrop>
-        <Snackbar
-          open={openDialog}
-          autoHideDuration={6000}
-          onClose={handleCloseDialog}
-          message={dialogText}
-          action={
-            <>
-              <Button
-                color="secondary"
-                size="small"
-                onClick={handleCloseDialog}
-              >
-                Fechar
-              </Button>
-              <IconButton
-                size="small"
-                aria-label="close"
-                color="inherit"
-                onClick={handleCloseDialog}
-              >
-                <Close fontSize="small" />
-              </IconButton>
-            </>
-          }
-        />
       </Paper>
     </ViewPanel>
   )
