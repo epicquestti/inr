@@ -34,9 +34,6 @@
     "superjson": "^1.8.1"
   },
   "devDependencies": {
-    "@types/mongoose": "^5.11.97",
-    "@types/next": "^9.0.0",
-    "@types/react": "^17.0.40",
     "@types/react-dom": "^17.0.13",
     "babel-plugin-superjson-next": "^0.4.3",
     "eslint": "^8.11.0",
