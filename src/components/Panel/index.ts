@@ -1,4 +1,2 @@
-export { default as DataGrid } from "./DataGrid"
-export { default as Location } from "./Location"
-export type { local } from "./Location/props"
-export { default as ViewPanel } from "./ViewPanel"
+export { DataGrid, DataGridV2, Location, ViewPanel } from "./common"
+export type { local } from "./common"

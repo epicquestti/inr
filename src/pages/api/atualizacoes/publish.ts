@@ -1,4 +1,4 @@
-import connect from "@lib/database"
+import connect from "@lib/backend/database"
 import Updates from "@schema/Updates"
 import { NextApiRequest, NextApiResponse } from "next"
 

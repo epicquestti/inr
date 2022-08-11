@@ -1,41 +1,20 @@
-import { DataGrid, local, Location, ViewPanel } from "@Components/Panel"
-import { ArrowBack, Close, PlusOne } from "@mui/icons-material"
+import { DataGridV2, ViewPanel } from "@Components/Panel"
+import { ArrowBack, PlusOne, Visibility } from "@mui/icons-material"
 import { LoadingButton } from "@mui/lab"
 import {
-  Box,
   Button,
   FormControl,
   Grid,
-  IconButton,
   InputLabel,
   MenuItem,
   Paper,
   Select,
   SelectChangeEvent,
-  Snackbar,
-  TextField,
-  Typography
+  TextField
 } from "@mui/material"
 import { useRouter } from "next/router"
 import { ChangeEvent, useState } from "react"
-import HttpRequest from "../../../lib/RequestApi"
-const location: local[] = [
-  {
-    text: "Home",
-    iconName: "home",
-    href: "/panel"
-  },
-  {
-    text: "INR Leitor",
-    iconName: "desktop_windows",
-    href: ""
-  },
-  {
-    text: "Atualizações",
-    iconName: "system_update_alt",
-    href: "/panel/atualizacoes"
-  }
-]
+import HttpRequest from "../../../lib/frontend/RequestApi"
 
 type atualizacaoList = {
   version: number
@@ -57,15 +36,8 @@ export default function SearchAtualizacoes() {
   const [rowsperpage, setRowsperpage] = useState<number>(5)
   const [openDialog, setOpenDialog] = useState<boolean>(false)
   const [dialogText, setDialogText] = useState<string>("")
-  const handleCloseDialog = () => {
-    setOpenDialog(false)
-  }
   const changePage = async (page: number) => {}
   const changeRowsPerPage = async (rpp: number) => {}
-  const onSelect = (id: string) => {
-    setLoading(true)
-    router.push(`/panel/atualizacoes/${id}`)
-  }
   const makeSearch = async () => {
     try {
       setLoading(true)
@@ -96,16 +68,86 @@ export default function SearchAtualizacoes() {
   const searchByEnterKeyPress = async (e: any) => {
     if (e.key === "Enter") await makeSearch()
   }
+  const backButton = (
+    <Button
+      fullWidth
+      disabled={loading}
+      variant="contained"
+      startIcon={<ArrowBack />}
+      onClick={() => {
+        router.push("/panel")
+      }}
+    >
+      Voltar
+    </Button>
+  )
+  const newButton = (
+    <Button
+      fullWidth
+      disabled={loading}
+      variant="contained"
+      onClick={() => {
+        setLoading(true)
+        router.push("/panel/atualizacoes/new")
+      }}
+      startIcon={<PlusOne />}
+    >
+      Novo
+    </Button>
+  )
+  const actionExecution = (id: string, actionName: string) => {
+    try {
+      switch (actionName) {
+        case "getById":
+          setLoading(true)
+          router.push(`/panel/atualizacoes/${id}`)
+          break
+        case "deleteById":
+          break
+      }
+    } catch (error: any) {
+      setDialogText(error.message)
+      setOpenDialog(true)
+    }
+  }
+
   return (
-    <ViewPanel>
+    <ViewPanel
+      title="Atualizações"
+      location={[
+        {
+          text: "Home",
+          iconName: "home",
+          href: "/panel"
+        },
+        {
+          text: "INR Leitor",
+          iconName: "desktop_windows",
+          href: ""
+        },
+        {
+          text: "Atualizações",
+          iconName: "system_update_alt",
+          href: "/panel/atualizacoes"
+        }
+      ]}
+      bottonButtons={[backButton, newButton]}
+      loading={{
+        isLoading: loading,
+        onClose: () => {
+          setLoading(false)
+        }
+      }}
+      snack={{
+        open: openDialog,
+        onClose: () => {
+          setOpenDialog(false)
+        },
+        message: dialogText
+      }}
+    >
       <Paper sx={{ padding: 3 }}>
         <Grid container spacing={2} justifyContent="center" alignItems="center">
-          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-            <Location location={location} />
-          </Grid>
-          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-            <Typography variant="h6">Atualizações</Typography>
-          </Grid>
           <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
             <TextField
               value={version}
@@ -167,99 +209,47 @@ export default function SearchAtualizacoes() {
             </LoadingButton>
           </Grid>
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-            <DataGrid
-              onPageChange={changePage}
-              onRowsPerPageChange={changeRowsPerPage}
+            <DataGridV2
+              // onPageChange={changePage}
+              // onRowsPerPageChange={changeRowsPerPage}
               loading={loading}
-              rowsPerPageOptions={[5, 10, 20, 30, 40, 50, 100]}
-              rowsPerPage={rowsperpage}
-              page={page}
-              count={count}
-              onSelectedRow={(id: string | number) => {
-                onSelect(id.toString())
-              }}
-              gridData={atualizacaoList}
-              gridHeaders={[
+              // rowsPerPageOptions={[5, 10, 20, 30, 40, 50, 100]}
+              // rowsPerPage={rowsperpage}
+              // page={page}
+              // count={count}
+              // onSelectedRow={(id: string | number) => {
+              //   onSelect(id.toString())
+              // }}
+              actionTrigger={actionExecution}
+              hasActions
+              actions={[
                 {
-                  headerName: "Versão",
-                  field: "version",
-                  align: "left"
+                  text: "Vizualizar",
+                  name: "getById",
+                  icon: <Visibility />
+                }
+              ]}
+              data={atualizacaoList}
+              headers={[
+                {
+                  text: "Versão",
+                  attrName: "version"
                 },
                 {
-                  headerName: "Major",
-                  field: "major",
-                  align: "center"
+                  text: "Major",
+                  attrName: "major"
                 },
                 {
-                  headerName: "Minor",
-                  field: "minor",
-                  align: "center"
+                  text: "Minor",
+                  attrName: "minor"
                 },
                 {
-                  headerName: "Severidade",
-                  field: "severity",
-                  align: "center"
+                  text: "Severidade",
+                  attrName: "severity"
                 }
               ]}
             />
           </Grid>
-          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-            <Box
-              sx={{
-                width: "100%",
-                display: "flex",
-                justifyContent: "space-around"
-              }}
-            >
-              <Button
-                disabled={loading}
-                variant="contained"
-                startIcon={<ArrowBack />}
-                onClick={() => {
-                  router.push("/panel")
-                }}
-              >
-                Voltar
-              </Button>
-
-              <Button
-                disabled={loading}
-                variant="contained"
-                onClick={() => {
-                  setLoading(true)
-                  router.push("/panel/atualizacoes/new")
-                }}
-                startIcon={<PlusOne />}
-              >
-                Novo
-              </Button>
-            </Box>
-          </Grid>
-          <Snackbar
-            open={openDialog}
-            autoHideDuration={6000}
-            onClose={handleCloseDialog}
-            message={dialogText}
-            action={
-              <>
-                <Button
-                  color="secondary"
-                  size="small"
-                  onClick={handleCloseDialog}
-                >
-                  Fechar
-                </Button>
-                <IconButton
-                  size="small"
-                  aria-label="close"
-                  color="inherit"
-                  onClick={handleCloseDialog}
-                >
-                  <Close fontSize="small" />
-                </IconButton>
-              </>
-            }
-          />
         </Grid>
       </Paper>
     </ViewPanel>

@@ -1,4 +1,4 @@
-import connect from "@lib/database"
+import connect from "@lib/backend/database"
 import Updates from "@schema/Updates"
 
 import { NextApiRequest, NextApiResponse } from "next"
@@ -12,8 +12,6 @@ export default async function saveAtualizacao(
       body: { id, version, major, minor, severity, link }
     } = req
 
-    console.log(version)
-
     if (version === "" || version === null)
       throw new Error("Versão não pode ser 0 ou nulo")
     if (major === "" || major === null)
@@ -24,7 +22,11 @@ export default async function saveAtualizacao(
       throw new Error("Selecione a severidade.")
     if (link === "" || link === null) throw new Error("insira o link.")
 
-    await connect()
+    try {
+      await connect()
+    } catch (error) {
+      console.log(error)
+    }
 
     if (!id) {
       const verify = await Updates.findOne({

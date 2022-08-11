@@ -1,5 +1,17 @@
+const envirorment = process.env.ENVIRORMENT
+const appHost = {
+  development: process.env.HOST_DEV,
+  homolog: process.env.HOST_HOMOLOG,
+  production: process.env.HOST_PRODUCTION
+}
 module.exports = {
   reactStrictMode: true,
+  serverRuntimeConfig: {
+    host: appHost[envirorment],
+    accessRegion: process.env.ACCESS_REGION,
+    accessKeyId: process.env.ACCESS_KEY_ID,
+    secretAccessKey: process.env.SECRET_ACCESS_KEY
+  },
   api: {
     bodyParser: {
       sizeLimit: "5mb"
