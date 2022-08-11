@@ -138,7 +138,7 @@ const ListMenu: FC<ListMenuProps> = ({ ...props }) => {
 
 interface viewPanelProps {
   title?: string
-  location: local[]
+  location?: local[]
   addButton?: ReactElement<ButtonTypeMap>
   bottonButtons?: ReactElement<ButtonTypeMap>[]
   loading?: {
