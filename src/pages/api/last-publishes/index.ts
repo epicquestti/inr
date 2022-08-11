@@ -1,9 +1,9 @@
+import { connect } from "@lib/backend"
 import lastPublishes from "@schema/LasPublishes"
 import PublicacaoModel from "@schema/Publicacao"
 import PublicacaoContentsModel from "@schema/PublicacaoContents"
 import Updates from "@schema/Updates"
 import { NextApiRequest, NextApiResponse } from "next"
-import { connect } from "src/lib"
 
 type sendModel = {
   title: string

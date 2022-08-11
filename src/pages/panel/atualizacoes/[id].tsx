@@ -1,4 +1,4 @@
-import { local, Location, ViewPanel } from "@Components/Panel"
+import { ViewPanel } from "@Components/Panel"
 import { ArrowBack, Close, Publish, Save } from "@mui/icons-material"
 import {
   Backdrop,
@@ -14,29 +14,11 @@ import {
   Select,
   SelectChangeEvent,
   Snackbar,
-  TextField,
-  Typography
+  TextField
 } from "@mui/material"
 import { useRouter } from "next/router"
 import { ChangeEvent, useEffect, useState } from "react"
-import RequestApi from "../../../lib/RequestApi"
-const location: local[] = [
-  {
-    text: "Home",
-    iconName: "home",
-    href: "/panel"
-  },
-  {
-    text: "INR Leitor",
-    iconName: "desktop_windows",
-    href: ""
-  },
-  {
-    text: "Atualizações",
-    iconName: "system_update_alt",
-    href: "/panel/aplicativo"
-  }
-]
+import RequestApi from "../../../lib/frontend/RequestApi"
 
 export default function GetAtualizacoesById() {
   const router = useRouter()
@@ -227,23 +209,32 @@ export default function GetAtualizacoesById() {
   }
 
   return (
-    <ViewPanel>
+    <ViewPanel
+      title={
+        loading
+          ? "Aguarde..."
+          : `Versão: ${version}.${major}.${minor} ${vigente ? "- VIGENTE" : ""}`
+      }
+      location={[
+        {
+          text: "Home",
+          iconName: "home",
+          href: "/panel"
+        },
+        {
+          text: "INR Leitor",
+          iconName: "desktop_windows",
+          href: ""
+        },
+        {
+          text: "Atualizações",
+          iconName: "system_update_alt",
+          href: "/panel/aplicativo"
+        }
+      ]}
+    >
       <Paper sx={{ padding: 3 }}>
         <Grid container spacing={2} justifyContent="center" alignItems="center">
-          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-            <Location location={location} />
-          </Grid>
-
-          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-            <Typography variant="h6">
-              {loading
-                ? "Aguarde..."
-                : `Versão: ${version}.${major}.${minor} ${
-                    vigente ? "- VIGENTE" : ""
-                  }`}
-            </Typography>
-          </Grid>
-
           <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
             <TextField
               disabled={blockFields || loading}
