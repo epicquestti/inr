@@ -1,4 +1,5 @@
 import { DataGridV2, ViewPanel } from "@Components/Panel"
+import { RequestApi } from "@lib/frontend"
 import {
   Add,
   ArrowBack,
@@ -21,7 +22,7 @@ import {
   Typography
 } from "@mui/material"
 import { useRouter } from "next/router"
-import { useState } from "react"
+import { ChangeEvent, useState } from "react"
 export default function SearchReportes() {
   const router = useRouter()
   const [destinatarios, setDestinatarios] = useState<
@@ -35,6 +36,13 @@ export default function SearchReportes() {
   const [reporteList, setReporteList] = useState<any[]>([])
   const [openMessage, setOpenMessage] = useState<boolean>(false)
   const [messageText, setMessageText] = useState<string>("")
+  const [nomeDestinatario, setNomeDestinatario] = useState<string>("")
+  const [nomeDestinatarioError, setNomeDestinatarioError] =
+    useState<boolean>(false)
+  const [emailDestinatario, setEmailDestinatario] = useState<string>("")
+  const [emailDestinatarioError, setEmailDestinatarioError] =
+    useState<boolean>(false)
+
   const [openBackDropDestinatarios, setOpenBackDropDestinatarios] =
     useState<boolean>(false)
 
@@ -43,7 +51,36 @@ export default function SearchReportes() {
   }
   const addNewDestinatario = async () => {
     try {
-    } catch (error) {}
+      if (!nomeDestinatario) {
+        setNomeDestinatarioError(true)
+        throw new Error("Insira o nome do Destinatário.")
+      }
+
+      if (!emailDestinatario) {
+        setEmailDestinatarioError(true)
+        throw new Error("Insira o email do destinatário")
+      }
+
+      const justAdded = destinatarios.findIndex(
+        filtered => filtered.email === emailDestinatario
+      )
+
+      if (justAdded >= 0) throw new Error("Email ja esta presente na lista")
+
+      const tmp = [...destinatarios]
+
+      tmp.push({
+        nome: nomeDestinatario,
+        email: emailDestinatario
+      })
+
+      setDestinatarios(tmp)
+      setNomeDestinatario("")
+      setEmailDestinatario("")
+    } catch (error: any) {
+      setMessageText(error.message)
+      setOpenMessage(true)
+    }
   }
   const changePage = async (page: number) => {}
   const changeRowsPerPage = async (rowsPerPage: number) => {}
@@ -53,8 +90,16 @@ export default function SearchReportes() {
       fullWidth
       disabled={loading}
       variant="contained"
-      onClick={() => {
-        setOpenBackDropDestinatarios(true)
+      onClick={async () => {
+        const list = await RequestApi.Get("/api/suporte/getListaDestinatarios")
+
+        if (list.success) {
+          setDestinatarios(list.data.list)
+          setOpenBackDropDestinatarios(true)
+        } else {
+          setMessageText("Erro ao buscar lista de destinatários.")
+          setOpenMessage(true)
+        }
       }}
       startIcon={<MarkEmailRead />}
     >
@@ -223,24 +268,28 @@ export default function SearchReportes() {
                 >
                   <Grid item xs={12} sm={12} md={5} lg={5} xl={5}>
                     <TextField
-                      // value={searchText}
-                      // onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                      //   setSearchText(e.target.value)
-                      // }}
+                      value={nomeDestinatario}
+                      error={nomeDestinatarioError}
+                      onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                        setNomeDestinatarioError(false)
+                        setNomeDestinatario(e.target.value)
+                      }}
                       // onKeyPress={searchByEnterKeyPress}
-                      // disabled={loading}
+                      disabled={loading}
                       label="nome"
                       fullWidth
                     />
                   </Grid>
                   <Grid item xs={12} sm={12} md={5} lg={5} xl={5}>
                     <TextField
-                      // value={searchText}
-                      // onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                      //   setSearchText(e.target.value)
-                      // }}
+                      error={emailDestinatarioError}
+                      value={emailDestinatario}
+                      onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                        setEmailDestinatarioError(false)
+                        setEmailDestinatario(e.target.value)
+                      }}
                       // onKeyPress={searchByEnterKeyPress}
-                      // disabled={loading}
+                      disabled={loading}
                       label="Email"
                       fullWidth
                     />
@@ -257,9 +306,9 @@ export default function SearchReportes() {
                           key={`id-destinatarios-item-${index}`}
                           sx={{
                             width: "100%",
-                            display: "inline-flex",
+                            display: "flex",
                             alignItems: "center",
-                            justifyContent: "space-between",
+                            // justifyContent: "space-between",
                             p: 1,
                             borderBottom: "1px solid #9999",
                             "&:hover": {
@@ -267,22 +316,41 @@ export default function SearchReportes() {
                             }
                           }}
                         >
-                          <Typography variant="subtitle1">
-                            asdasdasdadasd
-                          </Typography>{" "}
-                          |{" "}
-                          <Typography variant="subtitle1">
-                            asdasdasdadasd
-                          </Typography>
-                          <IconButton
-                            disabled={loading}
-                            onClick={() => {
-                              console.log("asddsadad")
+                          <Box
+                            sx={{
+                              width: "45%"
                             }}
-                            size="small"
                           >
-                            <Delete fontSize="small" />
-                          </IconButton>
+                            <Typography variant="subtitle1">
+                              {destinatario.nome}
+                            </Typography>
+                          </Box>
+                          <Box
+                            sx={{
+                              width: "45%"
+                            }}
+                          >
+                            <Typography variant="subtitle1">
+                              {destinatario.email}
+                            </Typography>
+                          </Box>
+                          <Box
+                            sx={{
+                              width: "10%"
+                            }}
+                          >
+                            <IconButton
+                              disabled={loading}
+                              onClick={() => {
+                                const tmp = [...destinatarios]
+                                tmp.splice(index, 1)
+                                setDestinatarios(tmp)
+                              }}
+                              size="small"
+                            >
+                              <Delete fontSize="small" />
+                            </IconButton>
+                          </Box>
                         </Box>
                       ))
                     ) : (
@@ -297,7 +365,7 @@ export default function SearchReportes() {
                         }}
                       >
                         <Typography variant="subtitle1">
-                          Nenhum destinatário Inserido.
+                          Nenhum destinatário cadastrado.
                         </Typography>
                       </Box>
                     )}
@@ -309,7 +377,27 @@ export default function SearchReportes() {
         </DialogContent>
         <DialogActions>
           <Button
-            // onClick={() => {}}
+            onClick={async () => {
+              if (destinatarios.length > 0) {
+                setMessageText("Salvando... Aguarde.")
+                setOpenMessage(true)
+                const responseApi = await RequestApi.Post(
+                  "/api/suporte/saveListaDestinatarios",
+                  { destinatarios }
+                )
+                setOpenMessage(false)
+                if (responseApi.success) {
+                  setMessageText("Lista salva com sucesso.")
+                  setOpenBackDropDestinatarios(false)
+                } else {
+                  setMessageText(
+                    responseApi.message ||
+                      "Erro ao salvr lista de destinatários. "
+                  )
+                }
+                setOpenMessage(true)
+              }
+            }}
             autoFocus
           >
             Ok

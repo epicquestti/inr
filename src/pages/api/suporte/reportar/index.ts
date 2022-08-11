@@ -1,6 +1,14 @@
+import {
+  SendEmailCommand,
+  SendEmailCommandOutput,
+  SESClient
+} from "@aws-sdk/client-ses"
 import { connect } from "@lib/backend"
+import ReportDestinatario from "@schema/ReportDestinatarios"
 import ReportesLifeCicle from "@schema/ReportesLifeCicle"
+import Mailgen from "mailgen"
 import { NextApiRequest, NextApiResponse } from "next"
+import getConfig from "next/config"
 import Reportes from "../../../../schemas/Reportes"
 
 export default async function searchAtualizacoes(
@@ -10,8 +18,10 @@ export default async function searchAtualizacoes(
   try {
     await connect()
 
+    const ca = new Date()
+
     const reporteRes = await Reportes.create({
-      createdAt: new Date(),
+      createdAt: ca,
       type: req.body.reportType,
       status: "CRIADO",
       os: req.body.os,
@@ -39,6 +49,133 @@ export default async function searchAtualizacoes(
       createdAt: new Date(),
       observacoes: `Report BUG - Status: CRIADO em: ${new Date().toLocaleDateString()} as ${new Date().toLocaleTimeString()}`
     })
+
+    const { serverRuntimeConfig } = getConfig()
+    const { host, accessKeyId, secretAccessKey, accessRegion } =
+      serverRuntimeConfig
+
+    const destinatariosList = await ReportDestinatario.find()
+
+    const mailGenerator = new Mailgen({
+      theme: "default",
+      product: {
+        logo: "https://object.epicquestti.com.br/inr/assets/apple-touch-icon-120x120.png",
+        name: "INR Publicações",
+        link: host,
+        copyright: `Copyright © ${new Date().getFullYear()} INR Publicações. Todos os direitos reservados.`
+      }
+    })
+
+    const mailPromissesArray: Promise<SendEmailCommandOutput>[] = []
+
+    for (let i = 0; i < destinatariosList.length; i++) {
+      const html = mailGenerator.generate({
+        body: {
+          name: destinatariosList[i].nome,
+          intro: [
+            "Um bug foi reportado atravéz do aplicativo.",
+            `Reporte realizado por: ${req.body.tratamento} ${req.body.nome}`,
+            `Reporte Criado em: ${ca.toLocaleDateString()}`,
+            "Clique no botão abaixo para acessar todas as informações do reporte."
+          ],
+          greeting: "Olá",
+          signature: "Atenciosamente,",
+          action: {
+            instructions:
+              "Clique no botão abaixo para acessar as informações do bug reportado.",
+            button: {
+              link: `${host}/reportes/${reporteRes._id}`,
+              text: "Acessar.",
+              color: "#1136C7"
+            }
+          },
+          outro: [
+            "Caso você tenha problemas com o botão ou seu cliente de email o bloqueie copie e cole o endereço abaixo.",
+            `${host}/reportes/${reporteRes._id}`
+          ]
+        }
+      })
+
+      const text = mailGenerator.generatePlaintext({
+        body: {
+          name: destinatariosList[i].nome,
+          intro: [
+            "Um bug foi reportado atravéz do aplicativo.",
+            `Reporte realizado por: ${req.body.tratamento} ${req.body.nome}`,
+            `Reporte Criado em: ${ca.toLocaleDateString()}`,
+            "Clique no botão abaixo para acessar todas as informações do reporte."
+          ],
+          greeting: "Olá",
+          signature: "Atenciosamente,",
+          action: {
+            instructions:
+              "Clique no botão abaixo para acessar as informações do bug reportado.",
+            button: {
+              link: `${host}/reportes/${reporteRes._id}`,
+              text: "Acessar.",
+              color: "#1136C7"
+            }
+          },
+          outro: [
+            "Caso você tenha problemas com o botão ou seu cliente de email o bloqueie copie e cole o endereço abaixo.",
+            `${host}/reportes/${reporteRes._id}`
+          ]
+        }
+      })
+
+      const clientSES = new SESClient({
+        region: accessRegion,
+        credentials: {
+          accessKeyId: accessKeyId,
+          secretAccessKey: secretAccessKey
+        }
+      })
+
+      mailPromissesArray.push(
+        clientSES.send(
+          new SendEmailCommand({
+            Destination: {
+              ToAddresses: [`${destinatariosList[i].email}`]
+            },
+            Message: {
+              Body: {
+                Text: {
+                  Charset: "UTF-8",
+                  Data: text
+                },
+                Html: {
+                  Charset: "UTF-8",
+                  Data: html
+                }
+              },
+              Subject: {
+                Charset: "UTF-8",
+                Data: "Notificação de Bug reportada por usuário"
+              }
+            },
+            Source: "INR Publicações <naoresponder@publicacoesinr.com.br>"
+          })
+        )
+      )
+    }
+
+    if (mailPromissesArray.length > 0) {
+      await ReportesLifeCicle.create({
+        reporte: reporteRes._id,
+        event: "INICIO ENVIO",
+        createdAt: new Date(),
+        observacoes: `Report BUG - Status: INÍCIO DO ENVIO em: ${new Date().toLocaleDateString()} as ${new Date().toLocaleTimeString()}`
+      })
+
+      Promise.all(mailPromissesArray).then(responseArray => {
+        ReportesLifeCicle.create({
+          reporte: reporteRes._id,
+          event: "FIM ENVIO",
+          createdAt: new Date(),
+          observacoes: `Report BUG - Status: FIM DO ENVIO em: ${new Date().toLocaleDateString()} as ${new Date().toLocaleTimeString()}`
+        })
+      })
+    }
 
     return res.status(200).send({
       success: true
