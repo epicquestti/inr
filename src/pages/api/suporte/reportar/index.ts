@@ -36,6 +36,7 @@ export default async function searchAtualizacoes(
       email: req.body.email,
       ddd: req.body.ddd,
       fone: req.body.fone,
+      isWhats: req.body.isWhats,
       contactWhats: req.body.contactWhats,
       contactEmail: req.body.contactEmail,
       contactLigacao: req.body.contactLigacao,
@@ -59,7 +60,7 @@ export default async function searchAtualizacoes(
     const mailGenerator = new Mailgen({
       theme: "default",
       product: {
-        logo: "https://object.epicquestti.com.br/inr/assets/apple-touch-icon-120x120.png",
+        logo: "https://object.epicquestti.com.br/inr/assets/inr-logo-mail.png",
         name: "INR Publicações",
         link: host,
         copyright: `Copyright © ${new Date().getFullYear()} INR Publicações. Todos os direitos reservados.`
@@ -75,23 +76,22 @@ export default async function searchAtualizacoes(
           intro: [
             "Um bug foi reportado atravéz do aplicativo.",
             `Reporte realizado por: ${req.body.tratamento} ${req.body.nome}`,
-            `Reporte Criado em: ${ca.toLocaleDateString()}`,
-            "Clique no botão abaixo para acessar todas as informações do reporte."
+            `Reporte Criado em: ${ca.toLocaleDateString()} as ${ca.toLocaleTimeString()}`
           ],
           greeting: "Olá",
-          signature: "Atenciosamente,",
+          signature: "Atenciosamente",
           action: {
             instructions:
               "Clique no botão abaixo para acessar as informações do bug reportado.",
             button: {
-              link: `${host}/reportes/${reporteRes._id}`,
-              text: "Acessar.",
+              link: `${host}panel/reportes/${reporteRes._id}`,
+              text: "Acessar",
               color: "#1136C7"
             }
           },
           outro: [
             "Caso você tenha problemas com o botão ou seu cliente de email o bloqueie copie e cole o endereço abaixo.",
-            `${host}/reportes/${reporteRes._id}`
+            `${host}panel/reportes/${reporteRes._id}`
           ]
         }
       })
@@ -102,23 +102,22 @@ export default async function searchAtualizacoes(
           intro: [
             "Um bug foi reportado atravéz do aplicativo.",
             `Reporte realizado por: ${req.body.tratamento} ${req.body.nome}`,
-            `Reporte Criado em: ${ca.toLocaleDateString()}`,
-            "Clique no botão abaixo para acessar todas as informações do reporte."
+            `Reporte Criado em: ${ca.toLocaleDateString()} as ${ca.toLocaleTimeString()}`
           ],
           greeting: "Olá",
-          signature: "Atenciosamente,",
+          signature: "Atenciosamente",
           action: {
             instructions:
               "Clique no botão abaixo para acessar as informações do bug reportado.",
             button: {
-              link: `${host}/reportes/${reporteRes._id}`,
+              link: `${host}panel/reportes/${reporteRes._id}`,
               text: "Acessar.",
               color: "#1136C7"
             }
           },
           outro: [
             "Caso você tenha problemas com o botão ou seu cliente de email o bloqueie copie e cole o endereço abaixo.",
-            `${host}/reportes/${reporteRes._id}`
+            `${host}panel/reportes/${reporteRes._id}`
           ]
         }
       })
@@ -153,7 +152,7 @@ export default async function searchAtualizacoes(
                 Data: "Notificação de Bug reportada por usuário"
               }
             },
-            Source: "INR Publicações <naoresponder@publicacoesinr.com.br>"
+            Source: "INR <naoresponder@publicacoesinr.com.br>"
           })
         )
       )
@@ -173,6 +172,15 @@ export default async function searchAtualizacoes(
           event: "FIM ENVIO",
           createdAt: new Date(),
           observacoes: `Report BUG - Status: FIM DO ENVIO em: ${new Date().toLocaleDateString()} as ${new Date().toLocaleTimeString()}`
+        }).then(async () => {
+          await Reportes.updateOne(
+            {
+              _id: reporteRes._id
+            },
+            {
+              status: "ENVIADO"
+            }
+          )
         })
       })
     }
