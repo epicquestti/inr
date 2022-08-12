@@ -259,15 +259,23 @@ const ViewPanel: FC<viewPanelProps> = ({ ...props }) => {
       <Drawer variant="permanent" open={open}>
         <Toolbar
           sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
+            display: "inline-block",
             px: [1]
           }}
         >
-          <IconButton onClick={toggleDrawer}>
-            <ChevronLeft />
-          </IconButton>
+          <Box
+            sx={{
+              width: "100%",
+              height: "60px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center"
+            }}
+          >
+            <IconButton onClick={toggleDrawer}>
+              <ChevronLeft />
+            </IconButton>
+          </Box>
         </Toolbar>
         <Divider />
         <ListMenu

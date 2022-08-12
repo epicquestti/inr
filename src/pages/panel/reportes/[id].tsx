@@ -1,13 +1,89 @@
 import { ViewPanel } from "@Components/Panel"
+import { RequestApi } from "@lib/frontend"
 import { ArrowBack, CheckCircle } from "@mui/icons-material"
-import { Button, Grid, Paper, Typography } from "@mui/material"
+import { Button, ButtonTypeMap, Grid, Paper, Typography } from "@mui/material"
 import { Box } from "@mui/system"
 import { useRouter } from "next/router"
-import { FC, useState } from "react"
+import { FC, ReactElement, useEffect, useState } from "react"
 
 export default function GetReporteBugById() {
-  const [loading, setLoading] = useState<boolean>(false)
   const router = useRouter()
+  const [loading, setLoading] = useState<boolean>(false)
+  const [showDialog, setShowDialog] = useState<boolean>(false)
+  const [textDialog, setDialogText] = useState<string>("")
+  const [tratamento, setTratamento] = useState<string>("")
+  const [nome, setNome] = useState<string>("")
+  const [email, setEmail] = useState<string>("")
+  const [ddd, setDdd] = useState<string>("")
+  const [fone, setFone] = useState<string>("")
+  const [appId, setAppId] = useState<string>("")
+  const [sisOperacional, setSisOperacional] = useState<string>("")
+  const [versao, setVersao] = useState<string>("")
+  const [status, setStatus] = useState<string>("")
+  const [ultimoBE, setUltimoBE] = useState<number>(0)
+  const [ultimoCL, setUltimoCL] = useState<number>(0)
+  const [notifyBE, setNotifyBE] = useState<boolean>(false)
+  const [notifyCL, setNotifyCL] = useState<boolean>(false)
+  const [aceitaContato, setAceitaContato] = useState<boolean>(false)
+  const [iswhatsApp, setIswhatsApp] = useState<boolean>(false)
+  const [contactWhatsApp, setContactWhatsApp] = useState<boolean>(false)
+  const [contactEmail, setContactEmail] = useState<boolean>(false)
+  const [contactCall, setContactCall] = useState<boolean>(false)
+  const [description, setDescription] = useState<string>("")
+  const [eventLists, setEventLists] = useState<any[]>([])
+  const [blockFinishReporte, setBlockFinishReporte] = useState<boolean>(false)
+
+  const getById = async () => {
+    try {
+      if (!router.isReady) return
+
+      setLoading(true)
+      setShowDialog(false)
+      const { id } = router.query
+
+      const report = await RequestApi.Get(`/api/suporte/${id}`)
+
+      if (report.success) {
+        setTratamento(report.data.report.tratamento)
+        setNome(report.data.report.nome)
+        setEmail(report.data.report.email)
+        setDdd(report.data.report.ddd)
+        setFone(report.data.report.fone)
+        setAppId(report.data.report.appId)
+        setSisOperacional(report.data.report.os)
+        setVersao(report.data.report.version)
+        setStatus(report.data.report.status)
+        setUltimoBE(report.data.report.lastBeReceived)
+        setUltimoCL(report.data.report.lastClassReceived)
+        setNotifyBE(report.data.report.notifyBoletim)
+        setNotifyCL(report.data.report.notifyClassificador)
+        setAceitaContato(report.data.report.contactNo)
+        setIswhatsApp(report.data.report.isWhats)
+        setContactWhatsApp(report.data.report.contactWhats)
+        setContactEmail(report.data.report.contactEmail)
+        setContactCall(report.data.report.contactCall)
+        setDescription(report.data.report.descricao)
+        setEventLists(report.data.events)
+
+        if (report.data.report.status === "FINALIZADO") {
+          setBlockFinishReporte(true)
+        } else {
+          setBlockFinishReporte(false)
+        }
+
+        setLoading(false)
+      } else throw new Error(report.message || "")
+    } catch (error: any) {
+      setDialogText(error.message)
+      setShowDialog(true)
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    getById()
+  }, [router.isReady])
+
   const Block: FC<{ label: string; text: string; center?: boolean }> = ({
     ...props
   }) => {
@@ -32,31 +108,72 @@ export default function GetReporteBugById() {
       </Box>
     )
   }
-  const backButton = (
-    <Button
-      fullWidth
-      disabled={loading}
-      variant="contained"
-      onClick={() => {
-        setLoading(true)
-        router.push("/panel/reportes")
-      }}
-      startIcon={<ArrowBack />}
-    >
-      Voltar
-    </Button>
-  )
-  const finalizeButton = (
-    <Button
-      fullWidth
-      disabled={loading}
-      variant="contained"
-      startIcon={<CheckCircle />}
-      // onClick={publish}
-    >
-      Finalizar
-    </Button>
-  )
+
+  const btnListFunction = (): ReactElement<ButtonTypeMap>[] => {
+    const l: ReactElement<ButtonTypeMap>[] = []
+
+    l.push(
+      <Button
+        fullWidth
+        disabled={loading}
+        variant="contained"
+        onClick={() => {
+          setLoading(true)
+          router.push("/panel/reportes")
+        }}
+        startIcon={<ArrowBack />}
+      >
+        Voltar
+      </Button>
+    )
+
+    if (!blockFinishReporte) {
+      l.push(
+        <Button
+          fullWidth
+          disabled={loading}
+          variant="contained"
+          startIcon={<CheckCircle />}
+          onClick={async () => {
+            try {
+              if (!router.isReady) return
+
+              setLoading(true)
+              setShowDialog(false)
+              const { id } = router.query
+              const report = await RequestApi.Post(
+                `/api/suporte/finishReport`,
+                {
+                  id
+                }
+              )
+
+              if (report.success) {
+                setBlockFinishReporte(true)
+                setDialogText(
+                  report.message || "Reporte Finalizado com sucesso."
+                )
+                setShowDialog(true)
+                setLoading(false)
+              } else throw new Error(report.message || "")
+            } catch (error: any) {
+              setDialogText(error.message)
+              setShowDialog(true)
+              setLoading(false)
+            }
+          }}
+        >
+          Finalizar
+        </Button>
+      )
+    }
+
+    return l
+  }
+
+  const btnList = btnListFunction()
+
+  const finalize = async () => {}
 
   return (
     <ViewPanel
@@ -69,6 +186,13 @@ export default function GetReporteBugById() {
         isLoading: loading,
         onClose: () => {
           setLoading(false)
+        }
+      }}
+      snack={{
+        open: showDialog,
+        message: textDialog,
+        onClose: () => {
+          setShowDialog(false)
         }
       }}
       location={[
@@ -88,48 +212,85 @@ export default function GetReporteBugById() {
           href: ""
         }
       ]}
-      bottonButtons={[backButton, finalizeButton]}
+      bottonButtons={btnList}
     >
       <Paper sx={{ padding: 3 }}>
         <Grid container spacing={2}>
-          <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
-            <Block label="Tratamento" text="Sr" />
+          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+            <Box
+              sx={{
+                width: "100%",
+                height: "40px",
+                background: theme => theme.palette.primary.dark,
+                dislplay: "flex",
+                alignItems: "center",
+                alignContent: "center",
+                color: "#FFFFFF",
+                p: 1,
+                borderRadius: 1
+              }}
+            >
+              <Typography variant="body2">
+                <strong>Informações do Reporte</strong>
+              </Typography>
+            </Box>
+          </Grid>
+          <Grid item xs={12} sm={12} md={1} lg={1} xl={1}>
+            <Block center label="Tratamento" text={tratamento} />
           </Grid>
           <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
-            <Block label="Nome" text="Douglas Aasddalves Pacor" />
+            <Block label="Nome" text={nome} />
+          </Grid>
+          <Grid item xs={12} sm={12} md={2} lg={3} xl={3}>
+            <Block label="Email" text={email} />
+          </Grid>
+          <Grid item xs={12} sm={12} md={1} lg={1} xl={1}>
+            <Block center label="DDD" text={ddd} />
+          </Grid>
+          <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
+            <Block label="Telefone" text={fone} />
+          </Grid>
+          <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
+            <Block center label="Status Atual" text={status} />
+          </Grid>
+          {/* linha */}
+          <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
+            <Block label="Sis. Operacional" text={sisOperacional} />
           </Grid>
           <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
-            <Block label="Email" text="douglas.pacor@outlook.com" />
+            <Block label="App ID" text={appId} />
           </Grid>
-          <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
-            <Block label="DDD" text="16" center />
+          <Grid item xs={12} sm={12} md={1} lg={1} xl={1}>
+            <Block center label="Versão" text={versao} />
           </Grid>
-          <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
-            <Block label="Telefone" text="993830033" />
+
+          <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
+            <Block
+              center
+              label="Ultimo BE Recebido"
+              text={ultimoBE.toString()}
+            />
           </Grid>
-          <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
-            <Block label="App ID" text="inrappID-993830033" />
+          <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
+            <Block
+              center
+              label="Ultimo CL Recebido"
+              text={ultimoCL.toString()}
+            />
           </Grid>
-          <Grid item xs={12} sm={12} md={5} lg={5} xl={5}>
-            <Block label="Sis. Operacional" text="Windows 10 Pro" />
+          <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
+            <Block
+              label="Notificações do cliente para BE Permitidas ?"
+              text={notifyBE ? "Sim" : "Não"}
+              center
+            />
           </Grid>
-          <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
-            <Block label="Versão" text="0.2.63" />
-          </Grid>
-          <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
-            <Block label="Status Atual" text="CRIADO" />
-          </Grid>
-          <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
-            <Block label="Ultimo BE Recebido" text="12" />
-          </Grid>
-          <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
-            <Block label="Ultimo CL Recebido" text="12" />
-          </Grid>
-          <Grid item xs={12} sm={12} md={4} lg={4} xl={4}>
-            <Block label="Notificações BL Permitidas" text="SIM" center />
-          </Grid>
-          <Grid item xs={12} sm={12} md={4} lg={4} xl={4}>
-            <Block label="Notificações CL Permitidas" text="SIM" center />
+          <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
+            <Block
+              label="Notificações do cliente para CL Permitidas"
+              text={notifyCL ? "Sim" : "Não"}
+              center
+            />
           </Grid>
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
             <Typography variant="body2">
@@ -137,19 +298,39 @@ export default function GetReporteBugById() {
             </Typography>
           </Grid>
           <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
-            <Block label="Aceita contato ?" text="SIM" center />
+            <Block
+              label="Aceita contato ?"
+              text={aceitaContato ? "Sim" : "Não"}
+              center
+            />
           </Grid>
           <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
-            <Block label="O número esta no whatsapp ?" text="SIM" center />
+            <Block
+              label="O número esta no whatsapp ?"
+              text={iswhatsApp ? "Sim" : "Não"}
+              center
+            />
           </Grid>
           <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
-            <Block label="Aceita contato por: whatsapp ?" text="SIM" center />
+            <Block
+              label="Aceita contato por: whatsapp ?"
+              text={contactWhatsApp ? "Sim" : "Não"}
+              center
+            />
           </Grid>
           <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
-            <Block label="Aceita contato por: Email ?" text="SIM" center />
+            <Block
+              label="Aceita contato por: Email ?"
+              text={contactEmail ? "Sim" : "Não"}
+              center
+            />
           </Grid>
           <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
-            <Block label="Aceita contato por: Ligação ?" text="SIM" center />
+            <Block
+              label="Aceita contato por: Ligação ?"
+              text={contactCall ? "Sim" : "Não"}
+              center
+            />
           </Grid>
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
             <Typography variant="body2">
@@ -166,16 +347,22 @@ export default function GetReporteBugById() {
               }}
             >
               <Grid container spacing={2}>
-                <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-                  <Typography variant="caption">
-                    Reporte CRIADO com sucesso em: 01/01/2011
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-                  <Typography variant="caption">
-                    Reporte CRIADO com sucesso em: 01/01/2011
-                  </Typography>
-                </Grid>
+                {eventLists.length > 0 &&
+                  eventLists.map((eventItem, index) => (
+                    <Grid
+                      key={`event-report-${index + 1}-report-id-${index}`}
+                      item
+                      xs={12}
+                      sm={12}
+                      md={12}
+                      lg={12}
+                      xl={12}
+                    >
+                      <Typography variant="caption">
+                        {eventItem.observacoes}
+                      </Typography>
+                    </Grid>
+                  ))}
               </Grid>
             </Box>
           </Grid>
@@ -190,8 +377,7 @@ export default function GetReporteBugById() {
             >
               <Block
                 label="Descrição enviada pelo usuário."
-                text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed vitae lacinia elit, nec tempus justo. Etiam ut felis nisi. Suspendisse vehicula arcu eros, a vestibulum nulla sollicitudin a. Aliquam posuere dignissim est. Donec tincidunt, metus quis sagittis sagittis, nisi urna consequat ex, vel consequat diam nunc id ante. Etiam eu bibendum mi. Donec ornare, est maximus imperdiet pulvinar, lorem lacus imperdiet urna, et laoreet diam diam id tellus. Mauris lobortis pharetra ipsum, vitae imperdiet sapien interdum euismod. Vivamus pellentesque fringilla nisl, vitae placerat nisi aliquam ut. Maecenas vitae mauris faucibus, blandit leo hendrerit, mattis lacus. Aliquam erat volutpat. Mauris in odio tempus, rutrum eros ut, consequat libero. Suspendisse malesuada vestibulum nulla sit amet finibus. Duis scelerisque facilisis dictum.
-Morbi semper ex eu massa dictum sodales. Donec porttitor magna ac ipsum placerat maximus. Quisque quis vehicula ex. Curabitur odio tortor, lacinia vel eros dapibus, fringilla rhoncus felis. Maecenas et tincidunt enim, ut tincidunt risus. Phasellus mattis, erat id vestibulum varius, massa eros facilisis tellus, sit amet commodo velit nisl non sapien. Morbi posuere nisl magna, et volutpat lacus congue ac. Integer lacinia consequat velit non ultricies. Aenean et ullamcorper quam, vel dignissim metus. In sit amet dolor auctor, mattis metus id, tempor arcu. Phasellus elementum, mi at sagittis tempus, purus eros hendrerit ex, quis viverra mauris dui ut magna. Ut sit amet nunc eget justo aliquet finibus at vel metus. Sed tincidunt mi ac semper feugiat. Sed turpis nisl, consectetur in eros hendrerit, venenatis iaculis sem. Aenean non varius ipsum, eu porttitor augue."
+                text={description}
               />
             </Box>
           </Grid>
