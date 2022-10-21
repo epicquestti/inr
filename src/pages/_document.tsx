@@ -8,7 +8,7 @@ export default class MyDocument extends Document {
         <Head>
           <meta name="theme-color" content={theme.palette.primary.main} />
           <meta charSet="utf-8" />
-          <meta name="author" content="Epic Quest, Epic Quest TI" />
+          <meta name="author" content="INR Publicações" />
           <meta name="copyright" content="INR Publicações (c) 2022" />
           <meta
             name="description"

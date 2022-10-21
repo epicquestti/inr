@@ -8,6 +8,8 @@ import { FC, ReactElement, useEffect, useState } from "react"
 
 export default function GetReporteBugById() {
   const router = useRouter()
+  const [id, setId] = useState<string | undefined>(undefined)
+  const [createdAt, setCreatedAt] = useState<string | undefined>(undefined)
   const [loading, setLoading] = useState<boolean>(false)
   const [showDialog, setShowDialog] = useState<boolean>(false)
   const [textDialog, setDialogText] = useState<string>("")
@@ -40,6 +42,7 @@ export default function GetReporteBugById() {
       setLoading(true)
       setShowDialog(false)
       const { id } = router.query
+      setId(id?.toString())
 
       const report = await RequestApi.Get(`/api/suporte/${id}`)
 
@@ -64,6 +67,7 @@ export default function GetReporteBugById() {
         setContactCall(report.data.report.contactCall)
         setDescription(report.data.report.descricao)
         setEventLists(report.data.events)
+        setCreatedAt(report.data.report.createdAt)
 
         if (report.data.report.status === "FINALIZADO") {
           setBlockFinishReporte(true)
@@ -173,14 +177,21 @@ export default function GetReporteBugById() {
 
   const btnList = btnListFunction()
 
-  const finalize = async () => {}
+  const titleProcess = (): string => {
+    const response: string = "criado em: "
+    if (createdAt) {
+      const d = new Date(createdAt).toLocaleDateString()
+      const h = new Date(createdAt).toLocaleTimeString()
+      return `${response} ${d} as ${h}`
+    } else {
+      return ""
+    }
+  }
 
   return (
     <ViewPanel
       title={
-        !loading
-          ? "Reporte de bug Nº 12312313 criado em: 01/01/2011"
-          : "Aguarde..."
+        !loading ? `Reporte de bug Nº ${id} ${titleProcess()}` : "Aguarde..."
       }
       loading={{
         isLoading: loading,
