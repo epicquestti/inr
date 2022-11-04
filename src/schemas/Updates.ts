@@ -1,6 +1,6 @@
 import { Document, model, Model, models, Schema } from "mongoose"
 
-interface updatesInterface extends Document {
+export interface updatesInterface extends Document {
   version: number
   major: number
   minor: number
