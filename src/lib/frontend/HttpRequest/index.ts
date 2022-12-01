@@ -10,7 +10,7 @@ class HttpRequest {
     this.instance = axiosInstance
   }
 
-  public async get(
+  public async Get(
     url: string,
     config?: AxiosRequestConfig<any>
   ): Promise<apiResponse> {
