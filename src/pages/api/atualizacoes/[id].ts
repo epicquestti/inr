@@ -1,5 +1,5 @@
-import connect from "@lib/backend/database"
 import Updates from "@schema/Updates"
+import { ObjectId } from "mongodb"
 
 import { NextApiRequest, NextApiResponse } from "next"
 
@@ -15,9 +15,8 @@ export default async function getAtualizaçõesById(
 
     if (!id) throw new Error("id ausente.")
 
-    await connect()
     const atualizacao = await Updates.findOne({
-      _id: id.toString()
+      _id: new ObjectId(id.toString())
     })
 
     const updatesSelected = {

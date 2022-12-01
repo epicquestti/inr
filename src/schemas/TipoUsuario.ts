@@ -1,12 +1,9 @@
-import { Document, model, Model, models, Schema } from "mongoose"
-interface tipoUsuarioInterface extends Document {
-  text: string
-}
+import { schema, types } from "papr"
 
-const tipoUsuarioSchema = new Schema({
-  text: { type: String, required: true }
+const tipoUsuarioSchema = schema({
+  text: types.string({ required: true })
 })
 
-const tipoUsuario: Model<tipoUsuarioInterface> =
-  models["TipoUsuario"] || model("TipoUsuario", tipoUsuarioSchema)
-export default tipoUsuario
+const tipoUsuarioModel = papr.model("TipoUsuario", tipoUsuarioSchema)
+export type tipoUsuarioDocument = typeof tipoUsuarioSchema[0]
+export default tipoUsuarioModel
