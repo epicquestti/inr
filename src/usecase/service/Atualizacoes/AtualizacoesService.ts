@@ -1,6 +1,7 @@
 import { defaultResponse } from "@lib/types/defaultResponse"
 import { ObjectId } from "mongodb"
 import UpdatesRepository from "src/usecase/repository/UpdatesRepository"
+import { atualizacaoListOutput } from "src/validation/Atualizacoes/atualizacaoList"
 import IAtualizacoesService from "./IAtualizacoesService"
 
 export default class AtualizacoesService implements IAtualizacoesService {
@@ -24,6 +25,21 @@ export default class AtualizacoesService implements IAtualizacoesService {
           link: atualizacao.link,
           vigent: atualizacao.vigent
         }
+      }
+    } catch (error: any) {
+      return {
+        success: error.message
+      }
+    }
+  }
+
+  async atualizacaoList(
+    params: atualizacaoListOutput
+  ): Promise<defaultResponse> {
+    try {
+      return {
+        success: true,
+        data: {}
       }
     } catch (error: any) {
       return {

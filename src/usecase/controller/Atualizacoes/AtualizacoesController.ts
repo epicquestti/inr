@@ -1,6 +1,10 @@
 import { defaultResponse } from "@lib/types/defaultResponse"
 import IAtualizacoesService from "src/usecase/service/Atualizacoes/IAtualizacoesService"
 import {
+  atualizacaoListInput,
+  atualizacaoListSchema
+} from "src/validation/Atualizacoes/atualizacaoList"
+import {
   getAtualizacoesById,
   getAtualizacoesByIdInput
 } from "src/validation/Atualizacoes/getAtualizacoesById"
@@ -18,6 +22,33 @@ export default class AtualizacoesController implements IAtualizacoesController {
         throw new Error(validation.error.issues[0].message)
 
       const service = await this._AtualizacaoService.getAtualizacoesById(
+        validation.data
+      )
+
+      if (!service.success) throw new Error(service.message)
+
+      return {
+        success: true,
+        data: service.data
+      }
+    } catch (error: any) {
+      return {
+        success: true,
+        message: error.message
+      }
+    }
+  }
+
+  async atualizacaoList(
+    params: atualizacaoListInput
+  ): Promise<defaultResponse> {
+    try {
+      const validation = await atualizacaoListSchema.safeParseAsync(params)
+
+      if (!validation.success)
+        throw new Error(validation.error.issues[0].message)
+
+      const service = await this._AtualizacaoService.atualizacaoList(
         validation.data
       )
 

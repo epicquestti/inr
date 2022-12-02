@@ -5,4 +5,5 @@ export interface IAtualizacoesController {
   getAtualizacoesById(
     params: getAtualizacoesByIdInput
   ): Promise<defaultResponse>
+  atualizacaoList(params: any): Promise<defaultResponse>
 }
