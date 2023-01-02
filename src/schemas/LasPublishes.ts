@@ -6,6 +6,6 @@ const lastPublishesSchema = schema({
   classificador: types.number({ required: false })
 })
 
-const LastPublishes = papr.model("LastPublishes", lastPublishesSchema)
+const LastPublishesModel = papr.model("LastPublishes", lastPublishesSchema)
 export type LastPublishesDocument = typeof lastPublishesSchema[0]
-export default LastPublishes
+export default LastPublishesModel
