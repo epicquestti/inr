@@ -1,6 +1,6 @@
 import LastPublishesModel, { LastPublishesDocument } from "@schema/LasPublishes"
 
-export default class LastPublishes {
+export default class LastPublishesRepository {
   async getLastPublishes(): Promise<LastPublishesDocument[]> {
     try {
       return LastPublishesModel.find({})

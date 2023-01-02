@@ -163,4 +163,14 @@ export default class UpdatesRepository {
       throw new Error(error.message)
     }
   }
+
+  async getVigentVersion(): Promise<updatesDocument | null> {
+    try {
+      return updatesModel.findOne({
+        vigent: true
+      })
+    } catch (error: any) {
+      throw new Error(error.message)
+    }
+  }
 }

@@ -1,11 +1,14 @@
 import PublicacaoModel, { PublicacaoDocument } from "@schema/Publicacao"
-import { ObjectId } from "mongodb"
 
 export default class PublicacaoRepository {
-  async getPublicacaoById(_id: ObjectId): Promise<PublicacaoDocument | null> {
+  async getPublicacaoByPublicId(
+    _id: number,
+    tipo: number
+  ): Promise<PublicacaoDocument | null> {
     try {
       return PublicacaoModel.findOne({
-        _id: _id
+        publicId: _id,
+        "type.id": tipo
       })
     } catch (error: any) {
       throw new Error(error.message)
