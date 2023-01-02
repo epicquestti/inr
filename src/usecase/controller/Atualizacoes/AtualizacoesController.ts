@@ -1,4 +1,5 @@
 import { defaultResponse } from "@lib/types/defaultResponse"
+import { salvarAtualizacao } from "@validation/Atualizacoes/salvarAtualizacao"
 import { getById } from "@validation/common/getById"
 import IAtualizacoesService from "src/usecase/service/Atualizacoes/IAtualizacoesService"
 import {
@@ -13,6 +14,39 @@ import { IAtualizacoesController } from "./IAtualizacoesController"
 
 export default class AtualizacoesController implements IAtualizacoesController {
   constructor(private _AtualizacaoService: IAtualizacoesService) {}
+
+  async salvarAtualizacao(params: {
+    id: string
+    version: string
+    major: string
+    minor: string
+    severity: string
+    link: string
+  }): Promise<defaultResponse> {
+    try {
+      const validation = await salvarAtualizacao.safeParseAsync(params)
+
+      if (!validation.success)
+        throw new Error(validation.error.issues[0].message)
+
+      const service = await this._AtualizacaoService.salvarAtualizacao(
+        validation.data
+      )
+
+      if (!service.success) throw new Error(service.message)
+
+      return {
+        success: true,
+        data: service.data
+      }
+    } catch (error: any) {
+      return {
+        success: true,
+        message: error.message
+      }
+    }
+  }
+
   async publicar(params: { id: string }): Promise<defaultResponse> {
     try {
       const validation = await getById.safeParseAsync(params)
@@ -37,6 +71,7 @@ export default class AtualizacoesController implements IAtualizacoesController {
       }
     }
   }
+
   async getAtualizacoesById(
     params: getAtualizacoesByIdInput
   ): Promise<defaultResponse> {

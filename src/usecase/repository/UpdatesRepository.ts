@@ -74,4 +74,93 @@ export default class UpdatesRepository {
       throw new Error(error.message)
     }
   }
+
+  async verifyIfExist(
+    verison: number,
+    major: number,
+    minor: number
+  ): Promise<updatesDocument | null> {
+    try {
+      return updatesModel.findOne({
+        verison,
+        major,
+        minor
+      })
+    } catch (error: any) {
+      throw new Error(error.message)
+    }
+  }
+
+  async novaVersion(
+    version: number,
+    major: number,
+    minor: number,
+    severity: string,
+    link: string,
+    vigent: boolean
+  ) {
+    try {
+      return updatesModel.insertOne({
+        version,
+        major,
+        minor,
+        link,
+        severity,
+        vigent
+      })
+    } catch (error: any) {
+      throw new Error(error.message)
+    }
+  }
+
+  async verifyIfExistNotEqualId(
+    _id: ObjectId,
+    verison: number,
+    major: number,
+    minor: number
+  ): Promise<updatesDocument | null> {
+    try {
+      return updatesModel.findOne({
+        verison,
+        major,
+        minor,
+        _id: {
+          $ne: _id
+        }
+      })
+    } catch (error: any) {
+      throw new Error(error.message)
+    }
+  }
+
+  async updateVersion(
+    _id: ObjectId,
+    version: number,
+    major: number,
+    minor: number,
+    vigent: boolean,
+    severity: string,
+    link: string
+  ): Promise<number> {
+    try {
+      const response = await updatesModel.updateOne(
+        {
+          _id: _id
+        },
+        {
+          $set: {
+            version,
+            major,
+            minor,
+            vigent,
+            severity,
+            link
+          }
+        }
+      )
+      return response.modifiedCount
+    } catch (error: any) {
+      throw new Error(error.message)
+    }
+  }
 }
