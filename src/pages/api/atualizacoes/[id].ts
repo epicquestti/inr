@@ -1,13 +1,13 @@
+import validateHandle from "@lib/backend/validateHandle"
 import { NextApiRequest, NextApiResponse } from "next"
 import atualizacoesController from "src/usecase/controller/Atualizacoes"
 
-export default async function getAtualizacoesById(
+async function handle(
   req: NextApiRequest,
   res: NextApiResponse
 ): Promise<void> {
   try {
     const {
-      method,
       query: { id }
     } = req
 
@@ -28,3 +28,12 @@ export default async function getAtualizacoesById(
     })
   }
 }
+
+export default validateHandle(
+  {
+    get: handle
+  },
+  {
+    validationLevel: "free"
+  }
+)

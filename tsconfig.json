@@ -1,18 +1,11 @@
 {
   "compilerOptions": {
     "target": "es5",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
-    "typeRoots": [
-      "./node_modules/@types",
-      "./src/@types"
-    ],
+    "typeRoots": ["./node_modules/@types", "./src/@types"],
     "forceConsistentCasingInFileNames": true,
     "noEmit": true,
     "esModuleInterop": true,
@@ -24,23 +17,15 @@
     "incremental": true,
     "baseUrl": ".",
     "paths": {
-      "@Components/*": [
-        "./src/components/*"
-      ],
-      "@schema/*": [
-        "./src/schemas/*"
-      ],
-      "@lib/*": [
-        "./src/lib/*"
-      ]
+      "@Components/*": ["./src/components/*"],
+      "@schema/*": ["./src/schemas/*"],
+      "@lib/*": ["./src/lib/*"],
+      "@usecase/controller/*": ["./src/usecase/controller/*"],
+      "@usecase/service/*": ["./src/usecase/service/*"],
+      "@usecase/repository/*": ["./src/usecase/repository/*"],
+      "@validation/*": ["./src/validation/*"]
     }
   },
-  "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules"]
 }

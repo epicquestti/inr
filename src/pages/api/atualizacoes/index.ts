@@ -1,18 +1,8 @@
+import validateHandle from "@lib/backend/validateHandle"
 import { NextApiRequest, NextApiResponse } from "next"
 import atualizacoesController from "src/usecase/controller/Atualizacoes"
 
-interface applicationVersionsInterface {
-  version: number
-  major: number
-  minor: number
-  severity: "normal" | "urgent"
-  link: string
-  vigent: boolean
-  publishAt?: Date
-  createdAt?: Date
-}
-
-export default async function searchAtualizacoes(
+async function handle(
   req: NextApiRequest,
   res: NextApiResponse
 ): Promise<void> {
@@ -43,3 +33,12 @@ export default async function searchAtualizacoes(
     })
   }
 }
+
+export default validateHandle(
+  {
+    get: handle
+  },
+  {
+    validationLevel: "free"
+  }
+)
