@@ -1,44 +1,24 @@
-import { Document, model, Model, models, Schema, Types } from "mongoose"
+import { schema, types } from "papr"
 
-export interface IPublicacao extends Document {
-  publicId: number
-  title: string
-  type: {
-    id: number
-    text: string
-  }
-  createdAt: Date
-  aproved?: Boolean
-  published?: Boolean
-  createdBy?: Types.ObjectId
-  updatedAt?: Date
-  updatedBy?: Types.ObjectId
-  aprovedAt?: Date
-  aprovedBy?: Types.ObjectId
-  publishedAt?: Date
-  publishedBy?: Types.ObjectId
-}
-
-const PublicacaoSchema = new Schema({
-  publicId: { type: Number, required: true },
-  title: { type: String, required: true },
-  type: {
-    id: { type: Number, required: true },
-    text: { type: String, required: true }
-  },
-  createdAt: { type: Date, required: true },
-  aproved: { type: Boolean, required: false },
-  published: { type: Boolean, required: false },
-  createdBy: { type: Types.ObjectId, required: false },
-  updatedAt: { type: Date, required: false },
-  updatedBy: { type: Types.ObjectId, required: false },
-  aprovedAt: { type: Date, required: false },
-  aprovedBy: { type: Types.ObjectId, required: false },
-  publishedAt: { type: Date, required: false },
-  publishedBy: { type: Types.ObjectId, required: false }
+const PublicacaoSchema = schema({
+  publicId: types.number({ required: true }),
+  title: types.string({ required: true }),
+  type: types.object({
+    id: types.number({ required: true }),
+    text: types.string({ required: true })
+  }),
+  createdAt: types.date({ required: true }),
+  aproved: types.boolean({ required: false }),
+  published: types.boolean({ required: false }),
+  createdBy: types.objectId({ required: false }),
+  updatedAt: types.date({ required: false }),
+  updatedBy: types.objectId({ required: false }),
+  aprovedAt: types.date({ required: false }),
+  aprovedBy: types.objectId({ required: false }),
+  publishedAt: types.date({ required: false }),
+  publishedBy: types.objectId({ required: false })
 })
 
-const PublicacaoModel: Model<IPublicacao> =
-  models["Publicacao"] || model("Publicacao", PublicacaoSchema)
-
+const PublicacaoModel = papr.model("Publicacao", PublicacaoSchema)
+export type PublicacaoDocument = typeof PublicacaoSchema[0]
 export default PublicacaoModel

@@ -18,7 +18,7 @@ import {
 } from "@mui/material"
 import { useRouter } from "next/router"
 import { ChangeEvent, useEffect, useState } from "react"
-import RequestApi from "../../../lib/frontend/RequestApi"
+import RequestApi from "../../../lib/frontend/HttpRequest"
 
 export default function GetAtualizacoesById() {
   const router = useRouter()

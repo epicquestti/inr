@@ -14,7 +14,7 @@ import {
 } from "@mui/material"
 import { useRouter } from "next/router"
 import { ChangeEvent, useState } from "react"
-import HttpRequest from "../../../lib/frontend/RequestApi"
+import HttpRequest from "../../../lib/frontend/HttpRequest"
 
 type atualizacaoList = {
   version: number

@@ -308,7 +308,7 @@ const ViewPanel: FC<viewPanelProps> = ({ ...props }) => {
             {props.addButton ? (
               <>
                 <Grid item xs={12} sm={12} md={10} lg={10} xl={10}>
-                  <Typography variant="h6">
+                  <Typography variant="h6" sx={{ color: "#ffffff" }}>
                     {props.title && props.title}
                   </Typography>
                 </Grid>
