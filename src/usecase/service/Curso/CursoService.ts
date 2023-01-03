@@ -1,17 +1,18 @@
 import { defaultResponse } from "@lib/types/defaultResponse"
 import CursoRepository from "@usecase/repository/CursoRepository"
-import { getByIdOutput } from "@validation/common/getById"
 import { cursoCreateOutput } from "@validation/Cursos/cursoCreate"
+import { cursoIdOutput } from "@validation/Cursos/cursoId"
 import { cursoUpdateOutput } from "@validation/Cursos/cursoUpdate"
 import ICursoService from "./ICursoService"
 
 export default class CursoService implements ICursoService {
   constructor(private _cursoRepository: CursoRepository) {}
-  async cursoGetById(params: getByIdOutput): Promise<defaultResponse> {
+
+  async cursoGetById(params: cursoIdOutput): Promise<defaultResponse> {
     try {
-      const repositoryResponse = await this._cursoRepository.cursoGetById(
-        params
-      )
+      const repositoryResponse = await this._cursoRepository.cursoGetById({
+        id: params.id
+      })
 
       if (!repositoryResponse?._id) throw new Error("Curso não encontrado.")
 
@@ -56,6 +57,24 @@ export default class CursoService implements ICursoService {
       return {
         success: true,
         message: "Curso editado com sucesso."
+      }
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error.message
+      }
+    }
+  }
+
+  async cursoDelete(params: cursoIdOutput): Promise<defaultResponse> {
+    try {
+      const repositoryResponse = await this._cursoRepository.cursoDelete(params)
+
+      if (repositoryResponse <= 0) throw new Error("Erro ao excluir Curso.")
+
+      return {
+        success: true,
+        message: "Curso excluído com sucesso."
       }
     } catch (error: any) {
       return {

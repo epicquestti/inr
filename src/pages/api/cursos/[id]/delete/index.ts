@@ -21,6 +21,8 @@ async function handle(
     const controllerResponse = await cursoController.cursoDelete({
       id: id?.toString() || ""
     })
+
+    return res.status(200).json(controllerResponse)
   } catch (error: any) {
     return res.status(200).json({
       success: false,

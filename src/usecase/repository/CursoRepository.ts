@@ -1,6 +1,6 @@
 import CursoModel, { CursoDocument } from "@schema/Cursos"
-import { getByIdOutput } from "@validation/common/getById"
 import { cursoCreateOutput } from "@validation/Cursos/cursoCreate"
+import { cursoIdOutput } from "@validation/Cursos/cursoId"
 import { cursoUpdateOutput } from "@validation/Cursos/cursoUpdate"
 
 export default class CursoRepository {
@@ -37,11 +37,23 @@ export default class CursoRepository {
     }
   }
 
-  async cursoGetById(params: getByIdOutput): Promise<CursoDocument | null> {
+  async cursoGetById(params: cursoIdOutput): Promise<CursoDocument | null> {
     try {
       const result = await CursoModel.findById(params.toString())
 
       return result
+    } catch (error: any) {
+      throw new Error(error.message)
+    }
+  }
+
+  async cursoDelete(params: cursoIdOutput): Promise<number> {
+    try {
+      const result = await CursoModel.deleteOne({
+        _id: params.id
+      })
+
+      return result.deletedCount
     } catch (error: any) {
       throw new Error(error.message)
     }
