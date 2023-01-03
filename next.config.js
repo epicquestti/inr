@@ -12,10 +12,8 @@ module.exports = {
     accessKeyId: process.env.ACCESS_KEY_ID,
     secretAccessKey: process.env.SECRET_ACCESS_KEY
   },
-  api: {
-    bodyParser: {
-      sizeLimit: "5mb"
-    }
+  images: {
+    domains: ["object.epicquestti.com.br"]
   },
   async headers() {
     return [
