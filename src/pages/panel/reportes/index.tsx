@@ -1,12 +1,14 @@
 import { DataGridV2, ViewPanel } from "@Components/Panel"
-import { RequestApi } from "@lib/frontend"
+import { HttpRequest } from "@lib/frontend"
 import {
   Add,
   ArrowBack,
+  CheckCircle,
   Delete,
   Info,
   MarkEmailRead,
-  Search
+  Search,
+  Visibility
 } from "@mui/icons-material"
 import {
   Box,
@@ -22,13 +24,14 @@ import {
   Typography
 } from "@mui/material"
 import { useRouter } from "next/router"
-import { ChangeEvent, useState } from "react"
+import { ChangeEvent, useEffect, useState } from "react"
 export default function SearchReportes() {
   const router = useRouter()
   const [destinatarios, setDestinatarios] = useState<
     { nome: string; email: string }[]
   >([])
   const [loading, setLoading] = useState<boolean>(false)
+  const [searchText, setSearchText] = useState<string>("")
   const [openBackDrop, setOpenBackDrop] = useState<boolean>(false)
   const [rowsperpage, setRowsperpage] = useState<number>(5)
   const [page, setPage] = useState<number>(0)
@@ -42,13 +45,17 @@ export default function SearchReportes() {
   const [emailDestinatario, setEmailDestinatario] = useState<string>("")
   const [emailDestinatarioError, setEmailDestinatarioError] =
     useState<boolean>(false)
-
   const [openBackDropDestinatarios, setOpenBackDropDestinatarios] =
     useState<boolean>(false)
+
+  useEffect(() => {
+    makeSearch()
+  }, [page, rowsperpage])
 
   const handleCloseBackDropDestinatarios = () => {
     setOpenBackDropDestinatarios(false)
   }
+
   const addNewDestinatario = async () => {
     try {
       if (!nomeDestinatario) {
@@ -82,8 +89,14 @@ export default function SearchReportes() {
       setOpenMessage(true)
     }
   }
-  const changePage = async (page: number) => {}
-  const changeRowsPerPage = async (rowsPerPage: number) => {}
+
+  const changePage = async (page: number) => {
+    setPage(page)
+  }
+
+  const changeRowsPerPage = async (rowsPerPage: number) => {
+    setRowsperpage(rowsPerPage)
+  }
 
   const destinatariosButton = (
     <Button
@@ -91,7 +104,7 @@ export default function SearchReportes() {
       disabled={loading}
       variant="contained"
       onClick={async () => {
-        const list = await RequestApi.Get("/api/suporte/getListaDestinatarios")
+        const list = await HttpRequest.Get("/api/suporte/getListaDestinatarios")
 
         if (list.success) {
           setDestinatarios(list.data.list)
@@ -120,6 +133,83 @@ export default function SearchReportes() {
       Voltar
     </Button>
   )
+
+  const searchByEnterKeyPress = async (e: any) => {
+    if (e.key === "Enter") await makeSearch()
+  }
+
+  const makeSearch = async () => {
+    try {
+      setLoading(true)
+
+      const apiResponse = await HttpRequest.Post(
+        "/api/suporte/searchReportes",
+        {
+          searchText,
+          page,
+          rowsperpage
+        }
+      )
+
+      if (apiResponse.success) {
+        setReporteList(apiResponse.data.list)
+        setCount(apiResponse.data.count)
+        setLoading(false)
+      } else throw new Error(apiResponse.message)
+    } catch (error: any) {
+      setMessageText(error.message)
+      setOpenMessage(true)
+      setLoading(false)
+    }
+  }
+
+  const getThisById = async (id: string) => {
+    try {
+      setLoading(true)
+      router.push(`/panel/reportes/${id}`)
+    } catch (error: any) {
+      setMessageText(error.message)
+      setOpenMessage(true)
+      setLoading(false)
+    }
+  }
+
+  const finalizeThis = async (id: string) => {
+    try {
+      setLoading(true)
+
+      const apiResponse = await HttpRequest.Post("/api/suporte/finishReport", {
+        id
+      })
+
+      if (apiResponse.success) {
+        setMessageText(apiResponse.message || "")
+        setOpenMessage(true)
+        await makeSearch()
+      } else throw new Error(apiResponse.message)
+    } catch (error: any) {
+      setMessageText(error.message)
+      setOpenMessage(true)
+      setLoading(false)
+    }
+  }
+
+  const actionDecision = async (id: string, actionName: string) => {
+    try {
+      switch (actionName) {
+        case "getById":
+          await getThisById(id)
+          break
+        case "finalizeThis":
+          await finalizeThis(id)
+          break
+      }
+    } catch (error: any) {
+      setMessageText(error.message)
+      setOpenMessage(true)
+      setLoading(false)
+    }
+  }
 
   return (
     <ViewPanel
@@ -160,32 +250,45 @@ export default function SearchReportes() {
         <Grid container spacing={2} justifyContent="center" alignItems="center">
           <Grid item xs={12} sm={12} md={10} lg={10} xl={10}>
             <TextField
-              // value={searchText}
-              // onChange={(e: ChangeEvent<HTMLInputElement>) => {
-              //   setSearchText(e.target.value)
-              // }}
-              // onKeyPress={searchByEnterKeyPress}
-              // disabled={loading}
+              value={searchText}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                setSearchText(e.target.value)
+              }}
+              onKeyPress={searchByEnterKeyPress}
+              disabled={loading}
               label="Buscar o reporte"
               fullWidth
             />
           </Grid>
           <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
-            <Button variant="contained" fullWidth endIcon={<Search />}>
+            <Button
+              variant="contained"
+              disabled={loading}
+              onKeyPress={searchByEnterKeyPress}
+              fullWidth
+              endIcon={<Search />}
+              onClick={makeSearch}
+            >
               Buscar
             </Button>
           </Grid>
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
             <DataGridV2
-              pagination={{
-                onPageChange: changePage,
-                count: count,
-                page: page,
-                rowsPerPage: rowsperpage,
-                onRowsPerPageChange: changeRowsPerPage,
-                rowsPerPageOptions: [5, 10, 20, 30, 40, 50, 100]
-              }}
               loading={loading}
+              hasActions
+              actionTrigger={actionDecision}
+              actions={[
+                {
+                  text: "Vizualizar",
+                  icon: <Visibility />,
+                  name: "getById"
+                },
+                {
+                  text: "Finalizar",
+                  icon: <CheckCircle />,
+                  name: "finalizeThis"
+                }
+              ]}
               data={reporteList}
               headers={[
                 {
@@ -209,6 +312,14 @@ export default function SearchReportes() {
                   attrName: "status"
                 }
               ]}
+              pagination={{
+                onPageChange: changePage,
+                count: count,
+                page: page,
+                rowsPerPage: rowsperpage,
+                onRowsPerPageChange: changeRowsPerPage,
+                rowsPerPageOptions: [5, 10, 20, 30, 40, 50, 100]
+              }}
             />
           </Grid>
         </Grid>
@@ -381,7 +492,7 @@ export default function SearchReportes() {
               if (destinatarios.length > 0) {
                 setMessageText("Salvando... Aguarde.")
                 setOpenMessage(true)
-                const responseApi = await RequestApi.Post(
+                const responseApi = await HttpRequest.Post(
                   "/api/suporte/saveListaDestinatarios",
                   { destinatarios }
                 )

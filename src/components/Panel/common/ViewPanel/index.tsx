@@ -259,15 +259,23 @@ const ViewPanel: FC<viewPanelProps> = ({ ...props }) => {
       <Drawer variant="permanent" open={open}>
         <Toolbar
           sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
+            display: "inline-block",
             px: [1]
           }}
         >
-          <IconButton onClick={toggleDrawer}>
-            <ChevronLeft />
-          </IconButton>
+          <Box
+            sx={{
+              width: "100%",
+              height: "60px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center"
+            }}
+          >
+            <IconButton onClick={toggleDrawer}>
+              <ChevronLeft />
+            </IconButton>
+          </Box>
         </Toolbar>
         <Divider />
         <ListMenu
@@ -300,7 +308,7 @@ const ViewPanel: FC<viewPanelProps> = ({ ...props }) => {
             {props.addButton ? (
               <>
                 <Grid item xs={12} sm={12} md={10} lg={10} xl={10}>
-                  <Typography variant="h6">
+                  <Typography variant="h6" sx={{ color: "#ffffff" }}>
                     {props.title && props.title}
                   </Typography>
                 </Grid>

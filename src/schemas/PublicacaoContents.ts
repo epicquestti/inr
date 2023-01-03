@@ -1,21 +1,15 @@
-import { Document, model, Model, models, Schema, Types } from "mongoose"
+import { schema, types } from "papr"
 
-export interface IPublicacaoContents extends Document {
-  title: string
-  url?: string
-  tipo: string
-  idBoletim: Types.ObjectId
-}
-
-const PublicacaoContentsSchema = new Schema({
-  title: { type: String, required: true },
-  url: { type: String, required: false },
-  tipo: { type: String, required: true },
-  idBoletim: { type: Types.ObjectId, required: true }
+const PublicacaoContentsSchema = schema({
+  title: types.string({ required: true }),
+  url: types.string({ required: false }),
+  tipo: types.string({ required: true }),
+  idBoletim: types.objectId({ required: true })
 })
 
-const PublicacaoContentsModel: Model<IPublicacaoContents> =
-  models["PublicacaoContents"] ||
-  model("PublicacaoContents", PublicacaoContentsSchema)
-
+const PublicacaoContentsModel = papr.model(
+  "PublicacaoContents",
+  PublicacaoContentsSchema
+)
+export type PublicacaoContentsDocument = typeof PublicacaoContentsSchema[0]
 export default PublicacaoContentsModel
