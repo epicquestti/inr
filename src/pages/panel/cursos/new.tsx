@@ -27,6 +27,9 @@ export default function CursosCreate() {
     false,
     false
   ])
+  const [showDialog, setShowDialog] = useState<boolean>(false)
+  const [textDialog, setTextDialog] = useState<string>("")
+
   const router = useRouter()
 
   const handleAtivoChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -38,6 +41,7 @@ export default function CursosCreate() {
   }
 
   const salvarNovoCurso = async () => {
+    setLoading(true)
     if (!nomeCurso) {
       const temp = [...errorList]
       temp[0] = true
@@ -58,7 +62,24 @@ export default function CursosCreate() {
 
     const apiResponse = await HttpRequest.Post("/api/cursos/new", cursoObj)
 
-    console.log(apiResponse)
+    if (apiResponse.success) {
+      setShowDialog(true)
+      setTextDialog("Curso inserido com sucesso.")
+      setLoading(false)
+
+      setNomeCurso("")
+      setUrlCurso("")
+      setAtivo(false)
+      setDestaque(false)
+    } else {
+      setShowDialog(true)
+      setTextDialog(
+        apiResponse.message
+          ? apiResponse.message
+          : "Erro ao inserir Novo Curso."
+      )
+      setLoading(false)
+    }
   }
 
   const backButton = (
@@ -114,6 +135,13 @@ export default function CursosCreate() {
         }
       }}
       bottonButtons={[backButton, saveButton]}
+      snack={{
+        open: showDialog,
+        message: textDialog,
+        onClose: () => {
+          setShowDialog(false)
+        }
+      }}
     >
       <Paper sx={{ padding: 3 }}>
         <Grid container spacing={2} justifyContent="center" alignItems="center">

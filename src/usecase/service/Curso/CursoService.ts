@@ -67,6 +67,8 @@ export default class CursoService implements ICursoService {
   }
 
   async cursoDelete(params: cursoIdOutput): Promise<defaultResponse> {
+    console.log("Service")
+
     try {
       const repositoryResponse = await this._cursoRepository.cursoDelete(params)
 

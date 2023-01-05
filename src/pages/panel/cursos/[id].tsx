@@ -1,5 +1,5 @@
 import { ViewPanel } from "@Components/Panel"
-import { ArrowBack, Save } from "@mui/icons-material"
+import { ArrowBack, DeleteForever, Save } from "@mui/icons-material"
 import {
   Button,
   Checkbox,
@@ -9,14 +9,15 @@ import {
   Paper,
   TextField
 } from "@mui/material"
-import { cursoCreateInput } from "@validation/Cursos/cursoCreate"
 import { cursoIdInput } from "@validation/Cursos/cursoId"
+import { cursoUpdateInput } from "@validation/Cursos/cursoUpdate"
 import { useRouter } from "next/router"
 import { ChangeEvent, useEffect, useState } from "react"
 import HttpRequest from "../../../lib/frontend/HttpRequest"
 
 export default function CursosUpdate() {
   // const [id, setId] = useState<string>("")
+  const [cursoId, setCursoId] = useState<string>("")
   const [nomeCurso, setNomeCurso] = useState<string>("")
   const [urlCurso, setUrlCurso] = useState<string>("")
   const [ativo, setAtivo] = useState<boolean>(false)
@@ -29,11 +30,13 @@ export default function CursosUpdate() {
     false,
     false
   ])
-  const router = useRouter()
-  const { id } = router.query
-  useEffect(() => {
-    console.log("ID", id)
+  const [showDialog, setShowDialog] = useState<boolean>(false)
+  const [textDialog, setTextDialog] = useState<string>("")
 
+  const router = useRouter()
+  useEffect(() => {
+    const { id } = router.query
+    if (id) setCursoId(id ? id.toString() : "")
     if (!router.isReady) return
 
     if (id) getCursoById({ id: id.toString() })
@@ -41,16 +44,13 @@ export default function CursosUpdate() {
 
   const getCursoById = async (params: cursoIdInput) => {
     const apiResponse = await HttpRequest.Get(`/api/cursos/${params.id}`)
-    console.log(apiResponse)
-
     if (apiResponse.success) {
       setNomeCurso(apiResponse.data.nome)
-      setAtivo(apiResponse.data.ativo)
-      setDestaque(apiResponse.data.destaque)
+      setAtivo(apiResponse.data.ativo ? apiResponse.data.ativo : false)
+      setDestaque(apiResponse.data.destaque ? apiResponse.data.destaque : false)
       setUrlCurso(apiResponse.data.url)
     } else {
-      // throw new Error(apiResponse.message)
-      console.log("Error")
+      console.log(apiResponse.message)
     }
   }
 
@@ -62,28 +62,70 @@ export default function CursosUpdate() {
     setDestaque(event.target.checked)
   }
 
-  const salvarNovoCurso = async () => {
+  const editarCurso = async () => {
+    setLoading(true)
     if (!nomeCurso) {
       const temp = [...errorList]
       temp[0] = true
       setErrorList(temp)
+      return
     }
     if (!urlCurso) {
       const temp = [...errorList]
       temp[1] = true
       setErrorList(temp)
+      return
     }
 
-    const cursoObj: cursoCreateInput = {
+    const cursoObj: cursoUpdateInput = {
+      id: cursoId,
       active: ativo,
       nome: nomeCurso,
       url: urlCurso,
       destaque: destaque
     }
 
-    const apiResponse = await HttpRequest.Post("/api/cursos/new", cursoObj)
+    const apiResponse = await HttpRequest.Post(
+      `/api/cursos/${cursoId}/update`,
+      cursoObj
+    )
 
-    console.log(apiResponse)
+    if (apiResponse.success) {
+      setShowDialog(true)
+      setTextDialog("Curso editado com sucesso.")
+      setLoading(false)
+    } else {
+      setShowDialog(true)
+      setTextDialog(
+        apiResponse.message ? apiResponse.message : "Erro ao editar Curso"
+      )
+      setLoading(false)
+    }
+  }
+
+  const excluirCurso = async () => {
+    setLoading(true)
+    const apiResponse = await HttpRequest.Post(
+      `/api/cursos/${cursoId}/delete`,
+      { id: cursoId }
+    )
+
+    if (apiResponse.success) {
+      setShowDialog(true)
+      setTextDialog("Curso excluído com sucesso.")
+      setLoading(false)
+
+      setNomeCurso("")
+      setUrlCurso("")
+      setAtivo(false)
+      setDestaque(false)
+    } else {
+      setShowDialog(true)
+      setTextDialog(
+        apiResponse.message ? apiResponse.message : "Erro ao excluir Curso."
+      )
+      setLoading(false)
+    }
   }
 
   const backButton = (
@@ -106,9 +148,22 @@ export default function CursosUpdate() {
       disabled={loading}
       variant="contained"
       startIcon={<Save />}
-      onClick={salvarNovoCurso}
+      onClick={editarCurso}
     >
       Salvar
+    </Button>
+  )
+
+  const deleteButton = (
+    <Button
+      fullWidth
+      sx={{ backgroundColor: "red" }}
+      disabled={loading}
+      variant="contained"
+      startIcon={<DeleteForever />}
+      onClick={excluirCurso}
+    >
+      Excluir
     </Button>
   )
 
@@ -138,7 +193,14 @@ export default function CursosUpdate() {
           setLoading(false)
         }
       }}
-      bottonButtons={[backButton, saveButton]}
+      bottonButtons={[backButton, saveButton, deleteButton]}
+      snack={{
+        open: showDialog,
+        message: textDialog,
+        onClose: () => {
+          setShowDialog(false)
+        }
+      }}
     >
       <Paper sx={{ padding: 3 }}>
         <Grid container spacing={2} justifyContent="center" alignItems="center">

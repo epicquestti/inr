@@ -7,21 +7,17 @@ async function handle(
   res: NextApiResponse
 ): Promise<void> {
   try {
-    const {
-      query: { id }
-    } = req
-
     const cursoExists = await cursoController.cursoGetById({
-      id: id?.toString() || ""
+      id: req.body.id
     })
+    console.log(cursoExists)
 
-    if (!cursoExists.data.id)
+    if (!cursoExists.data._id)
       throw new Error("Curso não encontrado no Banco de Dados.")
 
     const controllerResponse = await cursoController.cursoDelete({
-      id: id?.toString() || ""
+      id: req.body
     })
-
     return res.status(200).json(controllerResponse)
   } catch (error: any) {
     return res.status(200).json({

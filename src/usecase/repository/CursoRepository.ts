@@ -39,7 +39,7 @@ export default class CursoRepository {
 
   async cursoGetById(params: cursoIdOutput): Promise<CursoDocument | null> {
     try {
-      const result = await CursoModel.findById(params.toString())
+      const result = await CursoModel.findById(params.id)
 
       return result
     } catch (error: any) {
@@ -48,6 +48,8 @@ export default class CursoRepository {
   }
 
   async cursoDelete(params: cursoIdOutput): Promise<number> {
+    console.log("Repository")
+
     try {
       const result = await CursoModel.deleteOne({
         _id: params.id
