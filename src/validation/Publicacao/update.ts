@@ -2,7 +2,7 @@ import { ObjectId } from "mongodb"
 import { z } from "zod"
 
 export const updatePublicacao = z.object({
-  id: z
+  _id: z
     .string({
       invalid_type_error: "id prepcisa ser uma string",
       required_error: "id é obrigatório."

@@ -1,16 +1,11 @@
-const envirorment = process.env.ENVIRORMENT
-const appHost = {
-  development: process.env.HOST_DEV,
-  homolog: process.env.HOST_HOMOLOG,
-  production: process.env.HOST_PRODUCTION
-}
 module.exports = {
   reactStrictMode: true,
   serverRuntimeConfig: {
-    host: appHost[envirorment],
+    host: process.env.HOST,
     accessRegion: process.env.ACCESS_REGION,
     accessKeyId: process.env.ACCESS_KEY_ID,
-    secretAccessKey: process.env.SECRET_ACCESS_KEY
+    secretAccessKey: process.env.SECRET_ACCESS_KEY,
+    jwt_key: process.env.JWT_KEY
   },
   images: {
     domains: ["object.epicquestti.com.br"]

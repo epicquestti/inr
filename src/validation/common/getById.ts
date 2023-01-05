@@ -1,3 +1,4 @@
+import { ObjectId } from "mongodb"
 import { z } from "zod"
 
 export const getById = z.object({
@@ -8,6 +9,7 @@ export const getById = z.object({
     })
     .min(3)
     .max(100)
+    .transform(id => new ObjectId(id))
 })
 
 export type getByIdInput = z.input<typeof getById>
