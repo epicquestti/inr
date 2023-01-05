@@ -1,4 +1,5 @@
 import { schema, types } from "papr"
+import { papr } from "../lib/backend"
 
 const reportesLifeCicleSchema = schema({
   reporte: types.objectId({ required: true }),
