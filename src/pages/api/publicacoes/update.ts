@@ -18,10 +18,7 @@ async function handle(
 
     if (!controller.success) throw new Error(controller.message)
 
-    res.status(200).send({
-      success: true,
-      data: controller.message
-    })
+    res.status(200).send(controller)
   } catch (error: any) {
     return res.status(200).send({
       success: false,
@@ -30,11 +27,6 @@ async function handle(
   }
 }
 
-export default validateHandle(
-  {
-    put: handle
-  },
-  {
-    validationLevel: "free"
-  }
-)
+export default validateHandle({
+  put: handle
+})

@@ -17,6 +17,11 @@ export default class PublicacaoService implements IPublicacaoService {
 
       pub.published = true
       pub.publishedAt = new Date(new Date().setHours(new Date().getHours() - 3))
+
+      return {
+        success: true,
+        message: "mock"
+      }
     } catch (error: any) {
       return {
         success: true,

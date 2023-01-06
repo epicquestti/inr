@@ -34,11 +34,6 @@ async function handle(
   }
 }
 
-export default validateHandle(
-  {
-    post: handle
-  },
-  {
-    validationLevel: "free"
-  }
-)
+export default validateHandle({
+  post: handle
+})

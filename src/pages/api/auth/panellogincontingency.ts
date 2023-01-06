@@ -1,14 +1,20 @@
-import validateHandle from "@lib/backend/validateHandle"
+import { connect } from "@lib/backend"
 import { apiResponse } from "@lib/types/apiResponse"
-import lastPublishesController from "@usecase/controller/LastPublishes"
+import usuarioController from "@usecase/controller/Usuario"
 import { NextApiRequest, NextApiResponse } from "next"
 
-async function handle(
+export default async function handle(
   req: NextApiRequest,
   res: NextApiResponse<apiResponse>
 ): Promise<void> {
   try {
-    const controller = await lastPublishesController.getLastPublishes()
+    await connect()
+    console.log(req.body.credential)
+
+    const controller = await usuarioController.authenticationPanelContingency({
+      credential: req.body.credential
+    })
+
     if (!controller.success) throw new Error(controller.message)
 
     res.status(200).send({
@@ -22,7 +28,3 @@ async function handle(
     })
   }
 }
-
-export default validateHandle({
-  get: handle
-})

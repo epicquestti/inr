@@ -13,6 +13,7 @@ const UsuarioSchema = schema(
         nome: types.string({ required: true }),
         icone: types.string({ required: true }),
         tipo: types.string({ required: true }),
+        root: types.string({ required: true }),
         acoes: types.array(types.string({ required: true }))
       })
     )
