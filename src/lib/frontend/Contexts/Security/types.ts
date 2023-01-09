@@ -1,5 +1,6 @@
 export type securityContextTypes = {
   usuario?: securityContextUser
+  setUsuarioContext: (usuario: any) => void
 }
 
 export type securityContextUser = {

@@ -123,11 +123,7 @@ export default class UsuarioService implements IUsuarioService {
 
       if (!userType) throw new Error("Erro ao realizar login.")
 
-      const expireToken = params.keepConnected ? undefined : "2h"
-
-      const token = sign(user._id.toString(), serverRuntimeConfig.jwt_key, {
-        expiresIn: expireToken
-      })
+      const token = sign(user._id.toString(), serverRuntimeConfig.jwt_key)
 
       if (userType.super) {
         const appSuperFunctions =

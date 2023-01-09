@@ -9,7 +9,7 @@ export default class PublicacaoRepository {
     try {
       return PublicacaoModel.findOne({
         publicId: _id,
-        "type.id": tipo
+        "type.text": tipo
       })
     } catch (error: any) {
       throw new Error(error.message)

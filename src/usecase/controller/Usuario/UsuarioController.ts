@@ -20,8 +20,6 @@ export default class UsuarioController implements IUsuarioController {
         validation.data
       )
 
-      console.log(service)
-
       if (!service.success) throw new Error(service.message)
 
       return service

@@ -1,4 +1,5 @@
 import { HttpRequest } from "@lib/frontend"
+import { useSecurityContext } from "@lib/frontend/Contexts/Security"
 import {
   AccountCircle,
   Bookmark,
@@ -31,6 +32,7 @@ import { useCookies } from "react-cookie"
 const Autenticacao: NextPage = () => {
   const router = useRouter()
   const [cookies, setCookie] = useCookies(["inrpanel"])
+  const security = useSecurityContext()
   const [showPass, setShowPass] = useState(false)
   const [loading, setLoading] = useState(false)
   const [alert, setAlert] = useState(false)
@@ -57,6 +59,8 @@ const Autenticacao: NextPage = () => {
         throw new Error("Senha não pode ser vazio.")
       }
 
+      setLoading(true)
+
       const apiResponse = await HttpRequest.Post("/api/auth/panelLogin", {
         email,
         senha,
@@ -64,11 +68,9 @@ const Autenticacao: NextPage = () => {
       })
 
       if (apiResponse.success) {
-        console.log(apiResponse)
-
-        setCookie("inrpanel", apiResponse.data.credential, {
-          path: "/"
-        })
+        security.setUsuarioContext(apiResponse.data)
+        router.push("/panel")
+        setLoading(true)
         return
       } else throw new Error(apiResponse.message)
     } catch (error: any) {

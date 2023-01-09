@@ -3,11 +3,15 @@ import { useRouter } from "next/router"
 import { createContext, FC, useContext, useEffect, useState } from "react"
 import { useCookies } from "react-cookie"
 import { securityContextTypes, securityContextUser } from "./types"
-const contextDefault: securityContextTypes = {}
+const contextDefault: securityContextTypes = {
+  usuario: undefined,
+  setUsuarioContext: () => {}
+}
 const SecurityContext = createContext<securityContextTypes>(contextDefault)
 export function useSecurityContext(): securityContextTypes {
   return useContext(SecurityContext)
 }
+
 const SecurityContextControll: FC<{ children?: React.ReactNode }> = ({
   ...props
 }) => {
@@ -38,13 +42,16 @@ const SecurityContextControll: FC<{ children?: React.ReactNode }> = ({
   const initContext = async () => {
     try {
       const hasLocal = verifyLocal()
+
       if (hasLocal) {
         setUsuario(hasLocal)
+
         setCookie("inrpanel", hasLocal.credential, {
           path: "/"
         })
       } else {
         const hasCookie = verifyCookie()
+
         if (hasCookie) {
           const newLogin = await HttpRequest.Post(
             "/api/auth/panellogincontingency",
@@ -63,6 +70,16 @@ const SecurityContextControll: FC<{ children?: React.ReactNode }> = ({
       router.push("/panel/autenticacao")
     }
   }
+
+  const setUsuarioContext = async (usuario: securityContextUser) => {
+    try {
+      setUsuario(usuario)
+    } catch (error: any) {
+      console.log(error.message)
+      router.push("/panel/autenticacao")
+    }
+  }
+
   useEffect(() => {
     initContext()
   }, [])
@@ -70,6 +87,7 @@ const SecurityContextControll: FC<{ children?: React.ReactNode }> = ({
   useEffect(() => {
     if (usuario) {
       window.localStorage.setItem("inrpanel", JSON.stringify(usuario))
+
       setCookie("inrpanel", usuario.credential, {
         path: "/"
       })
@@ -77,7 +95,8 @@ const SecurityContextControll: FC<{ children?: React.ReactNode }> = ({
   }, [usuario])
 
   const providerValue: securityContextTypes = {
-    usuario
+    usuario,
+    setUsuarioContext: setUsuarioContext
   }
 
   return (

@@ -54,9 +54,9 @@ export default class AtualizacoesController implements IAtualizacoesController {
       if (!validation.success)
         throw new Error(validation.error.issues[0].message)
 
-      const service = await this._AtualizacaoService.getAtualizacoesById(
-        validation.data
-      )
+      const service = await this._AtualizacaoService.getAtualizacoesById({
+        id: validation.data.id.toString()
+      })
 
       if (!service.success) throw new Error(service.message)
 

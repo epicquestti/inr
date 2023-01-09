@@ -1,6 +1,6 @@
 import validateHandle from "@lib/backend/validateHandle"
+import apiController from "@usecase/controller/Api"
 import { NextApiRequest, NextApiResponse } from "next"
-import atualizacoesController from "src/usecase/controller/Atualizacoes"
 
 async function handle(
   req: NextApiRequest,
@@ -8,16 +8,14 @@ async function handle(
 ): Promise<void> {
   try {
     const {
-      query: { version, major, minor, severity, limit, page }
+      body: { _id, url, metodo, tipo }
     } = req
 
-    const controller = await atualizacoesController.atualizacaoList({
-      version: version?.toString() || "",
-      major: major?.toString() || "",
-      minor: minor?.toString() || "",
-      severity: severity?.toString() || "",
-      limit: limit?.toString() || "",
-      page: page?.toString() || ""
+    const controller = await apiController.saveApi({
+      _id,
+      url,
+      metodo,
+      tipo
     })
 
     if (!controller.success) throw new Error(controller.message)
@@ -35,5 +33,5 @@ async function handle(
 }
 
 export default validateHandle({
-  get: handle
+  post: handle
 })

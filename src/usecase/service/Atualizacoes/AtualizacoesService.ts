@@ -95,16 +95,20 @@ export default class AtualizacoesService implements IAtualizacoesService {
     }
   }
 
-  async publish(params: { id: string }): Promise<defaultResponse> {
+  async publish(params: { id: ObjectId }): Promise<defaultResponse> {
     try {
-      const toPublish = await this.getAtualizacoesById({ id: params.id })
+      const toPublish = await this.getAtualizacoesById({
+        id: params.id.toString()
+      })
 
       if (!toPublish) throw new Error("Atualização não encontrada.")
 
       if (toPublish.data.vigent)
         throw new Error("Essa já é a atualização vigente.")
 
-      const atual = await this._updatesRepository.getVigentNotId(params.id)
+      const atual = await this._updatesRepository.getVigentNotId(
+        params.id.toString()
+      )
 
       for (let i = 0; i < atual.length; i++)
         await this._updatesRepository.changeVigantState(atual[i]._id, false)
