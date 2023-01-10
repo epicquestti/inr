@@ -34,6 +34,7 @@ export class ApiController implements IApiController {
 
   async getApiById(params: { id: string }): Promise<defaultResponse> {
     try {
+      // change
       const validation = await getById.safeParseAsync(params)
 
       if (!validation.success)
