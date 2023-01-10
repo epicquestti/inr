@@ -1,21 +1,17 @@
-import validateHandle from "@lib/backend/validateHandle"
 import apiController from "@usecase/controller/Api"
 import { NextApiRequest, NextApiResponse } from "next"
 
-async function handle(
+export default async function handle(
   req: NextApiRequest,
   res: NextApiResponse
 ): Promise<void> {
   try {
     const {
-      body: { _id, url, metodo, tipo }
+      query: { id }
     } = req
 
-    const controller = await apiController.saveApi({
-      _id,
-      url,
-      metodo,
-      tipo
+    const controller = await apiController.getApiById({
+      id: id?.toString() || ""
     })
 
     if (!controller.success) throw new Error(controller.message)
@@ -32,6 +28,6 @@ async function handle(
   }
 }
 
-export default validateHandle({
-  post: handle
-})
+// export default validateHandle({
+//   post: handle
+// })

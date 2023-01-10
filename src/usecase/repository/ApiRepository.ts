@@ -43,4 +43,22 @@ export default class ApiRepository {
       throw new Error(error.message)
     }
   }
+
+  async getApiById(_id: ObjectId): Promise<ApiDocument | null> {
+    try {
+      return ApiModel.findById(_id)
+    } catch (error: any) {
+      throw new Error(error.message)
+    }
+  }
+
+  async deleteApi(_id: ObjectId): Promise<number | null> {
+    try {
+      const repositoryModel = await ApiModel.deleteOne(_id)
+
+      return repositoryModel.deletedCount
+    } catch (error: any) {
+      throw new Error(error.message)
+    }
+  }
 }

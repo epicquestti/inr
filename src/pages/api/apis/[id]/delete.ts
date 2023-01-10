@@ -7,14 +7,11 @@ export default async function handle(
 ): Promise<void> {
   try {
     const {
-      body: { _id, url, metodo, tipo }
+      query: { id }
     } = req
 
-    const controller = await apiController.saveApi({
-      _id,
-      url,
-      metodo,
-      tipo
+    const controller = await apiController.deleteApi({
+      id: id?.toString() || ""
     })
 
     if (!controller.success) throw new Error(controller.message)
@@ -30,7 +27,3 @@ export default async function handle(
     })
   }
 }
-
-// export default validateHandle({
-//   post: handle
-// })

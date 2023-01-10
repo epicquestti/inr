@@ -1,9 +1,8 @@
-import validateHandle from "@lib/backend/validateHandle"
 import { apiResponse } from "@lib/types/apiResponse"
 import lastPublishesController from "@usecase/controller/LastPublishes"
 import { NextApiRequest, NextApiResponse } from "next"
 
-async function handle(
+export default async function handle(
   req: NextApiRequest,
   res: NextApiResponse<apiResponse>
 ): Promise<void> {
@@ -23,6 +22,6 @@ async function handle(
   }
 }
 
-export default validateHandle({
-  get: handle
-})
+// export default validateHandle({
+//   get: handle
+// })

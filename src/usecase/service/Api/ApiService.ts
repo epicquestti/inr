@@ -5,6 +5,42 @@ import { IApiService } from "./IApiService"
 
 export default class ApiService implements IApiService {
   constructor(private _apiRepository: ApiRepository) {}
+  async getApiById(params: { id: ObjectId }): Promise<defaultResponse> {
+    try {
+      const api = await this._apiRepository.getApiById(params.id)
+
+      if (!api) throw new Error("Api não encontrado.")
+
+      return {
+        success: true,
+        data: api
+      }
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error.message
+      }
+    }
+  }
+
+  async deleteApi(params: { id: ObjectId }): Promise<defaultResponse> {
+    try {
+      const api = await this._apiRepository.deleteApi(params.id)
+
+      if (!api || api <= 0) throw new Error("Nenhuma api foi enxcluida.")
+
+      return {
+        success: true,
+        message: "Api Exluida com sucesso"
+      }
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error.message
+      }
+    }
+  }
+
   async saveApi(params: {
     _id?: string | ObjectId | null | undefined
     url: string
