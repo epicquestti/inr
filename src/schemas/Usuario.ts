@@ -1,26 +1,28 @@
-import { Document, model, Model, models, Schema, Types } from "mongoose"
+import { schema, types } from "papr"
+import { papr } from "../lib/backend"
 
-export interface UsuarioInterface extends Document {
-  nome: string
-  email: string
-  senha: string
-  tipoUsuario: Types.ObjectId
-  ativo: boolean
-  firstUsage: boolean
-}
-
-const UsuarioSchema = new Schema(
+const UsuarioSchema = schema(
   {
-    nome: { type: String, required: true },
-    email: { type: String, required: true },
-    senha: { type: String, required: true },
-    tipoUsuario: { type: Schema.Types.ObjectId, ref: "TipoUsuario" }
+    nome: types.string({ required: true }),
+    email: types.string({ required: true }),
+    senha: types.string({ required: true }),
+    tipoUsuario: types.objectId({ required: true }),
+    permissoes: types.array(
+      types.object({
+        _id: types.objectId({ required: true }),
+        nome: types.string({ required: true }),
+        icone: types.string({ required: true }),
+        tipo: types.string({ required: true }),
+        root: types.string({ required: true }),
+        acoes: types.array(types.string({ required: true }))
+      })
+    )
   },
   {
     timestamps: true
   }
 )
-const usuario: Model<UsuarioInterface> =
-  models["Usuario"] || model("Usuario", UsuarioSchema)
 
-export default usuario
+const usuarioModel = papr.model("Usuario", UsuarioSchema)
+export type usuarioDocument = typeof UsuarioSchema[0]
+export default usuarioModel

@@ -14,7 +14,7 @@ import {
 } from "@mui/material"
 import { useRouter } from "next/router"
 import { ChangeEvent, useState } from "react"
-import RequestApi from "../../../lib/frontend/RequestApi"
+import RequestApi from "../../../lib/frontend/HttpRequest"
 
 export default function CreateAtualizacoes() {
   const [loading, setLoading] = useState<boolean>(false)

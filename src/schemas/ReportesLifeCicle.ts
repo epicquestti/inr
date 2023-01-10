@@ -1,20 +1,16 @@
-import { Document, model, Model, models, Schema, Types } from "mongoose"
-interface reportesLifeCicleInterface extends Document {
-  reporte: Types.ObjectId
-  event: string
-  createdAt: Date
-  observacoes: string
-}
+import { schema, types } from "papr"
+import { papr } from "../lib/backend"
 
-const reportesLifeCicleSchema = new Schema({
-  reporte: { type: Types.ObjectId, required: true },
-  event: { type: String, required: true },
-  createdAt: { type: Date, required: true },
-  observacoes: { type: String, required: true }
+const reportesLifeCicleSchema = schema({
+  reporte: types.objectId({ required: true }),
+  event: types.string({ required: true }),
+  createdAt: types.date({ required: true }),
+  observacoes: types.date({ required: true })
 })
 
-const ReportesLifeCicle: Model<reportesLifeCicleInterface> =
-  models["ReportesLifeCicle"] ||
-  model("ReportesLifeCicle", reportesLifeCicleSchema)
-
-export default ReportesLifeCicle
+const reportesLifeCicleModel = papr.model(
+  "ReportesLifeCicle",
+  reportesLifeCicleSchema
+)
+export type ReportesLifeCicleDocument = typeof reportesLifeCicleSchema[0]
+export default reportesLifeCicleModel

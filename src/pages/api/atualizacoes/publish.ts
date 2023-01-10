@@ -1,77 +1,25 @@
-import connect from "@lib/backend/database"
-import Updates from "@schema/Updates"
+import atualizacoesController from "@usecase/controller/Atualizacoes"
 import { NextApiRequest, NextApiResponse } from "next"
 
-export default async function publishAtualizacao(
+export default async function handle(
   req: NextApiRequest,
   res: NextApiResponse
 ): Promise<void> {
   try {
     const {
-      // method,
       query: { id }
     } = req
 
-    if (!id) throw new Error("id ausente")
-
-    await connect()
-
-    const toPublish = await Updates.findOne({
-      _id: id
+    const controller = await atualizacoesController.publicar({
+      id: id?.toString() || ""
     })
 
-    if (!toPublish) throw new Error("Atualização não encontrada.")
+    if (!controller.success) throw new Error(controller.message)
 
-    if (toPublish.vigent) throw new Error("Essa já é a atualização vigente.")
-
-    const atual = await Updates.find({
-      $and: [
-        {
-          vigent: true
-        },
-        {
-          _id: {
-            $ne: id
-          }
-        }
-      ]
+    res.status(200).send({
+      success: true,
+      data: controller.message
     })
-
-    for (let i = 0; i < atual.length; i++) {
-      const updateItemId: string = atual[i].id
-
-      const resss = await Updates.updateOne(
-        {
-          _id: updateItemId
-        },
-        {
-          $set: {
-            vigent: false
-          }
-        }
-      )
-    }
-
-    const toPublishResult = await Updates.updateOne(
-      {
-        _id: id
-      },
-      {
-        vigent: true
-      }
-    )
-
-    if (toPublishResult.modifiedCount > 0) {
-      res.status(200).send({
-        success: true,
-        message: "Atualização Publicada com sucesso."
-      })
-    } else {
-      res.status(200).send({
-        success: false,
-        message: "Atualização não publicada."
-      })
-    }
   } catch (error: any) {
     return res.status(200).send({
       success: false,
@@ -79,3 +27,7 @@ export default async function publishAtualizacao(
     })
   }
 }
+
+// export default validateHandle({
+//   get: handle
+// })

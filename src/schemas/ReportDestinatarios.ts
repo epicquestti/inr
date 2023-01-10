@@ -1,16 +1,14 @@
-import { Document, model, Model, models, Schema } from "mongoose"
-interface reportDestinatarioInterface extends Document {
-  nome: string
-  email: string
-}
+import { schema, types } from "papr"
+import { papr } from "../lib/backend"
 
-const reportDestinatarioSchema = new Schema({
-  nome: { type: String, required: true },
-  email: { type: String, required: true }
+const reportDestinatarioSchema = schema({
+  nome: types.string({ required: true }),
+  email: types.string({ required: true })
 })
 
-const ReportDestinatario: Model<reportDestinatarioInterface> =
-  models["ReportDestinatario"] ||
-  model("ReportDestinatario", reportDestinatarioSchema)
-
-export default ReportDestinatario
+const publicIdentifierModel = papr.model(
+  "ReportDestinatario",
+  reportDestinatarioSchema
+)
+export type publicIdentifierDocument = typeof reportDestinatarioSchema[0]
+export default publicIdentifierModel

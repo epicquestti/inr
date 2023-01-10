@@ -1,24 +1,15 @@
-import { Document, model, Model, models, Schema } from "mongoose"
+import { schema, types } from "papr"
+import { papr } from "../lib/backend"
 
-interface updatesInterface extends Document {
-  version: number
-  major: number
-  minor: number
-  severity: "normal" | "urgent"
-  link: string
-  vigent: boolean
-}
-
-const updatesSchema = new Schema({
-  version: { type: Number, required: true },
-  major: { type: Number, required: true },
-  minor: { type: Number, required: true },
-  severity: { type: String, required: true },
-  link: { type: String, required: true },
-  vigent: { type: Boolean, required: true }
+const updatesSchema = schema({
+  version: types.number({ required: true }),
+  major: types.number({ required: true }),
+  minor: types.number({ required: true }),
+  severity: types.string({ required: true }),
+  link: types.string({ required: true }),
+  vigent: types.boolean({ required: true })
 })
 
-const Updates: Model<updatesInterface> =
-  models["Updates"] || model("Updates", updatesSchema)
-
-export default Updates
+const updatesModel = papr.model("Updates", updatesSchema)
+export type updatesDocument = typeof updatesSchema[0]
+export default updatesModel

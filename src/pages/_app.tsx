@@ -1,5 +1,6 @@
 import createCache from "@emotion/cache"
 import { CacheProvider } from "@emotion/react"
+import SecurityContextControll from "@lib/frontend/Contexts/Security"
 import { CssBaseline, ThemeProvider } from "@mui/material"
 import { ObjectId } from "bson"
 import { AppProps } from "next/app"
@@ -29,7 +30,9 @@ const App: FC<AppProps> = ({ Component, pageProps }) => {
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <CookiesProvider>
-          <Component {...pageProps} />
+          <SecurityContextControll>
+            <Component {...pageProps} />
+          </SecurityContextControll>
         </CookiesProvider>
       </ThemeProvider>
     </CacheProvider>

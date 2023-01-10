@@ -1,15 +1,11 @@
-import { Document, model, Model, models, Schema } from "mongoose"
-interface lastPublishesInterface extends Document {
-  boletim: number
-  classificador: number
-}
+import { schema, types } from "papr"
+import { papr } from "../lib/backend"
 
-const lastPublishesSchema = new Schema({
-  boletim: { type: Number, required: false },
-  classificador: { type: Number, required: false }
+const lastPublishesSchema = schema({
+  boletim: types.number({ required: false }),
+  classificador: types.number({ required: false })
 })
 
-const LastPublishes: Model<lastPublishesInterface> =
-  models["LastPublishes"] || model("LastPublishes", lastPublishesSchema)
-
-export default LastPublishes
+const LastPublishesModel = papr.model("LastPublishes", lastPublishesSchema)
+export type LastPublishesDocument = typeof lastPublishesSchema[0]
+export default LastPublishesModel

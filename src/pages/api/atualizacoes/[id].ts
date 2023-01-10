@@ -1,46 +1,25 @@
-import connect from "@lib/backend/database"
-import Updates from "@schema/Updates"
-
 import { NextApiRequest, NextApiResponse } from "next"
+import atualizacoesController from "src/usecase/controller/Atualizacoes"
 
-export default async function getAtualizaçõesById(
+export default async function handle(
   req: NextApiRequest,
   res: NextApiResponse
 ): Promise<void> {
   try {
     const {
-      method,
       query: { id }
     } = req
 
-    if (!id) throw new Error("id ausente.")
-
-    await connect()
-    const atualizacao = await Updates.findOne({
-      _id: id.toString()
+    const controller = await atualizacoesController.getAtualizacoesById({
+      id: id?.toString() || ""
     })
 
-    const updatesSelected = {
-      id: atualizacao?._id.toString(),
-      version: atualizacao?.version,
-      major: atualizacao?.major,
-      minor: atualizacao?.minor,
-      severity: atualizacao?.severity,
-      link: atualizacao?.link,
-      vigent: atualizacao?.vigent
-    }
+    if (!controller.success) throw new Error(controller.message)
 
-    if (atualizacao) {
-      res.status(200).send({
-        success: true,
-        data: updatesSelected
-      })
-    } else {
-      res.status(200).send({
-        success: false,
-        message: "Atualização não encontrada."
-      })
-    }
+    res.status(200).send({
+      success: true,
+      data: controller.message
+    })
   } catch (error: any) {
     return res.status(200).send({
       success: false,
@@ -48,3 +27,7 @@ export default async function getAtualizaçõesById(
     })
   }
 }
+
+// export default validateHandle({
+//   get: handle
+// })

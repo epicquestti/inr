@@ -1,5 +1,5 @@
 import { DataGridV2, ViewPanel } from "@Components/Panel"
-import HttpRequest from "@lib/frontend/RequestApi"
+import HttpRequest from "@lib/frontend/HttpRequest"
 import { ArrowBack, PlusOne, Visibility } from "@mui/icons-material"
 import {
   Button,

@@ -1,5 +1,5 @@
 import { ViewPanel } from "@Components/Panel"
-import RequestApi from "@lib/frontend/RequestApi"
+import RequestApi from "@lib/frontend/HttpRequest"
 import { ArrowBack, Delete, Edit, Save } from "@mui/icons-material"
 import {
   Box,
@@ -329,20 +329,25 @@ export default function NovaPublicacao() {
       return
     }
 
-    setLoading(true)
+    try {
+      setLoading(true)
 
-    const requestResponse = await RequestApi.Post("/api/publicacoes/new", {
-      titulo,
-      tipo,
-      conteudoList
-    })
+      const requestResponse = await RequestApi.Post("/api/publicacoes/new", {
+        titulo,
+        tipo,
+        conteudoList
+      })
 
-    setDialogText(requestResponse.message || "")
-    setOpenDialog(true)
-    setLoading(false)
-
-    if (requestResponse.success)
-      router.push(`/panel/publicacoes/${requestResponse.data.id}`)
+      if (requestResponse.success) {
+        setDialogText(requestResponse.message || "")
+        setOpenDialog(true)
+        router.push(`/panel/publicacoes/${requestResponse.data.id}`)
+      } else throw new Error(requestResponse.message)
+    } catch (error: any) {
+      setDialogText(error.message || "Erro ao Salvar.")
+      setOpenDialog(true)
+      setLoading(false)
+    }
   }
 
   const backButton = (
