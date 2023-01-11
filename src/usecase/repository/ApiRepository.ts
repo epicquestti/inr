@@ -1,3 +1,4 @@
+import { connect } from "@lib/backend"
 import ApiModel, { ApiDocument } from "@schema/Api"
 import { ObjectId } from "mongodb"
 
@@ -8,7 +9,8 @@ export default class ApiRepository {
     tipo: string
   ): Promise<ApiDocument | null> {
     try {
-      return ApiModel.insertOne({
+      await connect()
+      return await ApiModel.insertOne({
         url,
         method: metodo,
         type: tipo
@@ -25,6 +27,8 @@ export default class ApiRepository {
     type: string
   ): Promise<number> {
     try {
+      await connect()
+
       const res = await ApiModel.updateOne(
         {
           _id: _id
@@ -46,6 +50,8 @@ export default class ApiRepository {
 
   async getApiById(_id: ObjectId): Promise<ApiDocument | null> {
     try {
+      await connect()
+
       return ApiModel.findById(_id)
     } catch (error: any) {
       throw new Error(error.message)
@@ -53,8 +59,14 @@ export default class ApiRepository {
   }
 
   async deleteApi(_id: ObjectId): Promise<number | null> {
+    console.log(_id)
+
     try {
-      const repositoryModel = await ApiModel.deleteOne(_id)
+      await connect()
+
+      const repositoryModel = await ApiModel.deleteOne({
+        _id: _id
+      })
 
       return repositoryModel.deletedCount
     } catch (error: any) {

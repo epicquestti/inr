@@ -1,7 +1,7 @@
 import { ViewPanel } from "@Components/Panel"
 import { apiMethods, apiTypes } from "@lib/data/api"
 import { HttpRequest } from "@lib/frontend"
-import { ArrowBack, Save } from "@mui/icons-material"
+import { ArrowBack, DeleteForever, Save } from "@mui/icons-material"
 import {
   Button,
   FormControl,
@@ -19,7 +19,7 @@ import { ChangeEvent, useEffect, useState } from "react"
 
 export default function ApiManagement() {
   const router = useRouter()
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
   const [id, setId] = useState<string | undefined>(undefined)
   const [url, setUrl] = useState<string>("")
   const [metodo, setMetodo] = useState<string>("")
@@ -36,8 +36,8 @@ export default function ApiManagement() {
       if (apiResponse.success) {
         setId(apiResponse.data._id)
         setUrl(apiResponse.data.url)
-        setMetodo(apiResponse.data.metodo)
-        setTipo(apiResponse.data.tipo)
+        setMetodo(apiResponse.data.method)
+        setTipo(apiResponse.data.type)
       } else throw new Error(apiResponse.message)
     } catch (error: any) {
       setDialogText(error.message)
@@ -48,7 +48,12 @@ export default function ApiManagement() {
   }
 
   useEffect(() => {
-    if (id) getThisApi()
+    const aa = async () => {
+      await getThisApi()
+    }
+    if (id) {
+      aa()
+    }
   }, [id])
 
   useEffect(() => {
@@ -89,18 +94,40 @@ export default function ApiManagement() {
       }
 
       const apiResponse = await HttpRequest.Post("/api/apis/save", body)
-
       if (apiResponse.success) {
         setId(apiResponse.data._id)
         setUrl(apiResponse.data.url)
         setMetodo(apiResponse.data.metodo)
         setTipo(apiResponse.data.tipo)
-      } else throw new Error(apiResponse.message)
+
+        setDialogText(apiResponse.message ? apiResponse.message : "Sucesso!!!")
+        setOpenDialog(true)
+      } else {
+        throw new Error(apiResponse.message)
+      }
     } catch (error: any) {
       setDialogText(error.message)
       setOpenDialog(true)
       setLoading(false)
       return
+    }
+  }
+
+  const deleteApi = async () => {
+    const apiResponse = await HttpRequest.Post(`/api/apis/${id}/delete`, id)
+
+    if (apiResponse.success) {
+      setDialogText(apiResponse.message ? apiResponse.message : "API excluída.")
+      setOpenDialog(true)
+
+      setTimeout(() => {
+        router.push("/panel/api")
+      }, 2000)
+    } else {
+      setDialogText(
+        apiResponse.message ? apiResponse.message : "Erro ao excluir API."
+      )
+      setOpenDialog(true)
     }
   }
 
@@ -127,6 +154,19 @@ export default function ApiManagement() {
       onClick={saveThisApi}
     >
       Salvar
+    </Button>
+  )
+
+  const deleteButton = (
+    <Button
+      sx={{ backgroundColor: "red" }}
+      fullWidth
+      disabled={loading}
+      variant="contained"
+      startIcon={<DeleteForever />}
+      onClick={deleteApi}
+    >
+      Excluir
     </Button>
   )
   return (
@@ -162,7 +202,9 @@ export default function ApiManagement() {
           setOpenDialog(false)
         }
       }}
-      bottonButtons={[backButton, saveButton]}
+      bottonButtons={
+        id ? [backButton, saveButton, deleteButton] : [backButton, saveButton]
+      }
     >
       <Paper sx={{ padding: 3 }}>
         <Grid container spacing={2} justifyContent="center" alignItems="center">

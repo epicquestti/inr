@@ -10,15 +10,19 @@ export default async function handle(
       query: { id }
     } = req
 
+    console.log("ID getByID:", id)
     const controller = await apiController.getApiById({
       id: id?.toString() || ""
     })
+
+    console.log("controller getbyid: ", controller)
 
     if (!controller.success) throw new Error(controller.message)
 
     res.status(200).send({
       success: true,
-      data: controller.message
+      data: controller.data,
+      message: controller.message
     })
   } catch (error: any) {
     return res.status(200).send({

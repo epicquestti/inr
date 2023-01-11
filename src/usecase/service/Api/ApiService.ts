@@ -27,11 +27,11 @@ export default class ApiService implements IApiService {
     try {
       const api = await this._apiRepository.deleteApi(params.id)
 
-      if (!api || api <= 0) throw new Error("Nenhuma api foi enxcluida.")
+      if (!api || api <= 0) throw new Error("Nenhuma api foi excluída.")
 
       return {
         success: true,
-        message: "Api Exluida com sucesso"
+        message: "Api Excluída com sucesso"
       }
     } catch (error: any) {
       return {
@@ -68,7 +68,9 @@ export default class ApiService implements IApiService {
 
       return {
         success: true,
-        message: "Api salva com sucesso",
+        message: params._id
+          ? "Api salva com sucesso"
+          : "API criada com sucesso.",
         data: {
           _id: params._id ? params._id : isNew ? isNew._id : "",
           url: params.url,

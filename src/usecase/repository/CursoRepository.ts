@@ -48,8 +48,6 @@ export default class CursoRepository {
   }
 
   async cursoDelete(params: cursoIdOutput): Promise<number> {
-    console.log("Repository")
-
     try {
       const result = await CursoModel.deleteOne({
         _id: params.id

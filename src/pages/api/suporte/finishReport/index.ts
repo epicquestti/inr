@@ -10,8 +10,6 @@ export default async function finishReport(
   try {
     const { id } = req.body
 
-    console.log(req.body)
-
     if (!id) throw new Error("Identificador do Reporte ausente.")
 
     await connect()

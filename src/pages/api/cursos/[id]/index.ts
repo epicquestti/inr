@@ -8,7 +8,6 @@ const handle = async (
   res: NextApiResponse<apiResponse>
 ): Promise<void> => {
   try {
-    console.log(req.body)
     const { id } = req.query
 
     const controllerResponse = await cursoController.cursoGetById({

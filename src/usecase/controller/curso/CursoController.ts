@@ -83,7 +83,6 @@ export default class CursoController implements ICursoController {
   async cursoDelete(params: cursoIdInput): Promise<defaultResponse> {
     try {
       const zodValidation = await getById.safeParseAsync(params.id)
-      console.log(zodValidation)
 
       if (!zodValidation.success) {
         throw new Error(zodValidation.error.issues[0].message)

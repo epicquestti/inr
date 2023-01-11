@@ -10,8 +10,6 @@ async function handle(
     const cursoExists = await cursoController.cursoGetById({
       id: req.body.id
     })
-    console.log(cursoExists)
-
     if (!cursoExists.data._id)
       throw new Error("Curso não encontrado no Banco de Dados.")
 

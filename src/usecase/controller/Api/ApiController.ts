@@ -22,7 +22,8 @@ export class ApiController implements IApiController {
 
       return {
         success: true,
-        data: service.data
+        data: service.data,
+        message: service.message
       }
     } catch (error: any) {
       return {
@@ -76,6 +77,7 @@ export class ApiController implements IApiController {
 
       return {
         success: true,
+        message: "API criada com sucesso",
         data: service.data
       }
     } catch (error: any) {

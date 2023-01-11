@@ -42,8 +42,6 @@ export default function Cursos() {
         rowsperpage
       })
 
-      console.log(apiResponse)
-
       if (apiResponse.success) {
         setCursosList(apiResponse.data.list)
         setCount(apiResponse.data.count)
@@ -71,8 +69,6 @@ export default function Cursos() {
   }
 
   const visualizarCurso = (id: string) => {
-    console.log("Entrou")
-
     try {
       setLoading(true)
       router.push(`/panel/cursos/${id}`)
