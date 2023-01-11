@@ -1,6 +1,7 @@
 import { ViewPanel } from "@Components/Panel"
 import RequestApi from "@lib/frontend/RequestApi"
 import { ArrowBack, Delete, Edit, Save } from "@mui/icons-material"
+
 import {
   Box,
   Button,
@@ -13,8 +14,17 @@ import {
   Select,
   SelectChangeEvent,
   TextField,
-  Typography
+  Theme,
+  Typography,
+  useMediaQuery
 } from "@mui/material"
+import {
+  DesktopDatePicker,
+  LocalizationProvider,
+  MobileDatePicker
+} from "@mui/x-date-pickers"
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns"
+import ptBR from "date-fns/locale/pt-BR"
 import { useRouter } from "next/router"
 import { ChangeEvent, useEffect, useState } from "react"
 
@@ -43,6 +53,7 @@ enum countSessions {
   RS = "Rio Grande do Sul",
   "SP-NHP" = "São Paulo - NHP",
   "SP-NHA" = "São Paulo - NHA",
+  "SP-ACU" = "São Paulo - ACU",
   "PR-NHP" = "Paraná - NHP",
   "PR-NHA" = "Paraná - NHA",
   "RS-NHP" = "Rio Grande do Sul - NHP",
@@ -63,6 +74,7 @@ enum typeColors {
   "Rio Grande do Sul" = "#FFF9C4",
   "São Paulo - NHP" = "#FFECB3",
   "São Paulo - NHA" = "#FFE0B2",
+  "São Paulo - ACU" = "#D50000",
   "Paraná - NHP" = "#FFCCBC",
   "Paraná - NHA" = "#D7CCC8",
   "Rio Grande do Sul - NHP" = "#F5F5F5",
@@ -72,6 +84,7 @@ enum classTypes {
   SP = "Clique aqui e acesse o conteúdo desta edição.",
   "SP-NHP" = "Não houve publicação do Diário da Justiça Eletrônico do Tribunal de Justiça do Estado de São Paulo na data de hoje.",
   "SP-NHA" = "Não há atos de interesse no Diário da Justiça Eletrônico do Tribunal de Justiça do Estado de São Paulo.",
+  "SP-ACU" = "Clique aqui e acesse o conteúdo acumulado até o dia ",
   PR = "Clique aqui e acesse o conteúdo desta edição.",
   "PR-NHP" = "Não houve publicação do Diário da Justiça Eletrônico do Tribunal de Justiça do Estado do Paraná na data de hoje.",
   "PR-NHA" = "Não há atos de interesse no Diário da Justiça Eletrônico do Tribunal de Justiça do Estado do Paraná.",
@@ -110,8 +123,11 @@ type resumoList = {
 
 export default function NovaPublicacao() {
   const router = useRouter()
+  const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"))
   const [loading, setLoading] = useState<boolean>(false)
   const [blockLink, setBlockLink] = useState<boolean>(false)
+  const [showAcumuladoField, setShowAcumuladoField] = useState<boolean>(false)
+  const [dataAcumulado, setDataAcumulado] = useState<Date | null>(null)
 
   const [titulo, setTitulo] = useState<string>("")
   const [tipoBoletim] = useState<boletimType[]>([
@@ -215,7 +231,6 @@ export default function NovaPublicacao() {
       setConteudoList(temp)
 
       setTituloContentBoletim("")
-      // setTipoContentBoletim("")
       setUrlContentBoletim("")
     }
 
@@ -238,10 +253,23 @@ export default function NovaPublicacao() {
         return
       }
 
+      if (tipoContentClassificador === "SP-ACU" && !dataAcumulado) {
+        setDialogText("insira a data do acumulado.")
+        setOpenDialog(true)
+        return
+      }
+
+      const finalTitle =
+        tipoContentClassificador === "SP-ACU"
+          ? `${
+              classTypes[tipoContentClassificador as keyof typeof classTypes]
+            }${dataAcumulado?.toLocaleDateString()}`
+          : `${new Date().toLocaleDateString()} – ${
+              classTypes[tipoContentClassificador as keyof typeof classTypes]
+            }`
+
       const newClassificadoritem: content = {
-        titulo: `${new Date().toLocaleDateString()} – ${
-          classTypes[tipoContentClassificador as keyof typeof classTypes]
-        }`,
+        titulo: finalTitle,
         tipo: tipoContentClassificador,
         url: urlContentClassificador
       }
@@ -550,11 +578,18 @@ export default function NovaPublicacao() {
                     onChange={(e: SelectChangeEvent<string>) => {
                       const valueSelected = e.target.value.toString()
 
+                      if (valueSelected === "SP-ACU") {
+                        setShowAcumuladoField(true)
+                      } else {
+                        setShowAcumuladoField(false)
+                      }
+
                       if (
                         valueSelected === "" ||
                         valueSelected === "SP" ||
                         valueSelected === "PR" ||
-                        valueSelected === "RS"
+                        valueSelected === "RS" ||
+                        valueSelected === "SP-ACU"
                       ) {
                         setBlockLink(false)
                       } else {
@@ -562,7 +597,7 @@ export default function NovaPublicacao() {
                         setBlockLink(true)
                       }
 
-                      setTipoContentClassificador(e.target.value.toString())
+                      setTipoContentClassificador(valueSelected)
                     }}
                   >
                     <MenuItem value={""}>
@@ -575,6 +610,7 @@ export default function NovaPublicacao() {
                     <MenuItem value={"SP-NHA"}>
                       SP - Não há atos de interesse...
                     </MenuItem>
+                    <MenuItem value={"SP-ACU"}>SP - ACUMULADO</MenuItem>
                     <MenuItem value={"PR"}>PR</MenuItem>
                     <MenuItem value={"PR-NHP"}>
                       PR - Não houve publicação...
@@ -584,10 +620,10 @@ export default function NovaPublicacao() {
                     </MenuItem>
                     <MenuItem value={"RS"}>RS</MenuItem>
                     <MenuItem value={"RS-NHP"}>
-                      PR - Não houve publicação...
+                      RS - Não houve publicação...
                     </MenuItem>
                     <MenuItem value={"RS-NHA"}>
-                      PR - Não há atos de interesse...
+                      RS - Não há atos de interesse...
                     </MenuItem>
                   </Select>
                 </FormControl>
@@ -607,6 +643,39 @@ export default function NovaPublicacao() {
                   }}
                 />
               </Grid>
+              {showAcumuladoField && (
+                <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                  <LocalizationProvider
+                    dateAdapter={AdapterDateFns}
+                    locale={ptBR}
+                  >
+                    {isMobile ? (
+                      <MobileDatePicker
+                        label="Acumulado até a data de *"
+                        value={dataAcumulado}
+                        onChange={(newValue: any) => {
+                          setDataAcumulado(newValue)
+                        }}
+                        renderInput={(params: any) => (
+                          <TextField tabIndex={8} {...params} fullWidth />
+                        )}
+                      />
+                    ) : (
+                      <DesktopDatePicker
+                        label="Acumulado até a data de *"
+                        value={dataAcumulado}
+                        minDate={new Date("2010-01-01")}
+                        onChange={(newValue: any) => {
+                          setDataAcumulado(newValue)
+                        }}
+                        renderInput={(params: any) => (
+                          <TextField {...params} tabIndex={8} fullWidth />
+                        )}
+                      />
+                    )}
+                  </LocalizationProvider>
+                </Grid>
+              )}
               <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
                 <Box
                   sx={{

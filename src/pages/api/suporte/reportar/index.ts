@@ -36,8 +36,6 @@ export default async function searchAtualizacoes(
       email: req.body.email,
       ddd: req.body.ddd,
       fone: req.body.fone,
-      isWhats: req.body.isWhats,
-      contactWhats: req.body.contactWhats,
       contactEmail: req.body.contactEmail,
       contactLigacao: req.body.contactLigacao,
       contactNo: req.body.contactNo,
@@ -57,8 +55,11 @@ export default async function searchAtualizacoes(
 
     const destinatariosList = await ReportDestinatario.find()
 
+    console.log(host)
+
     const mailGenerator = new Mailgen({
       theme: "default",
+
       product: {
         logo: "https://object.epicquestti.com.br/inr/assets/inr-logo-mail.png",
         name: "INR Publicações",
@@ -189,6 +190,8 @@ export default async function searchAtualizacoes(
       success: true
     })
   } catch (error: any) {
+    console.log(error)
+
     return res.status(200).send({
       success: false,
       message: error.message

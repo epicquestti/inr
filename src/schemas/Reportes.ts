@@ -15,8 +15,6 @@ interface reportesinterface extends Document {
   email: string
   ddd: number
   fone: string
-  isWhats: boolean
-  contactWhats: boolean
   contactEmail: boolean
   contactLigacao: boolean
   contactNo: boolean
@@ -39,8 +37,6 @@ const reportesSchema = new Schema({
   email: { type: String, required: true },
   ddd: { type: String, required: true, maxlength: 2 },
   fone: { type: String, required: true, maxlength: 14 },
-  isWhats: { type: Boolean, required: true },
-  contactWhats: { type: Boolean, required: true },
   contactEmail: { type: Boolean, required: true },
   contactLigacao: { type: Boolean, required: true },
   contactNo: { type: Boolean, required: true },
