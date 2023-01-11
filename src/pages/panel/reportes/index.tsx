@@ -1,5 +1,5 @@
 import { DataGridV2, ViewPanel } from "@Components/Panel"
-import { RequestApi } from "@lib/frontend"
+import { HttpRequest } from "@lib/frontend"
 import {
   Add,
   ArrowBack,
@@ -55,6 +55,7 @@ export default function SearchReportes() {
   const handleCloseBackDropDestinatarios = () => {
     setOpenBackDropDestinatarios(false)
   }
+
   const addNewDestinatario = async () => {
     try {
       if (!nomeDestinatario) {
@@ -88,9 +89,11 @@ export default function SearchReportes() {
       setOpenMessage(true)
     }
   }
+
   const changePage = async (page: number) => {
     setPage(page)
   }
+
   const changeRowsPerPage = async (rowsPerPage: number) => {
     setRowsperpage(rowsPerPage)
   }
@@ -101,7 +104,7 @@ export default function SearchReportes() {
       disabled={loading}
       variant="contained"
       onClick={async () => {
-        const list = await RequestApi.Get("/api/suporte/getListaDestinatarios")
+        const list = await HttpRequest.Get("/api/suporte/getListaDestinatarios")
 
         if (list.success) {
           setDestinatarios(list.data.list)
@@ -139,11 +142,14 @@ export default function SearchReportes() {
     try {
       setLoading(true)
 
-      const apiResponse = await RequestApi.Post("/api/suporte/searchReportes", {
-        searchText,
-        page,
-        rowsperpage
-      })
+      const apiResponse = await HttpRequest.Post(
+        "/api/suporte/searchReportes",
+        {
+          searchText,
+          page,
+          rowsperpage
+        }
+      )
 
       if (apiResponse.success) {
         setReporteList(apiResponse.data.list)
@@ -167,11 +173,12 @@ export default function SearchReportes() {
       setLoading(false)
     }
   }
+
   const finalizeThis = async (id: string) => {
     try {
       setLoading(true)
 
-      const apiResponse = await RequestApi.Post("/api/suporte/finishReport", {
+      const apiResponse = await HttpRequest.Post("/api/suporte/finishReport", {
         id
       })
 
@@ -485,7 +492,7 @@ export default function SearchReportes() {
               if (destinatarios.length > 0) {
                 setMessageText("Salvando... Aguarde.")
                 setOpenMessage(true)
-                const responseApi = await RequestApi.Post(
+                const responseApi = await HttpRequest.Post(
                   "/api/suporte/saveListaDestinatarios",
                   { destinatarios }
                 )

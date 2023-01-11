@@ -1,5 +1,5 @@
 import { ViewPanel } from "@Components/Panel"
-import RequestApi from "@lib/frontend/RequestApi"
+import RequestApi from "@lib/frontend/HttpRequest"
 import {
   ArrowBack,
   Check,

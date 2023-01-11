@@ -1,68 +1,30 @@
-import connect from "@lib/backend/database"
-import Updates from "@schema/Updates"
-
-import { FilterQuery } from "mongoose"
+import validateHandle from "@lib/backend/validateHandle"
 import { NextApiRequest, NextApiResponse } from "next"
+import atualizacoesController from "src/usecase/controller/Atualizacoes"
 
-interface applicationVersionsInterface {
-  version: number
-  major: number
-  minor: number
-  severity: "normal" | "urgent"
-  link: string
-  vigent: boolean
-  publishAt?: Date
-  createdAt?: Date
-}
-
-export default async function searchAtualizacoes(
+async function handle(
   req: NextApiRequest,
   res: NextApiResponse
 ): Promise<void> {
   try {
     const {
-      query: { version, major, minor, severity, rowsPerPage, page }
+      query: { version, major, minor, severity, limit, page }
     } = req
 
-    const parsedRowsPerPage = rowsPerPage ? parseInt(rowsPerPage.toString()) : 5
-    const parsedPage = page ? parseInt(page.toString()) : 0
-    const offset = parsedRowsPerPage * parsedPage
-    await connect()
+    const controller = await atualizacoesController.atualizacaoList({
+      version: version?.toString() || "",
+      major: major?.toString() || "",
+      minor: minor?.toString() || "",
+      severity: severity?.toString() || "",
+      limit: limit?.toString() || "",
+      page: page?.toString() || ""
+    })
 
-    const filter: FilterQuery<applicationVersionsInterface> = {}
-
-    if (version || major || minor || severity) filter.$and = []
-    if (version) filter.$and?.push({ version: parseInt(version.toString()) })
-    if (major) filter.$and?.push({ major: parseInt(major.toString()) })
-    if (minor) filter.$and?.push({ minor: parseInt(minor.toString()) })
-    if (severity) filter.$and?.push({ severity })
-
-    const count = await Updates.count(filter)
-    const updateList = await Updates.find(filter)
-      .sort({ version: "asc", major: "asc", minor: "asc" })
-      .limit(parsedRowsPerPage)
-      .skip(offset)
-
-    const response: any[] = []
-
-    for (let i = 0; i < updateList.length; i++) {
-      response.push({
-        _id: updateList[i]._id,
-        version: updateList[i].version,
-        major: updateList[i].major,
-        minor: updateList[i].minor,
-        severity: updateList[i].severity,
-        link: updateList[i].link
-      })
-    }
+    if (!controller.success) throw new Error(controller.message)
 
     res.status(200).send({
       success: true,
-      message: "Atualizações encontradas:",
-      data: {
-        atualizacoes: response,
-        count
-      }
+      data: controller.message
     })
   } catch (error: any) {
     return res.status(200).send({
@@ -71,3 +33,12 @@ export default async function searchAtualizacoes(
     })
   }
 }
+
+export default validateHandle(
+  {
+    get: handle
+  },
+  {
+    validationLevel: "free"
+  }
+)
