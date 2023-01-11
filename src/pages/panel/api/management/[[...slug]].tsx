@@ -102,6 +102,10 @@ export default function ApiManagement() {
 
         setDialogText(apiResponse.message ? apiResponse.message : "Sucesso!!!")
         setOpenDialog(true)
+
+        setTimeout(() => {
+          router.push("/panel/api")
+        }, 2000)
       } else {
         throw new Error(apiResponse.message)
       }
@@ -186,7 +190,7 @@ export default function ApiManagement() {
         {
           text: "Nova api",
           iconName: "system_update_alt",
-          href: "/panel/api/new"
+          href: "/panel/api/management"
         }
       ]}
       loading={{

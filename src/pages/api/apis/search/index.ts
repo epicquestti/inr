@@ -6,6 +6,8 @@ export default async function searchApis(
   req: NextApiRequest,
   res: NextApiResponse
 ): Promise<void> {
+  console.log(req.body)
+
   try {
     const { searchText, page, rowsperpage } = req.body
 
@@ -20,6 +22,8 @@ export default async function searchApis(
       },
       { limit: rowsperpage, skip: rowsperpage * page }
     )
+
+    console.log(list)
 
     const count = await ApiModel.countDocuments({
       url: {
