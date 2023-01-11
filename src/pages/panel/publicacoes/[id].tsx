@@ -393,7 +393,7 @@ export default function GetPublicacaoById() {
     setLoading(true)
 
     const requestResponse = await RequestApi.Get(
-      `/api/publicacoes/aprovel?id=${id}`
+      `/api/publicacoes/aprove?id=${id}`
     )
 
     if (requestResponse.success) {

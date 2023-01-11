@@ -56,14 +56,16 @@ export default async function updatePublicacao(
       const updated = await PublicacaoModel.updateOne(
         { _id: new ObjectId(id.toString()) },
         {
-          publicId: pubId,
-          title: titulo,
-          type: {
-            id: tipo,
-            text: tipo === 1 ? "Boletim" : "Classificador"
-          },
-          aproved: false,
-          updatedAt: new Date(new Date().setHours(new Date().getHours() - 3))
+          $set: {
+            publicId: pubId,
+            title: titulo,
+            type: {
+              id: tipo,
+              text: tipo === 1 ? "Boletim" : "Classificador"
+            },
+            aproved: false,
+            updatedAt: new Date(new Date().setHours(new Date().getHours() - 3))
+          }
         }
       )
 
@@ -99,10 +101,10 @@ export default async function updatePublicacao(
         message: "Method not Allowed."
       })
     }
-  } catch (error) {
+  } catch (error: any) {
     res.status(200).send({
       success: false,
-      message: JSON.stringify(error)
+      message: error.message
     })
   }
 }

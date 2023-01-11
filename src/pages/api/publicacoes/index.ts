@@ -37,36 +37,29 @@ export default async function Search(
       $and: [
         {
           title: {
-            $regex: ".*" + parsedTitle + ".*"
+            $regex: new RegExp("^" + parsedTitle, "i")
           }
-        },
-        {
-          "type.id": tipoNumero,
-          "type.text": tipo
         }
       ]
     })
 
-    const publicacaoList = await PublicacaoModel.find(
-      {
-        $and: [
-          {
-            title: {
-              $regex: ".*" + parsedTitle + ".*"
-            }
-          },
-          {
-            "type.id": tipoNumero,
-            "type.text": tipo
-          }
-        ]
-      },
-      {
-        sort: {},
-        limit: parsedRowsPerPage,
-        skip: offset
+    console.log(count)
+
+    const publicacaoList = await PublicacaoModel.find({
+      title: {
+        $regex: new RegExp("^" + parsedTitle, "i")
       }
-    )
+    })
+
+    const a = await PublicacaoModel.insertOne({
+      title: "asdsdasdasdas",
+      type: {
+        id: 1,
+        text: "Boletim"
+      },
+      publicId: 12312312,
+      createdAt: new Date()
+    })
 
     const response: publicacoesSerialisedList = []
 
@@ -92,11 +85,11 @@ export default async function Search(
         count: count
       }
     })
-  } catch (error) {
+  } catch (error: any) {
     console.log(error)
     res.status(200).send({
       success: false,
-      message: JSON.stringify(error)
+      message: error.message
     })
   }
 }
