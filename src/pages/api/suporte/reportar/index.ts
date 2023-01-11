@@ -20,7 +20,7 @@ export default async function searchAtualizacoes(
 
     const ca = new Date()
 
-    const reporteRes = await Reportes.create({
+    const reporteRes = await Reportes.insertOne({
       createdAt: ca,
       type: req.body.reportType,
       status: "CRIADO",
@@ -42,7 +42,7 @@ export default async function searchAtualizacoes(
       descricao: req.body.descricao
     })
 
-    await ReportesLifeCicle.create({
+    await ReportesLifeCicle.insertOne({
       reporte: reporteRes._id,
       event: "CRIADO",
       createdAt: new Date(),
@@ -53,7 +53,7 @@ export default async function searchAtualizacoes(
     const { host, accessKeyId, secretAccessKey, accessRegion } =
       serverRuntimeConfig
 
-    const destinatariosList = await ReportDestinatario.find()
+    const destinatariosList = await ReportDestinatario.find({})
 
     console.log(host)
 
@@ -160,7 +160,7 @@ export default async function searchAtualizacoes(
     }
 
     if (mailPromissesArray.length > 0) {
-      await ReportesLifeCicle.create({
+      await ReportesLifeCicle.insertOne({
         reporte: reporteRes._id,
         event: "INICIO ENVIO",
         createdAt: new Date(),
@@ -168,7 +168,7 @@ export default async function searchAtualizacoes(
       })
 
       Promise.all(mailPromissesArray).then(responseArray => {
-        ReportesLifeCicle.create({
+        ReportesLifeCicle.insertOne({
           reporte: reporteRes._id,
           event: "FIM ENVIO",
           createdAt: new Date(),

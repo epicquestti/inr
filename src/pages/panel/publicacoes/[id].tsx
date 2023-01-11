@@ -179,10 +179,7 @@ export default function GetPublicacaoById() {
       const { id } = router.query
       try {
         const publicacao = await RequestApi.Get(
-          "/api/publicacoes/get-publish",
-          {
-            id
-          }
+          `/api/publicacoes/get-publish?id=${id?.toString()}`
         )
 
         if (publicacao.success) {
@@ -371,7 +368,6 @@ export default function GetPublicacaoById() {
 
     const requestResponse = await RequestApi.Put(
       `/api/publicacoes/update?id=${id}`,
-      undefined,
       {
         titulo,
         tipo,
@@ -396,9 +392,9 @@ export default function GetPublicacaoById() {
     const { id } = router.query
     setLoading(true)
 
-    const requestResponse = await RequestApi.Get(`/api/publicacoes/aprove`, {
-      id
-    })
+    const requestResponse = await RequestApi.Get(
+      `/api/publicacoes/aprovel?id=${id}`
+    )
 
     if (requestResponse.success) {
       setshowSave(true)
@@ -416,9 +412,9 @@ export default function GetPublicacaoById() {
     const { id } = router.query
     setLoading(true)
 
-    const requestResponse = await RequestApi.Get(`/api/publicacoes/publish`, {
-      id
-    })
+    const requestResponse = await RequestApi.Get(
+      `/api/publicacoes/publish?id=${id}`
+    )
 
     if (requestResponse.success) {
       setshowSave(false)

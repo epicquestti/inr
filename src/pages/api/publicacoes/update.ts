@@ -1,6 +1,7 @@
-import connect from "@lib/backend/database"
+import { connect } from "@lib/backend/database"
 import PublicacaoModel from "@schema/Publicacao"
 import PublicacaoContentsModel from "@schema/PublicacaoContents"
+import { ObjectId } from "mongodb"
 import { NextApiRequest, NextApiResponse } from "next"
 
 export default async function updatePublicacao(
@@ -53,7 +54,7 @@ export default async function updatePublicacao(
       }
 
       const updated = await PublicacaoModel.updateOne(
-        { _id: id },
+        { _id: new ObjectId(id.toString()) },
         {
           publicId: pubId,
           title: titulo,
@@ -67,16 +68,16 @@ export default async function updatePublicacao(
       )
 
       await PublicacaoContentsModel.deleteMany({
-        idBoletim: id
+        idBoletim: new ObjectId(id.toString())
       })
 
       for (let i = 0; i < conteudoList.length; i++) {
         try {
-          await PublicacaoContentsModel.create({
+          await PublicacaoContentsModel.insertOne({
             title: conteudoList[i].titulo,
             url: conteudoList[i].url,
             tipo: conteudoList[i].tipo,
-            idBoletim: id
+            idBoletim: new ObjectId(id.toString())
           })
         } catch (error) {
           console.log(error)
