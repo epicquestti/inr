@@ -43,7 +43,6 @@ const reportesSchema = new Schema({
   descricao: { type: String, required: true }
 })
 
-const Reportes: Model<reportesinterface> =
-  models["Reportes"] || model("Reportes", reportesSchema)
-
-export default Reportes
+const reportesModel = papr.model("Reportes", reportesSchema)
+export type publicIdentifierDocument = typeof reportesSchema[0]
+export default reportesModel

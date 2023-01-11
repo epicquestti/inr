@@ -1,5 +1,5 @@
 import { ViewPanel } from "@Components/Panel"
-import { RequestApi } from "@lib/frontend"
+import { HttpRequest } from "@lib/frontend"
 import { ArrowBack, CheckCircle } from "@mui/icons-material"
 import { Button, ButtonTypeMap, Grid, Paper, Typography } from "@mui/material"
 import { Box } from "@mui/system"
@@ -44,7 +44,7 @@ export default function GetReporteBugById() {
       const { id } = router.query
       setId(id?.toString())
 
-      const report = await RequestApi.Get(`/api/suporte/${id}`)
+      const report = await HttpRequest.Get(`/api/suporte/${id}`)
 
       if (report.success) {
         setTratamento(report.data.report.tratamento)
@@ -145,7 +145,7 @@ export default function GetReporteBugById() {
               setLoading(true)
               setShowDialog(false)
               const { id } = router.query
-              const report = await RequestApi.Post(
+              const report = await HttpRequest.Post(
                 `/api/suporte/finishReport`,
                 {
                   id
