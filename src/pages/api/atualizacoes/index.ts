@@ -23,7 +23,7 @@ export default async function handle(
 
     res.status(200).send({
       success: true,
-      data: controller.message
+      data: controller.data
     })
   } catch (error: any) {
     return res.status(200).send({

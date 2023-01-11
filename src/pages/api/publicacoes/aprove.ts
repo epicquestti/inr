@@ -26,8 +26,10 @@ export default async function aprovePublicacao(
       await PublicacaoModel.updateOne(
         { _id: new ObjectId(id.toString()) },
         {
-          aproved: true,
-          aprovedAt: new Date(new Date().setHours(new Date().getHours() - 3))
+          $set: {
+            aproved: true,
+            aprovedAt: new Date(new Date().setHours(new Date().getHours() - 3))
+          }
         }
       )
 
@@ -41,10 +43,10 @@ export default async function aprovePublicacao(
         message: "Method not Allowed."
       })
     }
-  } catch (error) {
+  } catch (error: any) {
     res.status(200).send({
       success: false,
-      message: JSON.stringify(error)
+      message: error.message
     })
   }
 }

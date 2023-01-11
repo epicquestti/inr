@@ -27,14 +27,16 @@ export default async function publishPublicacao(
       const publishToAprove = await PublicacaoModel.findById(id.toString())
 
       if (publishToAprove) {
-        publishToAprove.published = true
-        publishToAprove.publishedAt = new Date(
-          new Date().setHours(new Date().getHours() - 3)
-        )
-
         await PublicacaoModel.updateOne(
           { _id: new ObjectId(id.toString()) },
-          publishToAprove
+          {
+            $set: {
+              published: true,
+              publishedAt: new Date(
+                new Date().setHours(new Date().getHours() - 3)
+              )
+            }
+          }
         )
 
         const lp = await LastPublishes.find({})
@@ -60,7 +62,9 @@ export default async function publishPublicacao(
 
           await LastPublishes.updateOne(
             { _id: lpToBeUpdated._id },
-            lpToBeUpdated
+            {
+              $set: lpToBeUpdated
+            }
           )
         }
 

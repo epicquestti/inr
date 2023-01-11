@@ -114,6 +114,8 @@ export default class AtualizacoesController implements IAtualizacoesController {
 
       if (!service.success) throw new Error(service.message)
 
+      console.log(service)
+
       return {
         success: true,
         data: service.data

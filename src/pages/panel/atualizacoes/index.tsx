@@ -43,7 +43,7 @@ export default function SearchAtualizacoes() {
       setLoading(true)
 
       const res = await HttpRequest.Get(
-        `/api/atualizacoes?version=${version}&major=${major}&minor=${minor}&severity=${severity}&rowsPerPage=${rowsperpage}&page=${page}`
+        `/api/atualizacoes?version=${version}&major=${major}&minor=${minor}&severity=${severity}&limit=${rowsperpage}&page=${page}`
       )
 
       if (res.success) {
