@@ -1,25 +1,5 @@
 import { schema, types } from "papr"
-interface reportesinterface extends Document {
-  createdAt: Date
-  type: string
-  status: string
-  os: string
-  version: string
-  appId: string
-  lastBeReceived: number
-  lastClassReceived: number
-  notifyClassificador: boolean
-  notifyBoletim: boolean
-  tratamento: string
-  nome: string
-  email: string
-  ddd: number
-  fone: string
-  contactEmail: boolean
-  contactLigacao: boolean
-  contactNo: boolean
-  descricao: string
-}
+import { papr } from "../lib/backend"
 
 const reportesSchema = schema({
   createdAt: types.date({ required: true }),

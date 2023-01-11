@@ -1,4 +1,5 @@
 import { schema, types } from "papr"
+import { papr } from "../lib/backend"
 
 const publicIdentifierSchema = schema({
   boletim: types.number({ required: false }),
