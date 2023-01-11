@@ -50,7 +50,8 @@ export default async function getLastPublishes(
 
   try {
     await connect()
-    const lastPublishesResponse = await lastPublishes.find()
+    const lastPublishesResponse = await lastPublishes.find({})
+
     if (lastPublishesResponse.length > 0) {
       const bl = lastPublishesResponse[0].boletim
       const cl = lastPublishesResponse[0].classificador
