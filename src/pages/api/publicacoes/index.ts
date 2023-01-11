@@ -1,4 +1,4 @@
-import connect from "@lib/backend/database"
+import { connect } from "@lib/backend/database"
 import PublicacaoModel from "@schema/Publicacao"
 import { NextApiRequest, NextApiResponse } from "next"
 
@@ -31,7 +31,9 @@ export default async function Search(
 
     await connect()
 
-    const count = await PublicacaoModel.count({
+    const tipoNumero: number = tipo && tipo === "Boletim" ? 1 : 2
+
+    const count = await PublicacaoModel.countDocuments({
       $and: [
         {
           title: {
@@ -39,32 +41,32 @@ export default async function Search(
           }
         },
         {
-          type: {
-            id: tipo === "Boletim" ? 1 : 2,
-            text: tipo
-          }
+          "type.id": tipoNumero,
+          "type.text": tipo
         }
       ]
     })
 
-    const publicacaoList = await PublicacaoModel.find({
-      $and: [
-        {
-          title: {
-            $regex: ".*" + parsedTitle + ".*"
+    const publicacaoList = await PublicacaoModel.find(
+      {
+        $and: [
+          {
+            title: {
+              $regex: ".*" + parsedTitle + ".*"
+            }
+          },
+          {
+            "type.id": tipoNumero,
+            "type.text": tipo
           }
-        },
-        {
-          type: {
-            id: tipo === "Boletim" ? 1 : 2,
-            text: tipo
-          }
-        }
-      ]
-    })
-      .sort({ createdAt: -1 })
-      .limit(parsedRowsPerPage)
-      .skip(offset)
+        ]
+      },
+      {
+        sort: {},
+        limit: parsedRowsPerPage,
+        skip: offset
+      }
+    )
 
     const response: publicacoesSerialisedList = []
 
@@ -72,7 +74,7 @@ export default async function Search(
       response.push({
         _id: publicacaoList[i]._id,
         title: publicacaoList[i].title,
-        type: publicacaoList[i].type.text,
+        type: publicacaoList[i].type?.text || "",
         createdAt: publicacaoList[i].createdAt.toLocaleDateString(),
         aproved: publicacaoList[i].aproved ? "APROVADO" : "Ñ APROVADO",
         published: publicacaoList[i].published ? "PUBLICADO" : "Ñ PUBLICADO",

@@ -56,7 +56,7 @@ export default async function getLastPublishes(
       const bl = lastPublishesResponse[0].boletim
       const cl = lastPublishesResponse[0].classificador
 
-      if (bl > 0) {
+      if (bl && bl > 0) {
         const boletim = await PublicacaoModel.findOne({
           publicId: bl,
           "type.id": 1
@@ -90,7 +90,7 @@ export default async function getLastPublishes(
         response.lastBeId = 0
       }
 
-      if (cl > 0) {
+      if (cl && cl > 0) {
         const classificador = await PublicacaoModel.findOne({
           publicId: cl,
           "type.id": 2

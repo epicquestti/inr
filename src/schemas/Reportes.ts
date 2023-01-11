@@ -1,4 +1,4 @@
-import { Document, model, Model, models, Schema } from "mongoose"
+import { schema, types } from "papr"
 interface reportesinterface extends Document {
   createdAt: Date
   type: string
@@ -21,28 +21,28 @@ interface reportesinterface extends Document {
   descricao: string
 }
 
-const reportesSchema = new Schema({
-  createdAt: { type: Date, required: true },
-  type: { type: String, required: true, maxlength: 3 },
-  status: { type: String, required: true },
-  os: { type: String, required: false },
-  version: { type: String, required: true },
-  appId: { type: String, required: true },
-  lastBeReceived: { type: Number, required: false },
-  lastClassReceived: { type: Number, required: false },
-  notifyClassificador: { type: Boolean, required: false },
-  notifyBoletim: { type: Boolean, required: false },
-  tratamento: { type: String, required: true },
-  nome: { type: String, required: true },
-  email: { type: String, required: true },
-  ddd: { type: String, required: true, maxlength: 2 },
-  fone: { type: String, required: true, maxlength: 14 },
-  contactEmail: { type: Boolean, required: true },
-  contactLigacao: { type: Boolean, required: true },
-  contactNo: { type: Boolean, required: true },
-  descricao: { type: String, required: true }
+const reportesSchema = schema({
+  createdAt: types.date({ required: true }),
+  type: types.string({ required: true, maxLength: 3 }),
+  status: types.string({ required: true }),
+  os: types.string({ required: false }),
+  version: types.string({ required: true }),
+  appId: types.string({ required: true }),
+  lastBeReceived: types.number({ required: false }),
+  lastClassReceived: types.number({ required: false }),
+  notifyClassificador: types.boolean({ required: false }),
+  notifyBoletim: types.boolean({ required: false }),
+  tratamento: types.string({ required: true }),
+  nome: types.string({ required: true }),
+  email: types.string({ required: true }),
+  ddd: types.string({ required: true, maxLength: 2 }),
+  fone: types.string({ required: true, maxLength: 14 }),
+  contactEmail: types.boolean({ required: true }),
+  contactLigacao: types.boolean({ required: true }),
+  contactNo: types.boolean({ required: true }),
+  descricao: types.string({ required: true })
 })
 
 const reportesModel = papr.model("Reportes", reportesSchema)
-export type publicIdentifierDocument = typeof reportesSchema[0]
+export type reportesDocument = typeof reportesSchema[0]
 export default reportesModel

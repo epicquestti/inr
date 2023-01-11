@@ -11,45 +11,51 @@ export default async function searchReportes(
 
     await connect()
 
-    const list = await Reportes.find({
-      $or: [
-        {
-          nome: {
-            $regex: ".*" + searchText + ".*",
-            $options: "i"
+    const list = await Reportes.find(
+      {
+        $or: [
+          {
+            nome: {
+              $regex: ".*" + searchText + ".*",
+              $options: "i"
+            }
+          },
+          {
+            email: {
+              $regex: ".*" + searchText + ".*",
+              $options: "i"
+            }
+          },
+          {
+            ddd: {
+              $regex: ".*" + searchText + ".*",
+              $options: "i"
+            }
+          },
+          {
+            fone: {
+              $regex: ".*" + searchText + ".*",
+              $options: "i"
+            }
+          },
+          {
+            version: {
+              $regex: ".*" + searchText + ".*",
+              $options: "i"
+            }
           }
+        ]
+      },
+      {
+        sort: {
+          createdAt: "desc"
         },
-        {
-          email: {
-            $regex: ".*" + searchText + ".*",
-            $options: "i"
-          }
-        },
-        {
-          ddd: {
-            $regex: ".*" + searchText + ".*",
-            $options: "i"
-          }
-        },
-        {
-          fone: {
-            $regex: ".*" + searchText + ".*",
-            $options: "i"
-          }
-        },
-        {
-          version: {
-            $regex: ".*" + searchText + ".*",
-            $options: "i"
-          }
-        }
-      ]
-    })
-      .sort({ createdAt: "desc" })
-      .limit(rowsperpage)
-      .skip(rowsperpage * page)
+        limit: rowsperpage,
+        skip: rowsperpage * page
+      }
+    )
 
-    const count = await Reportes.count({
+    const count = await Reportes.countDocuments({
       $or: [
         {
           nome: {

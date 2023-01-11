@@ -1,4 +1,4 @@
-import connect from "@lib/backend/database"
+import { connect } from "@lib/backend/database"
 import PublicacaoModel from "@schema/Publicacao"
 import { NextApiRequest, NextApiResponse } from "next"
 
@@ -22,7 +22,7 @@ export default async function GetAfterBoletins(
     if (method === "GET") {
       const list = await PublicacaoModel.find({
         publicId: {
-          $gt: id
+          $gt: parseInt(id.toString())
         },
         "type.id": 2
       })

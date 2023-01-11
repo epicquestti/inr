@@ -14,9 +14,14 @@ export default async function getReportById(
 
     await connect()
 
-    const report = await Reportes.findById(id)
+    if (!id) throw new Error("id obrigatório.")
+
+    const report = await Reportes.findById(id.toString())
+
+    if (!report) throw new Error("reporte não encontrado.")
+
     const events = await ReportesLifeCicle.find({
-      reporte: report?._id
+      reporte: report._id
     })
 
     res.status(200).send({

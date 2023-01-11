@@ -1,4 +1,4 @@
-import connect from "@lib/backend/database"
+import { connect } from "@lib/backend/database"
 import PublicacaoModel from "@schema/Publicacao"
 import PublicacaoContentsModel from "@schema/PublicacaoContents"
 import { NextApiRequest, NextApiResponse } from "next"
@@ -23,14 +23,16 @@ export default async function deletePublicacao(
     }
 
     if (method === "DELETE") {
-      const publishToDelete = await PublicacaoModel.findById(id)
+      const publishToDelete = await PublicacaoModel.findById(id.toString())
 
       if (publishToDelete) {
         await PublicacaoContentsModel.deleteMany({
           idBoletim: publishToDelete._id
         })
 
-        await publishToDelete.deleteOne()
+        await PublicacaoModel.deleteOne({
+          _id: publishToDelete._id
+        })
 
         res.status(200).send({
           success: true,

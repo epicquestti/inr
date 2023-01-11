@@ -32,7 +32,7 @@ export default async function finishReport(
       }
     )
 
-    await ReportesLifeCicle.create({
+    await ReportesLifeCicle.insertOne({
       reporte: id,
       event: "FINALIZADO",
       createdAt: new Date(),
