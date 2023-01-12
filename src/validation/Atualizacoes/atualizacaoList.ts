@@ -6,15 +6,15 @@ export const atualizacaoListSchema = z.object({
       invalid_type_error: "version prepcisa ser uma string",
       required_error: "version é obrigatório."
     })
-    .max(3)
-    .transform(version => new Number(version)),
+    .max(3, { message: "max3" })
+    .transform(version => parseInt(version)),
   major: z
     .string({
       invalid_type_error: "major prepcisa ser uma string",
       required_error: "major é obrigatório."
     })
     .max(3)
-    .transform(major => new Number(major)),
+    .transform(major => parseInt(major)),
   minor: z
     .string({
       invalid_type_error: "minor prepcisa ser uma string",
@@ -22,7 +22,7 @@ export const atualizacaoListSchema = z.object({
     })
 
     .max(3)
-    .transform(minor => new Number(minor)),
+    .transform(minor => parseInt(minor)),
   severity: z
     .string({
       invalid_type_error: "severity prepcisa ser uma string",
@@ -37,7 +37,7 @@ export const atualizacaoListSchema = z.object({
     })
     .min(1)
     .max(3)
-    .transform(limit => new Number(limit)),
+    .transform(limit => parseInt(limit)),
   page: z
     .string({
       invalid_type_error: "page prepcisa ser uma string",
@@ -45,7 +45,7 @@ export const atualizacaoListSchema = z.object({
     })
     .min(1)
     .max(3)
-    .transform(page => new Number(page))
+    .transform(page => parseInt(page))
 })
 
 export type atualizacaoListInput = z.input<typeof atualizacaoListSchema>

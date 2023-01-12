@@ -163,9 +163,28 @@ export default class AtualizacoesService implements IAtualizacoesService {
     params: atualizacaoListOutput
   ): Promise<defaultResponse> {
     try {
+      const list = await this._updatesRepository.updateList(
+        params.limit,
+        params.page,
+        params.version,
+        params.major,
+        params.minor,
+        params.severity
+      )
+
+      const count = await this._updatesRepository.updateListCount(
+        params.version,
+        params.major,
+        params.minor,
+        params.severity
+      )
+
       return {
         success: true,
-        data: {}
+        data: {
+          atualizacoes: list,
+          count: count
+        }
       }
     } catch (error: any) {
       return {

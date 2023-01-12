@@ -43,22 +43,10 @@ export default async function Search(
       ]
     })
 
-    console.log(count)
-
     const publicacaoList = await PublicacaoModel.find({
       title: {
         $regex: new RegExp("^" + parsedTitle, "i")
       }
-    })
-
-    const a = await PublicacaoModel.insertOne({
-      title: "asdsdasdasdas",
-      type: {
-        id: 1,
-        text: "Boletim"
-      },
-      publicId: 12312312,
-      createdAt: new Date()
     })
 
     const response: publicacoesSerialisedList = []
