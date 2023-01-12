@@ -7,7 +7,7 @@ type validateApiOptions = {
   validationLevel: "free" | "credential" | "full"
 }
 
-const validateHandle = (handler: handlerProps, options: validateApiOptions) => {
+const validateHandle = (handler: handlerProps) => {
   return async (req: NextApiRequest, res: NextApiResponse) => {
     try {
       const { method, url, query, cookies } = req
@@ -26,8 +26,7 @@ const validateHandle = (handler: handlerProps, options: validateApiOptions) => {
 
       await connect()
 
-      if (options.validationLevel === "free")
-        return await methodHandler(req, res)
+      return await methodHandler(req, res)
     } catch (error: any) {
       if (error instanceof JsonWebTokenError)
         return res.status(200).json({

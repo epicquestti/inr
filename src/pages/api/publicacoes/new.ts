@@ -86,7 +86,9 @@ export default async function novoPublicacao(
         {
           _id: publicIdentifier._id
         },
-        publicIdentifier
+        {
+          $set: publicIdentifier
+        }
       )
 
       res.status(200).send({
@@ -100,10 +102,10 @@ export default async function novoPublicacao(
         message: "Method not Allowed."
       })
     }
-  } catch (error) {
+  } catch (error: any) {
     res.status(200).send({
       success: false,
-      message: JSON.stringify(error)
+      message: error.message
     })
   }
 }

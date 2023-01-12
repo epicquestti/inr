@@ -1,7 +1,8 @@
+import validateHandle from "@lib/backend/validateHandle"
 import { NextApiRequest, NextApiResponse } from "next"
 import atualizacoesController from "src/usecase/controller/Atualizacoes"
 
-export default async function handle(
+async function handle(
   req: NextApiRequest,
   res: NextApiResponse
 ): Promise<void> {
@@ -32,3 +33,7 @@ export default async function handle(
     })
   }
 }
+
+export default validateHandle({
+  get: handle
+})
