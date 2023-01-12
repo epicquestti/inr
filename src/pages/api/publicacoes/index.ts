@@ -38,16 +38,26 @@ export default async function Search(
         {
           title: {
             $regex: new RegExp("^" + parsedTitle, "i")
-          }
+          },
+          "type.id": tipoNumero,
+          "type.text": tipo
         }
       ]
     })
 
-    const publicacaoList = await PublicacaoModel.find({
-      title: {
-        $regex: new RegExp("^" + parsedTitle, "i")
+    const publicacaoList = await PublicacaoModel.find(
+      {
+        title: {
+          $regex: new RegExp("^" + parsedTitle, "i")
+        },
+        "type.id": tipoNumero,
+        "type.text": tipo
+      },
+      {
+        limit: parsedRowsPerPage,
+        skip: offset
       }
-    })
+    )
 
     const response: publicacoesSerialisedList = []
 
