@@ -1,4 +1,3 @@
-import validateHandle from "@lib/backend/validateHandle"
 import { apiResponse } from "@lib/types/apiResponse"
 import cursoController from "@usecase/controller/curso"
 import { cursoCreateInput } from "@validation/Cursos/cursoCreate"
@@ -27,4 +26,4 @@ const handle = async (
   }
 }
 
-export default validateHandle({ post: handle }, { validationLevel: "free" })
+// export default validateHandle({ post: handle }, { validationLevel: "free" })

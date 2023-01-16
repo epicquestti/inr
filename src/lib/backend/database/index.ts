@@ -15,6 +15,7 @@ export async function connect() {
     }
 
     client = global.mongo
+    client.startSession()
     papr.initialize(client.db(paprConfig.bdName))
     await papr.updateSchemas()
   }
@@ -22,6 +23,10 @@ export async function connect() {
 
 export async function disconnect() {
   await client.close()
+}
+
+export async function getClient() {
+  return client
 }
 
 export default papr

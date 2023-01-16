@@ -8,15 +8,19 @@ import {
   Autocomplete,
   Button,
   Checkbox,
+  Chip,
   FormControl,
   Grid,
   InputLabel,
   MenuItem,
+  OutlinedInput,
   Paper,
   Select,
   SelectChangeEvent,
   TextField
 } from "@mui/material"
+import { Box } from "@mui/system"
+import { funcaoSaveInput } from "@validation/Funcoes/funcaoSave"
 import { useRouter } from "next/router"
 import { ChangeEvent, useEffect, useState } from "react"
 
@@ -43,7 +47,7 @@ export default function FuncaoManagement() {
 
   const [apiList, setApiList] = useState<any[]>([])
   const [apiOptions, setApiOptions] = useState<any[]>([])
-  const [usuariosOptions, setUsuariosOptions] = useState<any[]>([])
+  const [tipoUsuariosSelected, setTipoUsuariosSelected] = useState<any[]>([])
   const [tipoUsuarioAutorizadoList, setTipoUsuarioAutorizadoList] = useState<
     any[]
   >([])
@@ -83,13 +87,25 @@ export default function FuncaoManagement() {
     }
   }
 
+  const getTiposUsuario = async () => {
+    const apiResponse = await HttpRequest.Post("/api/tipoUsuario/search", {
+      searchText: "",
+      page: 0,
+      rowsperpage: 999999
+    })
+
+    if (apiResponse.data.list.length > 0) {
+      setTipoUsuarioAutorizadoList(apiResponse.data.list)
+    }
+  }
+
   const saveThisFuncao = async () => {
     try {
       if (!nome) {
         const temp = [...errorList]
         temp[0] = true
         setErrorList(temp)
-        throw new Error("Url não pode estar vazio.")
+        throw new Error("Nome não pode estar vazio.")
       }
       if (!root) {
         const temp = [...errorList]
@@ -115,12 +131,54 @@ export default function FuncaoManagement() {
         setErrorList(temp)
         throw new Error("Tipo não pode estar vazio.")
       }
-      if (tipoUsuarioAutorizadoList.length <= 0) {
+      if (tipoUsuariosSelected.length <= 0) {
         const temp = [...errorList]
         temp[5] = true
         setErrorList(temp)
         throw new Error("Tipo de Usuário autorizado não pode estar vazio.")
       }
+
+      const acoesArray: string[] = []
+
+      for (let i = 0; i < apiList.length; i++) {
+        const a = acoesArray.find(item => {
+          item === apiList[i].type
+        })
+        if (!a) {
+          acoesArray.push(apiList[i].type)
+        }
+      }
+
+      const filteredActions: string[] = []
+      acoesArray.forEach(element => {
+        if (!filteredActions.includes(element)) {
+          filteredActions.push(element)
+        }
+      })
+
+      const tipoUsuarioArray: string[] = []
+
+      for (let i = 0; i < tipoUsuariosSelected.length; i++) {
+        tipoUsuarioArray.push(tipoUsuariosSelected[i]._id)
+      }
+
+      const apisRelacionadasArray = apiList.map(api => api._id)
+
+      const funcaoObj: funcaoSaveInput = {
+        icone: icone,
+        nivel: nivel,
+        nome: nome,
+        root: root,
+        tipo: tipo,
+        acoes: filteredActions,
+        tipoUsuarioAutorizado: tipoUsuarioArray,
+        _id: id,
+        apisRelacionadas: apisRelacionadasArray
+      }
+
+      const apiResponse = await HttpRequest.Post("/api/funcoes/new", funcaoObj)
+
+      console.log(apiResponse)
     } catch (error: any) {
       setDialogText(error.message)
       setOpenDialog(true)
@@ -132,16 +190,22 @@ export default function FuncaoManagement() {
   const deleteFuncao = async () => {}
 
   useEffect(() => {
-    const aa = async () => {
+    const getOptions = async () => {
       await getThisFunction()
     }
     if (id) {
-      aa()
+      getOptions()
     }
   }, [id])
 
   useEffect(() => {
     if (!router.isReady) return
+
+    const getOptions = async () => {
+      await getTiposUsuario()
+    }
+
+    getOptions()
 
     if (slug) {
       if (slug[0] === "new") {
@@ -193,6 +257,21 @@ export default function FuncaoManagement() {
 
   const icon = <CheckBoxOutlineBlankIcon fontSize="small" />
   const checkedIcon = <CheckBoxIcon fontSize="small" />
+
+  const handleTipoUsuarioChange = (
+    event: SelectChangeEvent<typeof tipoUsuariosSelected>
+  ) => {
+    const {
+      target: { value }
+    } = event
+
+    const temp = [...errorList]
+    temp[5] = false
+    setErrorList(temp)
+    setTipoUsuariosSelected(
+      typeof value === "string" ? value.split(",") : value
+    )
+  }
 
   return (
     <ViewPanel
@@ -353,7 +432,7 @@ export default function FuncaoManagement() {
               <Select
                 error={errorList[4]}
                 labelId="tipoListaSelectLabel"
-                label="Nível"
+                label="Tipo"
                 value={tipo}
                 onChange={(event: SelectChangeEvent<string>) => {
                   const tmp = [...errorList]
@@ -375,30 +454,34 @@ export default function FuncaoManagement() {
             </FormControl>
           </Grid>
 
-          <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
+          <Grid item xs={12} sm={12} md={7} lg={7} xl={7}>
             <FormControl fullWidth>
-              <InputLabel id="tipoUsuarioSelectLabel">
-                Usuários Autorizados
+              <InputLabel id="demo-multiple-chip-label">
+                Tipo de Usuário
               </InputLabel>
               <Select
-                error={errorList[3]}
-                labelId="tipoUsuarioSelectLabel"
-                label="Usuários Autorizados"
-                value={nivel}
-                onChange={(event: SelectChangeEvent<string>) => {
-                  const tmp = [...errorList]
-                  tmp[3] = false
-                  setErrorList(tmp)
-                  setNivel(event.target.value)
-                }}
+                label="Tipo de Usuário"
+                labelId="demo-multiple-chip-label"
+                multiple
+                error={errorList[5]}
+                value={tipoUsuariosSelected}
+                onChange={handleTipoUsuarioChange}
+                input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
+                renderValue={selected => (
+                  <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                    {selected.map(value => (
+                      <Chip
+                        key={value._id}
+                        label={value.text}
+                        variant="outlined"
+                      />
+                    ))}
+                  </Box>
+                )}
               >
-                <MenuItem value={"undefined"}>{"SELECIONE UM NÍVEL"}</MenuItem>
-                {functionNivel.map((nivel, index) => (
-                  <MenuItem
-                    key={`item-metodo-list-${nivel}-${index}`}
-                    value={nivel}
-                  >
-                    {nivel}
+                {tipoUsuarioAutorizadoList.map(item => (
+                  <MenuItem key={item._id} value={item}>
+                    {item.text}
                   </MenuItem>
                 ))}
               </Select>
