@@ -54,9 +54,7 @@ export default class AtualizacoesController implements IAtualizacoesController {
       if (!validation.success)
         throw new Error(validation.error.issues[0].message)
 
-      const service = await this._AtualizacaoService.getAtualizacoesById(
-        validation.data
-      )
+      const service = await this._AtualizacaoService.publish(validation.data)
 
       if (!service.success) throw new Error(service.message)
 
@@ -66,7 +64,7 @@ export default class AtualizacoesController implements IAtualizacoesController {
       }
     } catch (error: any) {
       return {
-        success: true,
+        success: false,
         message: error.message
       }
     }

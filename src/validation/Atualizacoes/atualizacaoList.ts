@@ -28,7 +28,7 @@ export const atualizacaoListSchema = z.object({
       invalid_type_error: "severity prepcisa ser uma string",
       required_error: "severity é obrigatório."
     })
-    .min(3)
+    .min(3, { message: "max3" })
     .max(100),
   limit: z
     .string({

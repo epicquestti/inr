@@ -56,11 +56,11 @@ export default class UpdatesRepository {
     }
   }
 
-  async changeVigantState(id: ObjectId, state: boolean): Promise<number> {
+  async changeVigantState(_id: string, state: boolean): Promise<number> {
     try {
       const result = await updatesModel.updateOne(
         {
-          _id: id
+          _id: new ObjectId(_id)
         },
         {
           $set: {
@@ -71,6 +71,7 @@ export default class UpdatesRepository {
 
       return result.modifiedCount
     } catch (error: any) {
+      console.log(JSON.stringify(error))
       throw new Error(error.message)
     }
   }

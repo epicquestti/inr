@@ -12,9 +12,9 @@ export async function connect() {
       if (!global.mongo) {
         global.mongo = await MongoClient.connect(paprConfig.uri)
       }
+      client = global.mongo
     }
 
-    client = global.mongo
     papr.initialize(client.db(paprConfig.bdName))
     await papr.updateSchemas()
   }

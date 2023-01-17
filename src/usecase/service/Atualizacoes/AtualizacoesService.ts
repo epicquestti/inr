@@ -62,7 +62,7 @@ export default class AtualizacoesService implements IAtualizacoesService {
           params.version,
           params.major,
           params.minor,
-          justPublished.vigent,
+          justPublished.vigent || false,
           params.severity,
           params.link
         )
@@ -97,20 +97,22 @@ export default class AtualizacoesService implements IAtualizacoesService {
 
   async publish(params: { id: string }): Promise<defaultResponse> {
     try {
-      const toPublish = await this.getAtualizacoesById({ id: params.id })
+      const toPublish = await this._updatesRepository.getUpdateById(
+        new ObjectId(params.id)
+      )
 
       if (!toPublish) throw new Error("Atualização não encontrada.")
-
-      if (toPublish.data.vigent)
-        throw new Error("Essa já é a atualização vigente.")
+      if (toPublish.vigent) throw new Error("Essa já é a atualização vigente.")
 
       const atual = await this._updatesRepository.getVigentNotId(params.id)
 
-      for (let i = 0; i < atual.length; i++)
-        await this._updatesRepository.changeVigantState(atual[i]._id, false)
+      for (let i = 0; i < atual.length; i++) {
+        let id = atual[i]._id.toString()
+        const t = await this._updatesRepository.changeVigantState(id, false)
+      }
 
       const thisIsFianl = await this._updatesRepository.changeVigantState(
-        new ObjectId(params.id),
+        params.id,
         true
       )
 
@@ -127,7 +129,8 @@ export default class AtualizacoesService implements IAtualizacoesService {
       }
     } catch (error: any) {
       return {
-        success: error.message
+        success: false,
+        message: error.message
       }
     }
   }
@@ -188,7 +191,8 @@ export default class AtualizacoesService implements IAtualizacoesService {
       }
     } catch (error: any) {
       return {
-        success: error.message
+        success: false,
+        message: error.message
       }
     }
   }
