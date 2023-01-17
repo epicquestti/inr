@@ -38,7 +38,7 @@ export default function FuncaoManagement() {
     false
   ])
 
-  const [id, setId] = useState<string | undefined>(undefined)
+  const [id, setId] = useState<string>("")
   const [nome, setNome] = useState<string>("")
   const [root, setRoot] = useState<string>("")
   const [icone, setIcone] = useState<string>("")
@@ -51,7 +51,6 @@ export default function FuncaoManagement() {
   const [tipoUsuarioAutorizadoList, setTipoUsuarioAutorizadoList] = useState<
     any[]
   >([])
-  const [textSearch, setTextSearch] = useState<string>("")
 
   const slug = router.query.slug
 
@@ -101,6 +100,7 @@ export default function FuncaoManagement() {
 
   const saveThisFuncao = async () => {
     try {
+      setLoading(true)
       if (!nome) {
         const temp = [...errorList]
         temp[0] = true
@@ -172,13 +172,40 @@ export default function FuncaoManagement() {
         tipo: tipo,
         acoes: filteredActions,
         tipoUsuarioAutorizado: tipoUsuarioArray,
-        _id: id,
-        apisRelacionadas: apisRelacionadasArray
+        apisRelacionadas: apisRelacionadasArray,
+        _id: id
       }
 
       const apiResponse = await HttpRequest.Post("/api/funcoes/new", funcaoObj)
 
-      console.log(apiResponse)
+      if (apiResponse.success) {
+        setId(apiResponse.data._id)
+        setNome(apiResponse.data.nome)
+        setRoot(apiResponse.data.root)
+        setIcone(apiResponse.data.icone)
+        setNivel(apiResponse.data.nivel)
+        setApiList(apiResponse.data.apiList)
+        setTipo(apiResponse.data.tipo)
+        setTipoUsuariosSelected(apiResponse.data.tipoUsuariosSelected)
+        setDialogText(
+          apiResponse.message
+            ? apiResponse.message
+            : "Função criada com sucesso."
+        )
+        setOpenDialog(true)
+        setLoading(false)
+        setTimeout(() => {
+          router.push("/panel/funcoes")
+        }, 2000)
+      } else {
+        setDialogText(
+          apiResponse.message
+            ? apiResponse.message
+            : "Erro ao criar ou editar Função."
+        )
+        setOpenDialog(true)
+        setLoading(false)
+      }
     } catch (error: any) {
       setDialogText(error.message)
       setOpenDialog(true)
@@ -187,11 +214,48 @@ export default function FuncaoManagement() {
     }
   }
 
-  const deleteFuncao = async () => {}
+  const funcaoGetById = async (id: string) => {
+    const apiResponse = await HttpRequest.Get(`/api/funcoes/${id}`)
+
+    if (apiResponse.success) {
+      const response = apiResponse.data.funcao
+
+      searchApi("")
+      setNome(response.nome)
+      setRoot(response.root)
+      setIcone(response.icone)
+      setNivel(response.nivel)
+      setTipo(response.tipo)
+      setApiList(apiResponse.data.apis)
+      setTipoUsuariosSelected(apiResponse.data.usuarios)
+    }
+
+    console.log(apiResponse)
+  }
+
+  const deleteFuncao = async () => {
+    setLoading(true)
+    const apiResponse = await HttpRequest.Delete(`/api/funcoes/${id}/delete`)
+
+    if (apiResponse.success) {
+      setDialogText("Função excluída com sucesso.")
+      setOpenDialog(true)
+      setLoading(false)
+      setTimeout(() => {
+        router.push("/panel/funcoes")
+      }, 2000)
+    } else {
+      setDialogText(
+        apiResponse.message ? apiResponse.message : "Erro ao excluir Função."
+      )
+      setOpenDialog(true)
+      setLoading(false)
+    }
+  }
 
   useEffect(() => {
     const getOptions = async () => {
-      await getThisFunction()
+      await funcaoGetById(id)
     }
     if (id) {
       getOptions()
@@ -209,10 +273,11 @@ export default function FuncaoManagement() {
 
     if (slug) {
       if (slug[0] === "new") {
-        setId(undefined)
+        setId("")
         setLoading(false)
       } else {
         setId(slug[0])
+        funcaoGetById(slug[0])
       }
     }
   }, [router.isReady])
@@ -235,7 +300,7 @@ export default function FuncaoManagement() {
       variant="contained"
       startIcon={<ArrowBack />}
       onClick={() => {
-        router.push("/panel/funcao")
+        router.push("/panel/funcoes")
       }}
     >
       Voltar
@@ -311,7 +376,6 @@ export default function FuncaoManagement() {
       }
     >
       <Paper sx={{ padding: 3 }}>
-        {JSON.stringify(apiList)}
         <Grid container spacing={2}>
           <Grid item xs={12} sm={12} md={4} lg={4} xl={4}>
             <TextField
@@ -326,6 +390,7 @@ export default function FuncaoManagement() {
               error={errorList[0]}
               label="Nome"
               fullWidth
+              InputLabelProps={{ shrink: nome !== "" ? true : false }}
             />
           </Grid>
           <Grid item xs={12} sm={12} md={4} lg={4} xl={4}>
@@ -341,6 +406,7 @@ export default function FuncaoManagement() {
               error={errorList[1]}
               label="Root"
               fullWidth
+              InputLabelProps={{ shrink: root !== "" ? true : false }}
             />
           </Grid>
           <Grid item xs={12} sm={12} md={4} lg={4} xl={4}>
@@ -356,6 +422,7 @@ export default function FuncaoManagement() {
               error={errorList[2]}
               label="Ícone"
               fullWidth
+              InputLabelProps={{ shrink: icone !== "" ? true : false }}
             />
           </Grid>
           <Grid item xs={12} sm={12} md={4} lg={4} xl={4}>
@@ -466,7 +533,12 @@ export default function FuncaoManagement() {
                 error={errorList[5]}
                 value={tipoUsuariosSelected}
                 onChange={handleTipoUsuarioChange}
-                input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
+                input={
+                  <OutlinedInput
+                    id="select-multiple-chip"
+                    label="Tipo de Usuário"
+                  />
+                }
                 renderValue={selected => (
                   <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
                     {selected.map(value => (

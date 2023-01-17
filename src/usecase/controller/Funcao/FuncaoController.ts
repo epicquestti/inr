@@ -1,5 +1,6 @@
 import { defaultResponse } from "@lib/types/defaultResponse"
 import IFuncaoService from "@usecase/service/Funcao/IFuncaoService"
+import { funcaoIdInput, funcaoIdSchema } from "@validation/Funcoes/funcaoId"
 import {
   funcaoSaveInput,
   funcaoSaveSchema
@@ -10,16 +11,64 @@ export default class FuncaoController implements IFuncaoController {
   constructor(private _funcaoService: IFuncaoService) {}
 
   async funcaoCreate(params: funcaoSaveInput): Promise<defaultResponse> {
-    const validation = await funcaoSaveSchema.safeParseAsync(params)
+    try {
+      const validation = await funcaoSaveSchema.safeParseAsync(params)
 
-    if (!validation.success) throw new Error(validation.error.issues[0].message)
+      if (!validation.success)
+        throw new Error(validation.error.issues[0].message)
 
-    const serviceResponse = await this._funcaoService.funcaoSave(
-      validation.data
-    )
+      const serviceResponse = await this._funcaoService.funcaoSave(
+        validation.data
+      )
 
-    if (!serviceResponse.success) throw new Error(serviceResponse.message)
+      if (!serviceResponse.success) throw new Error(serviceResponse.message)
 
-    return serviceResponse
+      return serviceResponse
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error.message
+      }
+    }
+  }
+
+  async funcaoGetById(id: funcaoIdInput): Promise<defaultResponse> {
+    try {
+      const validation = await funcaoIdSchema.safeParseAsync(id)
+
+      if (!validation.success)
+        throw new Error(validation.error.issues[0].message)
+
+      const serviceResponse = await this._funcaoService.funcaoGetById(
+        validation.data
+      )
+
+      return serviceResponse
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error.message
+      }
+    }
+  }
+
+  async funcaoDelete(id: funcaoIdInput): Promise<defaultResponse> {
+    try {
+      const validation = await funcaoIdSchema.safeParseAsync(id)
+
+      if (!validation.success)
+        throw new Error(validation.error.issues[0].message)
+
+      const serviceResponse = await this._funcaoService.funcaoDelete(
+        validation.data
+      )
+
+      return serviceResponse
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error.message
+      }
+    }
   }
 }

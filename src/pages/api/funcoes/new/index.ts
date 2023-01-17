@@ -17,7 +17,8 @@ const handle = async (
       tipo: req.body.tipo,
       _id: req.body._id,
       acoes: req.body.acoes,
-      tipoUsuarioAutorizado: req.body.tipoUsuarioAutorizado
+      tipoUsuarioAutorizado: req.body.tipoUsuarioAutorizado,
+      apisRelacionadas: req.body.apisRelacionadas
     }
     await connect()
 
