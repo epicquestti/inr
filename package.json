@@ -36,7 +36,8 @@
     "react-cookie": "^4.1.1",
     "react-dom": "^17.0.2",
     "superjson": "^1.8.1",
-    "zod": "^3.19.1"
+    "zod": "^3.19.1",
+    "typescript": "^4.6.2"
   },
   "devDependencies": {
     "@types/jsonwebtoken": "^8.5.9",
@@ -44,7 +45,6 @@
     "babel-plugin-superjson-next": "^0.4.3",
     "eslint": "^8.11.0",
     "eslint-config-next": "^12.1.0",
-    "prettier": "^2.5.1",
-    "typescript": "^4.6.2"
+    "prettier": "^2.5.1"
   }
 }
