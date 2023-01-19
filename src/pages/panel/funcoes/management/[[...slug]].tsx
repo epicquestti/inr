@@ -38,7 +38,7 @@ export default function FuncaoManagement() {
     false
   ])
 
-  const [id, setId] = useState<string>("")
+  const [id, setId] = useState<string | undefined>(undefined)
   const [nome, setNome] = useState<string>("")
   const [root, setRoot] = useState<string>("")
   const [icone, setIcone] = useState<string>("")
@@ -177,6 +177,7 @@ export default function FuncaoManagement() {
       }
 
       const apiResponse = await HttpRequest.Post("/api/funcoes/new", funcaoObj)
+      console.log("response", apiResponse)
 
       if (apiResponse.success) {
         setId(apiResponse.data._id)
@@ -216,6 +217,7 @@ export default function FuncaoManagement() {
 
   const funcaoGetById = async (id: string) => {
     const apiResponse = await HttpRequest.Get(`/api/funcoes/${id}`)
+    console.log("BY ID", apiResponse)
 
     if (apiResponse.success) {
       const response = apiResponse.data.funcao
@@ -229,8 +231,6 @@ export default function FuncaoManagement() {
       setApiList(apiResponse.data.apis)
       setTipoUsuariosSelected(apiResponse.data.usuarios)
     }
-
-    console.log(apiResponse)
   }
 
   const deleteFuncao = async () => {
@@ -255,7 +255,7 @@ export default function FuncaoManagement() {
 
   useEffect(() => {
     const getOptions = async () => {
-      await funcaoGetById(id)
+      await getThisFunction()
     }
     if (id) {
       getOptions()
@@ -376,6 +376,7 @@ export default function FuncaoManagement() {
       }
     >
       <Paper sx={{ padding: 3 }}>
+        {JSON.stringify(nome)}
         <Grid container spacing={2}>
           <Grid item xs={12} sm={12} md={4} lg={4} xl={4}>
             <TextField

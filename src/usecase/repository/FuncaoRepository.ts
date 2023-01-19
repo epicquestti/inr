@@ -29,76 +29,117 @@ export default class FuncaoRepository {
     }
   }
 
-  async funcaoSave(params: funcaoSaveOutput) {
+  async funcaoSave(params: funcaoSaveOutput): Promise<FuncaoDocument | null> {
     try {
-      if (params._id) {
-        const funcaoExists = FuncaoModel.findOne({
-          _id: params._id
-        })
+      const funcaoCreation = await FuncaoModel.insertOne({
+        acoes: params.acoes,
+        icone: params.icone,
+        nivel: params.nivel,
+        nome: params.nome,
+        root: params.root,
+        tipo: params.tipo,
+        tipoUsuarioAutorizado: params.tipoUsuarioAutorizado
+      })
 
-        if (!funcaoExists)
-          throw new Error("Função com o ID fornecido não encontrada.")
+      return funcaoCreation
 
-        await FuncaoModel.updateOne(
-          { _id: params._id },
-          {
-            $set: {
-              acoes: params.acoes,
-              icone: params.icone,
-              nivel: params.nivel,
-              nome: params.nome,
-              root: params.root,
-              tipo: params.tipo,
-              tipoUsuarioAutorizado: params.tipoUsuarioAutorizado
-            }
+      // if (params._id) {
+      //   const funcaoExists = FuncaoModel.findOne({
+      //     _id: params._id
+      //   })
+
+      //   if (!funcaoExists)
+      //     throw new Error("Função com o ID fornecido não encontrada.")
+
+      //   const dbResponse = await FuncaoModel.updateOne(
+      //     { _id: params._id },
+      //     {
+      //       $set: {
+      //         acoes: params.acoes,
+      //         icone: params.icone,
+      //         nivel: params.nivel,
+      //         nome: params.nome,
+      //         root: params.root,
+      //         tipo: params.tipo,
+      //         tipoUsuarioAutorizado: params.tipoUsuarioAutorizado
+      //       }
+      //     }
+      //   )
+
+      //   await FuncaoApiModel.deleteMany({
+      //     funcao: params._id
+      //   })
+
+      //   if (params.apisRelacionadas && params.apisRelacionadas.length > 0) {
+      //     for (let i = 0; i < params.apisRelacionadas.length; i++) {
+      //       await FuncaoApiModel.insertOne({
+      //         api: new ObjectId(params.apisRelacionadas[i]),
+      //         funcao: params._id
+      //       })
+      //     }
+      //   }
+
+      //   return dbResponse.modifiedCount
+      // } else {
+
+      //   if (funcaoCreation._id) {
+      //     if (params.apisRelacionadas && params.apisRelacionadas.length > 0) {
+      //       for (let i = 0; i < params.apisRelacionadas.length; i++) {
+      //         await FuncaoApiModel.insertOne({
+      //           api: new ObjectId(params.apisRelacionadas[i]),
+      //           funcao: funcaoCreation._id
+      //         })
+      //       }
+      //     }
+      //   }
+
+      //   return funcaoCreation
+      // }
+    } catch (error: any) {
+      throw new Error(error.message)
+    }
+  }
+
+  async funcaoUpdate(params: funcaoSaveOutput): Promise<number> {
+    try {
+      const dbResponse = await FuncaoModel.updateOne(
+        { _id: params._id },
+        {
+          $set: {
+            acoes: params.acoes,
+            icone: params.icone,
+            nivel: params.nivel,
+            nome: params.nome,
+            root: params.root,
+            tipo: params.tipo,
+            tipoUsuarioAutorizado: params.tipoUsuarioAutorizado
           }
-        )
+        }
+      )
 
+      return dbResponse.modifiedCount
+    } catch (error: any) {
+      throw new Error(error.message)
+    }
+  }
+
+  async funcaoDelete(params: funcaoIdOutput) {
+    try {
+      const dbResponse = await FuncaoModel.deleteOne({
+        _id: params.id
+      })
+
+      if (dbResponse.deletedCount > 0) {
         await FuncaoApiModel.deleteMany({
-          funcao: params._id
+          funcao: params.id
         })
-
-        if (params.apisRelacionadas && params.apisRelacionadas.length > 0) {
-          for (let i = 0; i < params.apisRelacionadas.length; i++) {
-            await FuncaoApiModel.insertOne({
-              api: new ObjectId(params.apisRelacionadas[i]),
-              funcao: params._id
-            })
-          }
-        }
-
-        return {
-          success: true,
-          message: "Função editada com sucesso.",
-          data: params._id
-        }
       } else {
-        const funcaoCreation = await FuncaoModel.insertOne({
-          acoes: params.acoes,
-          icone: params.icone,
-          nivel: params.nivel,
-          nome: params.nome,
-          root: params.root,
-          tipo: params.tipo,
-          tipoUsuarioAutorizado: params.tipoUsuarioAutorizado
-        })
+        throw new Error("Erro ao excluir função.")
+      }
 
-        if (funcaoCreation._id) {
-          if (params.apisRelacionadas && params.apisRelacionadas.length > 0) {
-            for (let i = 0; i < params.apisRelacionadas.length; i++) {
-              await FuncaoApiModel.insertOne({
-                api: new ObjectId(params.apisRelacionadas[i]),
-                funcao: funcaoCreation._id
-              })
-            }
-          }
-        }
-
-        return {
-          success: true,
-          message: "Função criada com sucesso.",
-          data: funcaoCreation
-        }
+      return {
+        success: true,
+        message: "Função excluída com sucesso."
       }
     } catch (error: any) {
       throw new Error(error.message)
@@ -145,24 +186,19 @@ export default class FuncaoRepository {
     }
   }
 
-  async funcaoDelete(params: funcaoIdOutput) {
+  async funcaoVerifyRoot(
+    root: string,
+    id: ObjectId
+  ): Promise<FuncaoDocument | null> {
     try {
-      const dbResponse = await FuncaoModel.deleteOne({
-        _id: params.id
+      const dbResponse = await FuncaoModel.findOne({
+        root: root,
+        _id: {
+          $not: id.id
+        }
       })
 
-      if (dbResponse.deletedCount > 0) {
-        await FuncaoApiModel.deleteMany({
-          funcao: params.id
-        })
-      } else {
-        throw new Error("Erro ao excluir função.")
-      }
-
-      return {
-        success: true,
-        message: "Função excluída com sucesso."
-      }
+      return dbResponse
     } catch (error: any) {
       throw new Error(error.message)
     }
