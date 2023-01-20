@@ -35,5 +35,5 @@ async function handle(
 }
 
 export default validateHandle({
-  get: handle
+  post: handle
 })
