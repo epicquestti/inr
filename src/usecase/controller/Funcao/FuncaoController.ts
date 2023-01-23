@@ -11,11 +11,8 @@ export default class FuncaoController implements IFuncaoController {
   constructor(private _funcaoService: IFuncaoService) {}
 
   async funcaoCreate(params: funcaoSaveInput): Promise<defaultResponse> {
-    console.log("Controller", params)
-
     try {
       const validation = await funcaoSaveSchema.safeParseAsync(params)
-
       if (!validation.success)
         throw new Error(validation.error.issues[0].message)
 

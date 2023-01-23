@@ -11,4 +11,20 @@ export default class TipoUsuarioRepository {
       throw new Error(error.message)
     }
   }
+
+  async tipoUsuarioGetList(
+    tipoUsuarioArray: ObjectId[]
+  ): Promise<tipoUsuarioDocument[] | null> {
+    try {
+      const dbResponse = await tipoUsuarioModel.find({
+        _id: {
+          $in: tipoUsuarioArray
+        }
+      })
+
+      return dbResponse
+    } catch (error: any) {
+      throw new Error(error.message)
+    }
+  }
 }

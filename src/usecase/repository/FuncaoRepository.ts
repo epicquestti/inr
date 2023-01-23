@@ -1,7 +1,5 @@
-import ApiModel from "@schema/Api"
 import FuncaoModel, { FuncaoDocument } from "@schema/Funcao"
 import FuncaoApiModel from "@schema/FuncaoApi"
-import tipoUsuarioModel from "@schema/TipoUsuario"
 import { funcaoIdOutput } from "@validation/Funcoes/funcaoId"
 import { funcaoSaveOutput } from "@validation/Funcoes/funcaoSave"
 import { ObjectId } from "mongodb"
@@ -42,59 +40,6 @@ export default class FuncaoRepository {
       })
 
       return funcaoCreation
-
-      // if (params._id) {
-      //   const funcaoExists = FuncaoModel.findOne({
-      //     _id: params._id
-      //   })
-
-      //   if (!funcaoExists)
-      //     throw new Error("Função com o ID fornecido não encontrada.")
-
-      //   const dbResponse = await FuncaoModel.updateOne(
-      //     { _id: params._id },
-      //     {
-      //       $set: {
-      //         acoes: params.acoes,
-      //         icone: params.icone,
-      //         nivel: params.nivel,
-      //         nome: params.nome,
-      //         root: params.root,
-      //         tipo: params.tipo,
-      //         tipoUsuarioAutorizado: params.tipoUsuarioAutorizado
-      //       }
-      //     }
-      //   )
-
-      //   await FuncaoApiModel.deleteMany({
-      //     funcao: params._id
-      //   })
-
-      //   if (params.apisRelacionadas && params.apisRelacionadas.length > 0) {
-      //     for (let i = 0; i < params.apisRelacionadas.length; i++) {
-      //       await FuncaoApiModel.insertOne({
-      //         api: new ObjectId(params.apisRelacionadas[i]),
-      //         funcao: params._id
-      //       })
-      //     }
-      //   }
-
-      //   return dbResponse.modifiedCount
-      // } else {
-
-      //   if (funcaoCreation._id) {
-      //     if (params.apisRelacionadas && params.apisRelacionadas.length > 0) {
-      //       for (let i = 0; i < params.apisRelacionadas.length; i++) {
-      //         await FuncaoApiModel.insertOne({
-      //           api: new ObjectId(params.apisRelacionadas[i]),
-      //           funcao: funcaoCreation._id
-      //         })
-      //       }
-      //     }
-      //   }
-
-      //   return funcaoCreation
-      // }
     } catch (error: any) {
       throw new Error(error.message)
     }
@@ -116,8 +61,9 @@ export default class FuncaoRepository {
           }
         }
       )
+      console.log(dbResponse)
 
-      return dbResponse.modifiedCount
+      return dbResponse.matchedCount
     } catch (error: any) {
       throw new Error(error.message)
     }
@@ -146,56 +92,36 @@ export default class FuncaoRepository {
     }
   }
 
-  async funcaoGetById(params: funcaoIdOutput) {
+  async funcaoGetById(params: funcaoIdOutput): Promise<FuncaoDocument | null> {
     try {
       const dbResponse = await FuncaoModel.findById(params.id)
 
-      if (!dbResponse) throw new Error("Função não encontrada.")
-
-      const apiRelacionadas = await FuncaoApiModel.find({
-        funcao: params.id
-      })
-
-      const apiArray: ObjectId[] = []
-
-      for (let i = 0; i < apiRelacionadas.length; i++) {
-        apiArray.push(apiRelacionadas[i].api)
-      }
-
-      const apiSearch = await ApiModel.find({
-        _id: { $in: apiArray }
-      })
-
-      const tipoUsuarioResponse = await tipoUsuarioModel.find({
-        _id: {
-          $in: dbResponse.tipoUsuarioAutorizado
-        }
-      })
-
-      return {
-        success: true,
-        message: "Exibindo Função selecionada.",
-        data: {
-          funcao: dbResponse,
-          apis: apiSearch,
-          usuarios: tipoUsuarioResponse
-        }
-      }
+      return dbResponse
     } catch (error: any) {
       throw new Error(error.message)
     }
   }
 
-  async funcaoVerifyRoot(
+  async funcaoVerifyRoot(root: string): Promise<FuncaoDocument | null> {
+    try {
+      const dbResponse = await FuncaoModel.findOne({
+        root: root
+      })
+
+      return dbResponse
+    } catch (error: any) {
+      throw new Error(error.message)
+    }
+  }
+
+  async funcaoVerifyRootWithId(
     root: string,
     id: ObjectId
   ): Promise<FuncaoDocument | null> {
     try {
       const dbResponse = await FuncaoModel.findOne({
         root: root,
-        _id: {
-          $not: id.id
-        }
+        _id: { $ne: id }
       })
 
       return dbResponse

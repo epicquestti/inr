@@ -73,4 +73,18 @@ export default class ApiRepository {
       throw new Error(error.message)
     }
   }
+
+  async getApiList(idArray: ObjectId[]): Promise<ApiDocument[] | null> {
+    try {
+      const dbResponse = await ApiModel.find({
+        _id: {
+          $in: idArray
+        }
+      })
+
+      return dbResponse
+    } catch (error: any) {
+      throw new Error(error.message)
+    }
+  }
 }

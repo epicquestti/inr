@@ -177,17 +177,8 @@ export default function FuncaoManagement() {
       }
 
       const apiResponse = await HttpRequest.Post("/api/funcoes/new", funcaoObj)
-      console.log("response", apiResponse)
 
       if (apiResponse.success) {
-        setId(apiResponse.data._id)
-        setNome(apiResponse.data.nome)
-        setRoot(apiResponse.data.root)
-        setIcone(apiResponse.data.icone)
-        setNivel(apiResponse.data.nivel)
-        setApiList(apiResponse.data.apiList)
-        setTipo(apiResponse.data.tipo)
-        setTipoUsuariosSelected(apiResponse.data.tipoUsuariosSelected)
         setDialogText(
           apiResponse.message
             ? apiResponse.message
@@ -217,7 +208,8 @@ export default function FuncaoManagement() {
 
   const funcaoGetById = async (id: string) => {
     const apiResponse = await HttpRequest.Get(`/api/funcoes/${id}`)
-    console.log("BY ID", apiResponse)
+
+    console.log(apiResponse)
 
     if (apiResponse.success) {
       const response = apiResponse.data.funcao
@@ -228,8 +220,8 @@ export default function FuncaoManagement() {
       setIcone(response.icone)
       setNivel(response.nivel)
       setTipo(response.tipo)
-      setApiList(apiResponse.data.apis)
-      setTipoUsuariosSelected(apiResponse.data.usuarios)
+      setApiList(apiResponse.data.api)
+      setTipoUsuariosSelected(apiResponse.data.tipoUsuarios)
     }
   }
 
@@ -252,15 +244,6 @@ export default function FuncaoManagement() {
       setLoading(false)
     }
   }
-
-  useEffect(() => {
-    const getOptions = async () => {
-      await getThisFunction()
-    }
-    if (id) {
-      getOptions()
-    }
-  }, [id])
 
   useEffect(() => {
     if (!router.isReady) return
@@ -350,7 +333,7 @@ export default function FuncaoManagement() {
         {
           text: "Função",
           iconName: "desktop_windows",
-          href: "/panel/funcao"
+          href: "/panel/funcoes"
         },
         {
           text: "Nova Função",
@@ -376,7 +359,6 @@ export default function FuncaoManagement() {
       }
     >
       <Paper sx={{ padding: 3 }}>
-        {JSON.stringify(nome)}
         <Grid container spacing={2}>
           <Grid item xs={12} sm={12} md={4} lg={4} xl={4}>
             <TextField
@@ -460,11 +442,6 @@ export default function FuncaoManagement() {
               id="checkboxes-tags-demo"
               options={apiOptions}
               disableCloseOnSelect
-              // ListboxProps={{
-              //   onScroll: async params => {
-              //     params.scrollHeight === params.scrollTop + params.clientHeight
-              //   }
-              // }}
               getOptionLabel={option => `${option.url} - ${option.method}`}
               renderOption={(props, option, { selected }) => (
                 <li {...props}>

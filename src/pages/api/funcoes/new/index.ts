@@ -33,7 +33,8 @@ const handle = async (
 
     return res.status(200).json({
       success: true,
-      message: controllerResponse.message
+      message: controllerResponse.message,
+      data: controllerResponse.data
     })
   } catch (error: any) {
     return res.status(200).json({
