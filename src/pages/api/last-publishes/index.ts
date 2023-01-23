@@ -1,4 +1,4 @@
-import { connect } from "@lib/backend"
+import { connect, disconnect } from "@lib/backend"
 import lastPublishes from "@schema/LasPublishes"
 import PublicacaoModel from "@schema/Publicacao"
 import PublicacaoContentsModel from "@schema/PublicacaoContents"
@@ -140,5 +140,7 @@ export default async function getLastPublishes(
     return res.status(200).send(response)
   } catch (error) {
     return res.status(200).send(response)
+  } finally {
+    await disconnect()
   }
 }

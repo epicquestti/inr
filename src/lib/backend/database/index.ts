@@ -2,7 +2,7 @@ import { MongoClient } from "mongodb"
 import Papr from "papr"
 import paprConfig from "../../../config/papr"
 let client: MongoClient
-const papr = new Papr()
+const papr = new Papr({})
 
 export async function connect() {
   if (paprConfig.uri) {
@@ -12,9 +12,9 @@ export async function connect() {
       if (!global.mongo) {
         global.mongo = await MongoClient.connect(paprConfig.uri)
       }
-      client = global.mongo
     }
 
+    client = global.mongo
     papr.initialize(client.db(paprConfig.bdName))
     await papr.updateSchemas()
   }
