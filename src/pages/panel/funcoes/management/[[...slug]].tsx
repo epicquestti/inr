@@ -2,24 +2,17 @@ import { ViewPanel } from "@Components/Panel"
 import { functionNivel, functionTipo } from "@lib/data/funcao"
 import { HttpRequest } from "@lib/frontend"
 import { ArrowBack, DeleteForever, Save } from "@mui/icons-material"
-import CheckBoxIcon from "@mui/icons-material/CheckBox"
-import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank"
 import {
-  Autocomplete,
   Button,
-  Checkbox,
-  Chip,
   FormControl,
   Grid,
   InputLabel,
   MenuItem,
-  OutlinedInput,
   Paper,
   Select,
   SelectChangeEvent,
   TextField
 } from "@mui/material"
-import { Box } from "@mui/system"
 import { funcaoSaveInput } from "@validation/Funcoes/funcaoSave"
 import { useRouter } from "next/router"
 import { ChangeEvent, useEffect, useState } from "react"
@@ -45,58 +38,58 @@ export default function FuncaoManagement() {
   const [nivel, setNivel] = useState<string>("")
   const [tipo, setTipo] = useState<string>("")
 
-  const [apiList, setApiList] = useState<any[]>([])
-  const [apiOptions, setApiOptions] = useState<any[]>([])
-  const [tipoUsuariosSelected, setTipoUsuariosSelected] = useState<any[]>([])
-  const [tipoUsuarioAutorizadoList, setTipoUsuarioAutorizadoList] = useState<
-    any[]
-  >([])
+  // const [apiList, setApiList] = useState<any[]>([])
+  // const [apiOptions, setApiOptions] = useState<any[]>([])
+  // const [tipoUsuariosSelected, setTipoUsuariosSelected] = useState<any[]>([])
+  // const [tipoUsuarioAutorizadoList, setTipoUsuarioAutorizadoList] = useState<
+  //   any[]
+  // >([])
 
   const slug = router.query.slug
 
-  const searchApi = async (text: string) => {
-    const apiResponse = await HttpRequest.Post("/api/apis/search", {
-      searchText: text,
-      page: 0,
-      rowsperpage: 1000
-    })
+  // const searchApi = async (text: string) => {
+  //   const apiResponse = await HttpRequest.Post("/api/apis/search", {
+  //     searchText: text,
+  //     page: 0,
+  //     rowsperpage: 1000
+  //   })
 
-    if (apiResponse.data.list.length > 0) {
-      setApiOptions(apiResponse.data.list)
-    }
-  }
+  //   if (apiResponse.data.list.length > 0) {
+  //     setApiOptions(apiResponse.data.list)
+  //   }
+  // }
 
-  const getThisFunction = async () => {
-    try {
-      const apiResponse = await HttpRequest.Get(`/api/funcoes/${id}`)
+  // const getThisFunction = async () => {
+  //   try {
+  //     const apiResponse = await HttpRequest.Get(`/api/funcoes/${id}`)
 
-      if (apiResponse.success) {
-        setId(apiResponse.data._id)
-        setNome(apiResponse.data.nome)
-        setRoot(apiResponse.data.root)
-        setIcone(apiResponse.data.icone)
-        setNivel(apiResponse.data.nivel)
-        setTipo(apiResponse.data.tipo)
-      } else throw new Error(apiResponse.message)
-    } catch (error: any) {
-      setDialogText(error.message)
-      setOpenDialog(true)
-      setLoading(false)
-      return
-    }
-  }
+  //     if (apiResponse.success) {
+  //       setId(apiResponse.data._id)
+  //       setNome(apiResponse.data.nome)
+  //       setRoot(apiResponse.data.root)
+  //       setIcone(apiResponse.data.icone)
+  //       setNivel(apiResponse.data.nivel)
+  //       setTipo(apiResponse.data.tipo)
+  //     } else throw new Error(apiResponse.message)
+  //   } catch (error: any) {
+  //     setDialogText(error.message)
+  //     setOpenDialog(true)
+  //     setLoading(false)
+  //     return
+  //   }
+  // }
 
-  const getTiposUsuario = async () => {
-    const apiResponse = await HttpRequest.Post("/api/tipoUsuario/search", {
-      searchText: "",
-      page: 0,
-      rowsperpage: 999999
-    })
+  // const getTiposUsuario = async () => {
+  //   const apiResponse = await HttpRequest.Post("/api/tipoUsuario/search", {
+  //     searchText: "",
+  //     page: 0,
+  //     rowsperpage: 999999
+  //   })
 
-    if (apiResponse.data.list.length > 0) {
-      setTipoUsuarioAutorizadoList(apiResponse.data.list)
-    }
-  }
+  //   if (apiResponse.data.list.length > 0) {
+  //     setTipoUsuarioAutorizadoList(apiResponse.data.list)
+  //   }
+  // }
 
   const saveThisFuncao = async () => {
     try {
@@ -131,38 +124,38 @@ export default function FuncaoManagement() {
         setErrorList(temp)
         throw new Error("Tipo não pode estar vazio.")
       }
-      if (tipoUsuariosSelected.length <= 0) {
-        const temp = [...errorList]
-        temp[5] = true
-        setErrorList(temp)
-        throw new Error("Tipo de Usuário autorizado não pode estar vazio.")
-      }
+      // if (tipoUsuariosSelected.length <= 0) {
+      //   const temp = [...errorList]
+      //   temp[5] = true
+      //   setErrorList(temp)
+      //   throw new Error("Tipo de Usuário autorizado não pode estar vazio.")
+      // }
 
-      const acoesArray: string[] = []
+      // const acoesArray: string[] = []
 
-      for (let i = 0; i < apiList.length; i++) {
-        const a = acoesArray.find(item => {
-          item === apiList[i].type
-        })
-        if (!a) {
-          acoesArray.push(apiList[i].type)
-        }
-      }
+      // for (let i = 0; i < apiList.length; i++) {
+      //   const a = acoesArray.find(item => {
+      //     item === apiList[i].type
+      //   })
+      //   if (!a) {
+      //     acoesArray.push(apiList[i].type)
+      //   }
+      // }
 
-      const filteredActions: string[] = []
-      acoesArray.forEach(element => {
-        if (!filteredActions.includes(element)) {
-          filteredActions.push(element)
-        }
-      })
+      // const filteredActions: string[] = []
+      // acoesArray.forEach(element => {
+      //   if (!filteredActions.includes(element)) {
+      //     filteredActions.push(element)
+      //   }
+      // })
 
-      const tipoUsuarioArray: string[] = []
+      // const tipoUsuarioArray: string[] = []
 
-      for (let i = 0; i < tipoUsuariosSelected.length; i++) {
-        tipoUsuarioArray.push(tipoUsuariosSelected[i]._id)
-      }
+      // for (let i = 0; i < tipoUsuariosSelected.length; i++) {
+      //   tipoUsuarioArray.push(tipoUsuariosSelected[i]._id)
+      // }
 
-      const apisRelacionadasArray = apiList.map(api => api._id)
+      // const apisRelacionadasArray = apiList.map(api => api._id)
 
       const funcaoObj: funcaoSaveInput = {
         icone: icone,
@@ -170,9 +163,9 @@ export default function FuncaoManagement() {
         nome: nome,
         root: root,
         tipo: tipo,
-        acoes: filteredActions,
-        tipoUsuarioAutorizado: tipoUsuarioArray,
-        apisRelacionadas: apisRelacionadasArray,
+        // acoes: filteredActions,
+        // tipoUsuarioAutorizado: tipoUsuarioArray,
+        // apisRelacionadas: apisRelacionadasArray,
         _id: id
       }
 
@@ -214,14 +207,14 @@ export default function FuncaoManagement() {
     if (apiResponse.success) {
       const response = apiResponse.data.funcao
 
-      searchApi("")
+      // searchApi("")
       setNome(response.nome)
       setRoot(response.root)
       setIcone(response.icone)
       setNivel(response.nivel)
       setTipo(response.tipo)
-      setApiList(apiResponse.data.api)
-      setTipoUsuariosSelected(apiResponse.data.tipoUsuarios)
+      // setApiList(apiResponse.data.api)
+      // setTipoUsuariosSelected(apiResponse.data.tipoUsuarios)
     }
   }
 
@@ -248,11 +241,11 @@ export default function FuncaoManagement() {
   useEffect(() => {
     if (!router.isReady) return
 
-    const getOptions = async () => {
-      await getTiposUsuario()
-    }
+    // const getOptions = async () => {
+    //   await getTiposUsuario()
+    // }
 
-    getOptions()
+    // getOptions()
 
     if (slug) {
       if (slug[0] === "new") {
@@ -303,23 +296,24 @@ export default function FuncaoManagement() {
     </Button>
   )
 
-  const icon = <CheckBoxOutlineBlankIcon fontSize="small" />
-  const checkedIcon = <CheckBoxIcon fontSize="small" />
+  // const icon = <CheckBoxOutlineBlankIcon fontSize="small" />
+  // const checkedIcon = <CheckBoxIcon fontSize="small" />
 
-  const handleTipoUsuarioChange = (
-    event: SelectChangeEvent<typeof tipoUsuariosSelected>
-  ) => {
-    const {
-      target: { value }
-    } = event
+  // const handleTipoUsuarioChange = (
+  //   event: SelectChangeEvent<typeof tipoUsuariosSelected>
+  // ) => {
+  //   const {
+  //     target: { value }
+  //   } = event
 
-    const temp = [...errorList]
-    temp[5] = false
-    setErrorList(temp)
-    setTipoUsuariosSelected(
-      typeof value === "string" ? value.split(",") : value
-    )
-  }
+  //   const temp = [...errorList]
+  //   temp[5] = false
+  //   setErrorList(temp)
+
+  //   setTipoUsuariosSelected(
+  //     typeof value === "string" ? value.split(",") : value
+  //   )
+  // }
 
   return (
     <ViewPanel
@@ -435,7 +429,7 @@ export default function FuncaoManagement() {
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={12} sm={12} md={5} lg={5} xl={5}>
+          {/* <Grid item xs={12} sm={12} md={5} lg={5} xl={5}>
             <Autocomplete
               multiple
               limitTags={1}
@@ -470,7 +464,7 @@ export default function FuncaoManagement() {
                 setApiList(newValue)
               }}
             />
-          </Grid>
+          </Grid> */}
           <Grid item xs={12} sm={12} md={4} lg={4} xl={4}>
             <FormControl fullWidth>
               <InputLabel id="tipoListaSelectLabel">Tipo</InputLabel>
@@ -499,7 +493,7 @@ export default function FuncaoManagement() {
             </FormControl>
           </Grid>
 
-          <Grid item xs={12} sm={12} md={7} lg={7} xl={7}>
+          {/* <Grid item xs={12} sm={12} md={7} lg={7} xl={7}>
             <FormControl fullWidth>
               <InputLabel id="demo-multiple-chip-label">
                 Tipo de Usuário
@@ -536,7 +530,7 @@ export default function FuncaoManagement() {
                 ))}
               </Select>
             </FormControl>
-          </Grid>
+          </Grid> */}
         </Grid>
       </Paper>
     </ViewPanel>

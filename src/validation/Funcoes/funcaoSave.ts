@@ -22,35 +22,35 @@ export const funcaoSaveSchema = z.object({
     invalid_type_error: "Tipo deve ser uma string.",
     required_error: "Tipo é obrigatório."
   }),
-  tipoUsuarioAutorizado: z
-    .array(
-      z
-        .string({
-          invalid_type_error: "Tipo deve ser uma string."
-        })
-        .transform(id => new ObjectId(id))
-    )
-    .optional(),
-  acoes: z
-    .array(
-      z.string({
-        invalid_type_error: "Ações deve ser uma Array de strings."
-      })
-    )
-    .optional(),
+  // tipoUsuarioAutorizado: z
+  //   .array(
+  //     z
+  //       .string({
+  //         invalid_type_error: "Tipo deve ser uma string."
+  //       })
+  //       .transform(id => new ObjectId(id))
+  //   )
+  //   .optional(),
+  // acoes: z
+  //   .array(
+  //     z.string({
+  //       invalid_type_error: "Ações deve ser uma Array de strings."
+  //     })
+  //   )
+  //   .optional(),
   _id: z
     .string({
       invalid_type_error: "ID deve ser uma string."
     })
     .transform(id => new ObjectId(id))
-    .optional(),
-  apisRelacionadas: z
-    .array(
-      z.string({
-        invalid_type_error: "APIs Relacionadas deve ser uma array de strings."
-      })
-    )
     .optional()
+  // apisRelacionadas: z
+  //   .array(
+  //     z.string({
+  //       invalid_type_error: "APIs Relacionadas deve ser uma array de strings."
+  //     })
+  //   )
+  //   .optional()
 })
 
 export type funcaoSaveInput = z.input<typeof funcaoSaveSchema>

@@ -30,13 +30,13 @@ export default class FuncaoRepository {
   async funcaoSave(params: funcaoSaveOutput): Promise<FuncaoDocument | null> {
     try {
       const funcaoCreation = await FuncaoModel.insertOne({
-        acoes: params.acoes,
+        // acoes: params.acoes,
         icone: params.icone,
         nivel: params.nivel,
         nome: params.nome,
         root: params.root,
-        tipo: params.tipo,
-        tipoUsuarioAutorizado: params.tipoUsuarioAutorizado
+        tipo: params.tipo
+        // tipoUsuarioAutorizado: params.tipoUsuarioAutorizado
       })
 
       return funcaoCreation
@@ -51,13 +51,13 @@ export default class FuncaoRepository {
         { _id: params._id },
         {
           $set: {
-            acoes: params.acoes,
+            // acoes: params.acoes,
             icone: params.icone,
             nivel: params.nivel,
             nome: params.nome,
             root: params.root,
-            tipo: params.tipo,
-            tipoUsuarioAutorizado: params.tipoUsuarioAutorizado
+            tipo: params.tipo
+            // tipoUsuarioAutorizado: params.tipoUsuarioAutorizado
           }
         }
       )

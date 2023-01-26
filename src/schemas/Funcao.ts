@@ -6,9 +6,9 @@ const FuncaoSchema = schema({
   root: types.string({ required: true }),
   icone: types.string({ required: true }),
   nivel: types.string({ required: true }),
-  tipo: types.string({ required: true }),
-  tipoUsuarioAutorizado: types.array(types.objectId()),
-  acoes: types.array(types.string({ required: true }))
+  tipo: types.string({ required: true })
+  // tipoUsuarioAutorizado: types.array(types.objectId()),
+  // acoes: types.array(types.string({ required: true }))
 })
 
 const FuncaoModel = papr.model("Funcao", FuncaoSchema)

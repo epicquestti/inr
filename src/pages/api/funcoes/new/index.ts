@@ -14,11 +14,11 @@ const handle = async (
       nivel: req.body.nivel,
       nome: req.body.nome,
       root: req.body.root,
-      tipo: req.body.tipo,
-      _id: req.body._id,
-      acoes: req.body.acoes,
-      tipoUsuarioAutorizado: req.body.tipoUsuarioAutorizado,
-      apisRelacionadas: req.body.apisRelacionadas
+      tipo: req.body.tipo
+      // _id: req.body._id,
+      // acoes: req.body.acoes,
+      // tipoUsuarioAutorizado: req.body.tipoUsuarioAutorizado,
+      // apisRelacionadas: req.body.apisRelacionadas
     }
     await connect()
 

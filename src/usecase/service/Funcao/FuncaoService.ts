@@ -5,7 +5,6 @@ import FuncaoRepository from "@usecase/repository/FuncaoRepository"
 import TipoUsuarioRepository from "@usecase/repository/TipoUsuarioRepository"
 import { funcaoIdOutput } from "@validation/Funcoes/funcaoId"
 import { funcaoSaveOutput } from "@validation/Funcoes/funcaoSave"
-import { ObjectId } from "mongodb"
 import IFuncaoService from "./IFuncaoService"
 
 export default class FuncaoService implements IFuncaoService {
@@ -30,20 +29,22 @@ export default class FuncaoService implements IFuncaoService {
 
         const saveResponse = await this._funcaoRepository.funcaoSave(params)
 
-        if (saveResponse) {
-          let apiArray: any[] = []
-          if (params.apisRelacionadas && params.apisRelacionadas.length > 0) {
-            for (let i = 0; i < params.apisRelacionadas.length; i++) {
-              apiArray.push({
-                funcao: saveResponse?._id,
-                api: new ObjectId(params.apisRelacionadas[i])
-              })
-            }
-          }
+        if (!saveResponse) throw new Error("Erro ao criar Função.")
 
-          const relationResponse =
-            await this._funcaoApiRepository.createRelation(apiArray)
-        }
+        // if (saveResponse) {
+        //   let apiArray: any[] = []
+        //   if (params.apisRelacionadas && params.apisRelacionadas.length > 0) {
+        //     for (let i = 0; i < params.apisRelacionadas.length; i++) {
+        //       apiArray.push({
+        //         funcao: saveResponse?._id,
+        //         api: new ObjectId(params.apisRelacionadas[i])
+        //       })
+        //     }
+        //   }
+
+        //   const relationResponse =
+        //     await this._funcaoApiRepository.createRelation(apiArray)
+        // }
 
         return {
           success: true,
@@ -70,26 +71,26 @@ export default class FuncaoService implements IFuncaoService {
 
         const update = await this._funcaoRepository.funcaoUpdate(params)
 
-        if (update > 0) {
-          if (params.apisRelacionadas && params.apisRelacionadas.length > 0) {
-            const deleteRelations =
-              await this._funcaoApiRepository.deleteRelations(params._id)
+        // if (update > 0) {
+        //   if (params.apisRelacionadas && params.apisRelacionadas.length > 0) {
+        //     const deleteRelations =
+        //       await this._funcaoApiRepository.deleteRelations(params._id)
 
-            if (deleteRelations > 0) {
-              let apiArray: any[] = []
-              for (let i = 0; i < params.apisRelacionadas.length; i++) {
-                apiArray.push({
-                  funcao: params?._id,
-                  api: new ObjectId(params.apisRelacionadas[i])
-                })
-              }
+        //     if (deleteRelations > 0) {
+        //       let apiArray: any[] = []
+        //       for (let i = 0; i < params.apisRelacionadas.length; i++) {
+        //         apiArray.push({
+        //           funcao: params?._id,
+        //           api: new ObjectId(params.apisRelacionadas[i])
+        //         })
+        //       }
 
-              await this._funcaoApiRepository.createRelation(apiArray)
-            }
-          }
-        } else {
-          throw new Error("Erro ao editar Função.")
-        }
+        //       await this._funcaoApiRepository.createRelation(apiArray)
+        //     }
+        //   }
+        // } else {
+        //   throw new Error("Erro ao editar Função.")
+        // }
 
         return {
           success: true,
@@ -110,39 +111,37 @@ export default class FuncaoService implements IFuncaoService {
 
       if (!repositoryResponse) throw new Error("Nenhuma Função encontrada.")
 
-      const apisRelacionadas = await this._funcaoApiRepository.funcaoApiGetApis(
-        id.id
-      )
+      // const apisRelacionadas = await this._funcaoApiRepository.funcaoApiGetApis(
+      //   id.id
+      // )
 
-      let apisCompletas
-      if (apisRelacionadas && apisRelacionadas?.length > 0) {
-        const apiArray: ObjectId[] = []
+      // let apisCompletas
+      // if (apisRelacionadas && apisRelacionadas?.length > 0) {
+      //   const apiArray: ObjectId[] = []
 
-        for (let i = 0; i < apisRelacionadas.length; i++) {
-          apiArray.push(apisRelacionadas[i].api)
-        }
+      //   for (let i = 0; i < apisRelacionadas.length; i++) {
+      //     apiArray.push(apisRelacionadas[i].api)
+      //   }
 
-        apisCompletas = await this._apiRepository.getApiList(apiArray)
-      }
+      //   apisCompletas = await this._apiRepository.getApiList(apiArray)
+      // }
 
-      let tipoUsuarioCompleto
-      if (
-        repositoryResponse?.tipoUsuarioAutorizado &&
-        repositoryResponse?.tipoUsuarioAutorizado?.length > 0
-      ) {
-        tipoUsuarioCompleto =
-          await this._tipoUsuarioRepository.tipoUsuarioGetList(
-            repositoryResponse?.tipoUsuarioAutorizado
-          )
-      }
+      // let tipoUsuarioCompleto
+      // if (
+      //   repositoryResponse?.tipoUsuarioAutorizado &&
+      //   repositoryResponse?.tipoUsuarioAutorizado?.length > 0
+      // ) {
+      //   tipoUsuarioCompleto =
+      //     await this._tipoUsuarioRepository.tipoUsuarioGetList(
+      //       repositoryResponse?.tipoUsuarioAutorizado
+      //     )
+      // }
 
       return {
         success: true,
         message: "Exibindo Função.",
         data: {
-          funcao: repositoryResponse,
-          api: apisCompletas,
-          tipoUsuarios: tipoUsuarioCompleto
+          funcao: repositoryResponse
         }
       }
     } catch (error: any) {
