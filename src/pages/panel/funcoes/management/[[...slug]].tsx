@@ -202,8 +202,6 @@ export default function FuncaoManagement() {
   const funcaoGetById = async (id: string) => {
     const apiResponse = await HttpRequest.Get(`/api/funcoes/${id}`)
 
-    console.log(apiResponse)
-
     if (apiResponse.success) {
       const response = apiResponse.data.funcao
 

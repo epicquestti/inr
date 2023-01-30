@@ -3,8 +3,6 @@ import { ObjectId } from "mongodb"
 
 export default class FuncaoApiRepository {
   async createRelation(fapiArray: any[]) {
-    console.log(fapiArray)
-
     try {
       await FuncaoApiModel.insertMany(fapiArray)
     } catch (error: any) {

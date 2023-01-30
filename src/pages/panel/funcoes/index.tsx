@@ -42,8 +42,6 @@ export default function Cursos() {
         page,
         rowsperpage
       })
-      console.log(apiResponse)
-
       if (apiResponse.success) {
         setFuncoesList(apiResponse.data.list)
         setCount(apiResponse.data.count)

@@ -1,4 +1,4 @@
-const functionNivel = ["CONTROLADA", "LIVRE", "PUBLICO"]
-const functionTipo = ["APP", "USER", "INTERNA"]
+const functionNivel = ["RESTRITA", "CONTROLADA", "PUBLICA"]
+const functionTipo = ["APP", "USER", "ESPECIAL"]
 
 export { functionNivel, functionTipo }

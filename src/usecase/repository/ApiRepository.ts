@@ -59,8 +59,6 @@ export default class ApiRepository {
   }
 
   async deleteApi(_id: ObjectId): Promise<number | null> {
-    console.log(_id)
-
     try {
       await connect()
 

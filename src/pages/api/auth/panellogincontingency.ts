@@ -9,7 +9,6 @@ export default async function handle(
 ): Promise<void> {
   try {
     await connect()
-    console.log(req.body.credential)
 
     const controller = await usuarioController.authenticationPanelContingency({
       credential: req.body.credential

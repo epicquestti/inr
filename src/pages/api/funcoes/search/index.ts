@@ -7,8 +7,6 @@ export default async function searchReportes(
   res: NextApiResponse
 ): Promise<void> {
   try {
-    console.log(req.body)
-
     const { searchText, page, rowsperpage } = req.body
 
     await connect()
@@ -22,8 +20,6 @@ export default async function searchReportes(
       },
       { limit: rowsperpage, skip: rowsperpage * page }
     )
-    console.log(list)
-
     const count = await FuncaoModel.countDocuments({
       nome: {
         $regex: ".*" + searchText + ".*",

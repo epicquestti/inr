@@ -96,8 +96,6 @@ export default function CreateAtualizacoes() {
         body
       )
 
-      console.log(newAtualizacao)
-
       if (!newAtualizacao.success) throw new Error(newAtualizacao.message)
 
       setDialogText("Versão salva com sucesso. direcionando.")

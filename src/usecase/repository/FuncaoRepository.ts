@@ -61,7 +61,6 @@ export default class FuncaoRepository {
           }
         }
       )
-      console.log(dbResponse)
 
       return dbResponse.matchedCount
     } catch (error: any) {

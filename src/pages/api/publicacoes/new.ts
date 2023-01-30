@@ -54,8 +54,6 @@ export default async function novoPublicacao(
           ? publicIdentifier.boletim + 1
           : publicIdentifier.classificador + 1
 
-      console.log(newPublicId)
-
       const newPublic = await PublicacaoModel.create({
         publicId: newPublicId,
         title: titulo,
