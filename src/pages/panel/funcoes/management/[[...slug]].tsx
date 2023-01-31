@@ -239,12 +239,6 @@ export default function FuncaoManagement() {
   useEffect(() => {
     if (!router.isReady) return
 
-    // const getOptions = async () => {
-    //   await getTiposUsuario()
-    // }
-
-    // getOptions()
-
     if (slug) {
       if (slug[0] === "new") {
         setId("")
@@ -254,7 +248,7 @@ export default function FuncaoManagement() {
         funcaoGetById(slug[0])
       }
     }
-  }, [router.isReady])
+  }, [router.isReady, slug])
 
   const saveButton = (
     <Button

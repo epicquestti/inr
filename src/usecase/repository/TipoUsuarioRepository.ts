@@ -74,4 +74,16 @@ export default class TipoUsuarioRepository {
       throw new Error(error.message)
     }
   }
+
+  async tipoUsuarioDelete(id: ObjectId): Promise<number> {
+    try {
+      const dbResponse = await tipoUsuarioModel.deleteOne({
+        _id: id
+      })
+
+      return dbResponse.deletedCount
+    } catch (error: any) {
+      throw new Error(error.message)
+    }
+  }
 }

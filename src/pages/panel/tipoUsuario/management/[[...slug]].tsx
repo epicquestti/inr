@@ -28,6 +28,8 @@ export default function TipoUsuarioManagement() {
   const [funcoesOptions, setFuncoesOptions] = useState<FuncaoDocument[]>([])
   const [superUser, setSuperUser] = useState<boolean>(false)
 
+  const slug = router.query.slug
+
   const [checked, setChecked] = useState<boolean[]>([])
 
   const [loading, setLoading] = useState<boolean>(false)
@@ -36,6 +38,8 @@ export default function TipoUsuarioManagement() {
   const [dialogText, setDialogText] = useState<string>("")
 
   useEffect(() => {
+    if (!router.isReady) return
+
     const funcoesGetList = async () => {
       const apiResponse = await HttpRequest.Post("/api/funcoes/search", {
         searchText: "",
@@ -49,7 +53,17 @@ export default function TipoUsuarioManagement() {
     }
 
     funcoesGetList()
-  }, [])
+
+    if (slug) {
+      if (slug[0] === "new") {
+        setId("")
+        setLoading(false)
+      } else {
+        setId(slug[0])
+        tipoUsuarioGetById(slug[0])
+      }
+    }
+  }, [router.isReady])
 
   const handleChecked = async (index: number, item: FuncaoDocument) => {
     const result = funcoesList.indexOf(item)
@@ -95,7 +109,35 @@ export default function TipoUsuarioManagement() {
     setLoading(false)
   }
 
-  const deleteFuncao = async () => {}
+  const deleteFuncao = async () => {
+    setLoading(true)
+    const apiResponse = await HttpRequest.Delete(
+      `/api/tipoUsuario/${id}/delete`
+    )
+
+    console.log(apiResponse)
+
+    if (!apiResponse) {
+      setDialogText("Erro ao excluir Tipo de Usuário.")
+      setOpenDialog(true)
+      setLoading(false)
+    } else {
+      setDialogText("Tipo de Usuário excluído com sucesso.")
+      setOpenDialog(true)
+      setLoading(false)
+      setTimeout(() => {
+        router.push("/panel/tipoUsuario")
+      }, 2000)
+    }
+  }
+
+  const tipoUsuarioGetById = async (id: string) => {
+    const apiResponse = await HttpRequest.Get(`/api/tipoUsuario/${id}`)
+
+    if (apiResponse) {
+      setNome(apiResponse.data.nome)
+    }
+  }
 
   const saveButton = (
     <Button
