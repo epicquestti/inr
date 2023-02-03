@@ -15,7 +15,6 @@ import {
   TextField,
   Typography
 } from "@mui/material"
-import { FuncaoDocument } from "@schema/Funcao"
 import { useRouter } from "next/router"
 import { ChangeEvent, useEffect, useState } from "react"
 
@@ -24,8 +23,8 @@ export default function TipoUsuarioManagement() {
 
   const [id, setId] = useState<string | undefined>(undefined)
   const [nome, setNome] = useState<string>("")
-  const [funcoesList, setFuncoesList] = useState<FuncaoDocument[]>([])
-  const [funcoesOptions, setFuncoesOptions] = useState<FuncaoDocument[]>([])
+  const [funcoesList, setFuncoesList] = useState<any[]>([])
+  const [funcoesOptions, setFuncoesOptions] = useState<any[]>([])
   const [superUser, setSuperUser] = useState<boolean>(false)
 
   const slug = router.query.slug
@@ -65,16 +64,42 @@ export default function TipoUsuarioManagement() {
     }
   }, [router.isReady])
 
-  const handleChecked = async (index: number, item: FuncaoDocument) => {
-    const result = funcoesList.indexOf(item)
-
-    let temp = [...funcoesList]
-    if (result >= 0) {
-      temp.splice(index, 1)
-    } else {
-      temp[index] = item
-    }
-    setFuncoesList(temp)
+  const handleChecked = async (item: any) => {
+    // const findItem = funcoesOptions.find(element => element._id === item._id)
+    // if (!findItem) {
+    //   const temp = [...funcoesOptions]
+    //   item.checked = !item.checked
+    //   temp.push(item)
+    //   setFuncoesOptions(temp)
+    // } else {
+    //   const index = funcoesOptions.findIndex(
+    //     element => element._id === item._id
+    //   )
+    //   const temp = [...funcoesOptions]
+    //   item.checked = false
+    //   temp.splice(index, 1)
+    //   setFuncoesOptions(temp)
+    // }
+    // if (!findItem) {
+    //   const temp = [...funcoesList]
+    //   // item.checked = true
+    //   temp.push(item)
+    //   setFuncoesList(temp)
+    // } else {
+    //   const index = funcoesList.findIndex(element => element._id === item._id)
+    //   const temp = [...funcoesList]
+    //   // item.checked = false
+    //   temp.splice(index, 1)
+    //   setFuncoesList(temp)
+    // }
+    // const result = funcoesList.indexOf(item)
+    // let temp = [...funcoesList]
+    // if (result >= 0) {
+    //   temp.splice(index, 1)
+    // } else {
+    //   temp[index] = item
+    // }
+    // setFuncoesList(temp)
   }
 
   const salvarTipoUsuario = async () => {
@@ -105,6 +130,15 @@ export default function TipoUsuarioManagement() {
       super: superUser
     })
 
+    if (apiResponse.success) {
+      setDialogText("Tipo de Usuário criado com sucesso.")
+      setOpenDialog(true)
+      setLoading(false)
+      setTimeout(() => {
+        router.push("/panel/tipoUsuario")
+      }, 2000)
+    }
+
     console.log(apiResponse)
     setLoading(false)
   }
@@ -133,10 +167,40 @@ export default function TipoUsuarioManagement() {
 
   const tipoUsuarioGetById = async (id: string) => {
     const apiResponse = await HttpRequest.Get(`/api/tipoUsuario/${id}`)
+    console.log("API", apiResponse)
 
-    if (apiResponse) {
-      setNome(apiResponse.data.nome)
+    if (apiResponse.success) {
+      setNome(apiResponse.data.data.tipoUsuario.nome)
+      setSuperUser(apiResponse.data.data.tipoUsuario.super)
+      if (
+        apiResponse.data.data.funcoes &&
+        apiResponse.data.data.funcoes.length > 0
+      ) {
+        const options = await HttpRequest.Post("/api/funcoes/search", {
+          searchText: "",
+          page: 0,
+          rowsperpage: 999999
+        })
+
+        for (let i = 0; i < apiResponse.data.data.funcoes.length; i++) {
+          const elementExists = options.data.list.find(
+            (item: any) => item._id === apiResponse.data.data.funcoes[i]._id
+          )
+          if (elementExists) {
+            options.data.list[i] = apiResponse.data.data.funcoes[i]
+          }
+        }
+
+        setFuncoesOptions(options.data.list)
+      }
+      setFuncoesList(apiResponse.data.data.funcoes)
     }
+
+    console.log(apiResponse)
+
+    // if (apiResponse) {
+    //   setNome(apiResponse.data.text)
+    // }
   }
 
   const saveButton = (
@@ -197,7 +261,7 @@ export default function TipoUsuarioManagement() {
         id ? [backButton, saveButton, deleteButton] : [backButton, saveButton]
       }
     >
-      {JSON.stringify(superUser)}
+      {JSON.stringify(funcoesList)}
       <Paper sx={{ padding: 3 }}>
         <Grid container spacing={2}>
           <Grid item xs={12} sm={12} md={4} lg={4} xl={4}>
@@ -232,15 +296,15 @@ export default function TipoUsuarioManagement() {
               <ListItem>
                 <Typography fontWeight="bold">Funções Associadas</Typography>
               </ListItem>
-              {funcoesOptions.map((item, index) => (
+              {funcoesOptions.map(item => (
                 <ListItem key={item._id.toString()}>
                   <ListItemButton dense disableRipple>
                     <ListItemIcon>
                       <Switch
                         disableRipple
-                        checked={checked[index]}
+                        checked={item.checked}
                         onClick={() => {
-                          handleChecked(index, item)
+                          handleChecked(item)
                         }}
                       />
                     </ListItemIcon>

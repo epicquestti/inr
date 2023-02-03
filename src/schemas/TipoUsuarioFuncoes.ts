@@ -1,4 +1,5 @@
 import { schema, types } from "papr"
+import { papr } from "../lib/backend"
 
 const tipoUsuarioFuncoesSchema = schema({
   tipoUsuarioId: types.objectId({ required: true }),

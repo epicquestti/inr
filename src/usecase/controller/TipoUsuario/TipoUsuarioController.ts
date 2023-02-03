@@ -1,6 +1,9 @@
 import { defaultResponse } from "@lib/types/defaultResponse"
 import ITipoUsuarioService from "@usecase/service/TipoUsuario/ITipoUsuarioService"
-import { tipoUsuarioIdSchema } from "@validation/TipoUsuario/tipoUsuarioId"
+import {
+  tipoUsuarioIdInput,
+  tipoUsuarioIdSchema
+} from "@validation/TipoUsuario/tipoUsuarioId"
 import {
   tipoUsuarioSaveInput,
   tipoUsuarioSaveSchema
@@ -14,8 +17,6 @@ export default class TipoUsuarioController implements ITipoUsuarioController {
     params: tipoUsuarioSaveInput
   ): Promise<defaultResponse> {
     try {
-      console.log("Controller", params)
-
       const validation = await tipoUsuarioSaveSchema.safeParseAsync(params)
 
       if (!validation.success)
@@ -24,8 +25,6 @@ export default class TipoUsuarioController implements ITipoUsuarioController {
       const serviceResponse = await this._tipoUsuarioService.tipoUsuarioSave(
         validation.data
       )
-
-      console.log("Service", serviceResponse)
 
       return {
         success: true,
@@ -47,7 +46,7 @@ export default class TipoUsuarioController implements ITipoUsuarioController {
         throw new Error(validation.error.issues[0].message)
 
       const tipoUsuarioExists =
-        await this._tipoUsuarioService.tipoUsuarioGetbyId(validation.data.id)
+        await this._tipoUsuarioService.tipoUsuarioGetbyId(validation.data)
 
       if (!tipoUsuarioExists)
         throw new Error("Nenhum Tipo de Usuário encontrado com o ID fornecido.")
@@ -59,6 +58,28 @@ export default class TipoUsuarioController implements ITipoUsuarioController {
 
       const serviceResponse = await this._tipoUsuarioService.tipoUsuarioDelete(
         validation.data.id
+      )
+
+      if (!serviceResponse.success) throw new Error(serviceResponse.message)
+
+      return serviceResponse
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error.message
+      }
+    }
+  }
+
+  async tipoUsuarioGetById(id: tipoUsuarioIdInput): Promise<defaultResponse> {
+    try {
+      const validation = await tipoUsuarioIdSchema.safeParseAsync(id)
+
+      if (!validation.success)
+        throw new Error(validation.error.issues[0].message)
+
+      const serviceResponse = await this._tipoUsuarioService.tipoUsuarioGetbyId(
+        validation.data
       )
 
       if (!serviceResponse.success) throw new Error(serviceResponse.message)

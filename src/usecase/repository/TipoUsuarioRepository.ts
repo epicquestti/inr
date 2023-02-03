@@ -8,6 +8,13 @@ export default class TipoUsuarioRepository {
   ): Promise<tipoUsuarioDocument | null> {
     try {
       return await tipoUsuarioModel.findById(tipoUsuarioId)
+
+      // const aa =  await tipoUsuarioModel.aggregate([{
+      //   $lookup: {
+      //     from: "TipoUsuarioFuncoes",
+      //     localField: "ID"
+      //   }
+      // }])
     } catch (error: any) {
       throw new Error(error.message)
     }

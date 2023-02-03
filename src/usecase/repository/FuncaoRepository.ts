@@ -128,4 +128,21 @@ export default class FuncaoRepository {
       throw new Error(error.message)
     }
   }
+
+  async funcaoListSearch(
+    idArray: ObjectId[]
+  ): Promise<FuncaoDocument[] | null> {
+    try {
+      const aa = await FuncaoModel.find({
+        _id: {
+          $in: idArray
+        }
+      })
+
+      console.log(aa)
+      return aa
+    } catch (error: any) {
+      throw new Error(error.message)
+    }
+  }
 }

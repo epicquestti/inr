@@ -1,6 +1,8 @@
 import { defaultResponse } from "@lib/types/defaultResponse"
+import FuncaoRepository from "@usecase/repository/FuncaoRepository"
 import TipoUsuarioFuncoesRepository from "@usecase/repository/TipoUsuarioFuncoesRepository"
 import TipoUsuarioRepository from "@usecase/repository/TipoUsuarioRepository"
+import { tipoUsuarioIdOutput } from "@validation/TipoUsuario/tipoUsuarioId"
 import { tipoUsuarioSaveOutput } from "@validation/TipoUsuario/tipoUsuarioSave"
 import { ObjectId } from "mongodb"
 import ITipoUsuarioService from "./ITipoUsuarioService"
@@ -8,7 +10,8 @@ import ITipoUsuarioService from "./ITipoUsuarioService"
 export default class TipoUsuarioService implements ITipoUsuarioService {
   constructor(
     private _tipoUsuarioRepository: TipoUsuarioRepository,
-    private _tipoUsuarioFuncoesRepository: TipoUsuarioFuncoesRepository
+    private _tipoUsuarioFuncoesRepository: TipoUsuarioFuncoesRepository,
+    private _funcoesRepository: FuncaoRepository
   ) {}
 
   async tipoUsuarioSave(
@@ -100,18 +103,39 @@ export default class TipoUsuarioService implements ITipoUsuarioService {
     }
   }
 
-  async tipoUsuarioGetbyId(id: ObjectId): Promise<defaultResponse> {
+  async tipoUsuarioGetbyId(id: tipoUsuarioIdOutput): Promise<defaultResponse> {
     try {
       const repositoryResponse =
-        await this._tipoUsuarioRepository.getTipoUsuarioById(id)
+        await this._tipoUsuarioRepository.getTipoUsuarioById(id.id)
 
       if (!repositoryResponse)
         throw new Error("Nenhum Tipo de Usuário encontrado.")
 
+      const relationFind =
+        await this._tipoUsuarioFuncoesRepository.findRelations(
+          repositoryResponse._id
+        )
+
+      const relationArray: ObjectId[] = relationFind.map(item => item.funcaoId)
+
+      const relationList: any = await this._funcoesRepository.funcaoListSearch(
+        relationArray
+      )
+
+      for (let i = 0; i < relationList.length; i++) {
+        relationList[i].checked = true
+      }
+      console.log("LIST", relationList)
+
+      const tipoUsuarioObj: {} = {
+        tipoUsuario: repositoryResponse,
+        funcoes: relationList
+      }
+
       return {
         success: true,
         message: "Exibindo Tipo de Usuário.",
-        data: repositoryResponse
+        data: tipoUsuarioObj
       }
     } catch (error: any) {
       return {

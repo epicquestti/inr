@@ -2,7 +2,7 @@ import { connect } from "@lib/backend"
 import tipoUsuarioModel from "@schema/TipoUsuario"
 import { NextApiRequest, NextApiResponse } from "next"
 
-export default async function searchReportes(
+export default async function searchTipoUsuario(
   req: NextApiRequest,
   res: NextApiResponse
 ): Promise<void> {
@@ -20,6 +20,8 @@ export default async function searchReportes(
       },
       { limit: rowsperpage, skip: rowsperpage * page }
     )
+
+    console.log(list)
 
     const count = await tipoUsuarioModel.countDocuments({
       nome: {

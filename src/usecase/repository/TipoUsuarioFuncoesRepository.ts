@@ -16,4 +16,10 @@ export default class TipoUsuarioFuncoesRepository {
 
     return dbResponse.deletedCount
   }
+
+  async findRelations(tipoUsuarioId: ObjectId): Promise<any[]> {
+    return await TipoUsuarioFuncoesModel.find({
+      tipoUsuarioId: tipoUsuarioId
+    })
+  }
 }

@@ -1,4 +1,5 @@
 import { DataGridV2, ViewPanel } from "@Components/Panel"
+import { HttpRequest } from "@lib/frontend"
 import { Add, Search, Visibility } from "@mui/icons-material"
 import { Button, Grid, Paper, TextField } from "@mui/material"
 import { useRouter } from "next/router"
@@ -61,7 +62,31 @@ export default function TipoUsuario() {
     }
   }
 
-  const makeSearch = async () => {}
+  const makeSearch = async () => {
+    try {
+      setLoading(true)
+
+      const apiResponse = await HttpRequest.Post("/api/tipoUsuario/search", {
+        searchText,
+        page,
+        rowsperpage
+      })
+
+      console.log(apiResponse)
+
+      if (apiResponse.success) {
+        setTipoUsuarioList(apiResponse.data.list)
+        setCount(apiResponse.data.count)
+        setLoading(false)
+      } else throw new Error(apiResponse.message)
+
+      setLoading(false)
+    } catch (error: any) {
+      setMessageText(error.message)
+      setOpenMessage(true)
+      setLoading(false)
+    }
+  }
 
   return (
     <ViewPanel>
@@ -75,7 +100,7 @@ export default function TipoUsuario() {
               }}
               onKeyPress={searchByEnterKeyPress}
               disabled={loading}
-              label="Buscar Função"
+              label="Buscar Tipo de usuário"
               fullWidth
             />
           </Grid>
