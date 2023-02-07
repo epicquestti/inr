@@ -28,9 +28,24 @@ export default function TipoUsuario() {
     router.push("/panel/tipoUsuario/management/new")
   }
 
-  const changePage = async (page: number) => {
-    setPage(page)
-    await makeSearch()
+  const changePage = async (value: number) => {
+    console.log("Page", value)
+
+    setPage(value)
+
+    const apiResponse = await HttpRequest.Post("/api/tipoUsuario/search", {
+      searchText,
+      value,
+      rowsperpage
+    })
+
+    console.log("PageChange", apiResponse)
+
+    if (apiResponse.success) {
+      setTipoUsuarioList(apiResponse.data.list)
+      setCount(apiResponse.data.count)
+      setLoading(false)
+    } else throw new Error(apiResponse.message)
   }
 
   const changeRowsPerPage = async (rowsPerPage: number) => {
@@ -91,6 +106,7 @@ export default function TipoUsuario() {
   return (
     <ViewPanel>
       <Paper sx={{ padding: 3 }}>
+        {JSON.stringify(page)}
         <Grid container spacing={2} justifyContent="center" alignItems="center">
           <Grid item xs={12} sm={12} md={8} lg={8} xl={8}>
             <TextField
@@ -135,10 +151,6 @@ export default function TipoUsuario() {
                 {
                   text: "Nome",
                   attrName: "nome"
-                },
-                {
-                  text: "Super",
-                  attrName: "super"
                 }
               ]}
               pagination={{

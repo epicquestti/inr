@@ -30,13 +30,12 @@ export default class FuncaoRepository {
   async funcaoSave(params: funcaoSaveOutput): Promise<FuncaoDocument | null> {
     try {
       const funcaoCreation = await FuncaoModel.insertOne({
-        // acoes: params.acoes,
         icone: params.icone,
         nivel: params.nivel,
         nome: params.nome,
         root: params.root,
-        tipo: params.tipo
-        // tipoUsuarioAutorizado: params.tipoUsuarioAutorizado
+        tipo: params.tipo,
+        checked: params.checked
       })
 
       return funcaoCreation
@@ -127,6 +126,10 @@ export default class FuncaoRepository {
     } catch (error: any) {
       throw new Error(error.message)
     }
+  }
+
+  async funcoesGetAll(): Promise<FuncaoDocument[] | null> {
+    return await FuncaoModel.find({})
   }
 
   async funcaoListSearch(

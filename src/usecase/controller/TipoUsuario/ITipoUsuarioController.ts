@@ -4,6 +4,7 @@ import { tipoUsuarioSaveInput } from "@validation/TipoUsuario/tipoUsuarioSave"
 
 export default interface ITipoUsuarioController {
   tipoUsuarioSave(params: tipoUsuarioSaveInput): Promise<defaultResponse>
-  tipoUsuarioDelete(id: string): Promise<defaultResponse>
+  tipoUsuarioDelete(id: tipoUsuarioIdInput): Promise<defaultResponse>
   tipoUsuarioGetById(id: tipoUsuarioIdInput): Promise<defaultResponse>
+  tipoUsuarioUpdate(params: tipoUsuarioSaveInput): Promise<defaultResponse>
 }

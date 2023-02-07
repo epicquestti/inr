@@ -16,6 +16,8 @@ const handle = async (
       id: id?.toString() || ""
     })
 
+    if (!controllerResponse.success) throw new Error(controllerResponse.message)
+
     res.status(200).json({
       success: true,
       message: "Exibindo Tipo de Usuário.",

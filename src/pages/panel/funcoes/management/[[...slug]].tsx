@@ -124,48 +124,13 @@ export default function FuncaoManagement() {
         setErrorList(temp)
         throw new Error("Tipo não pode estar vazio.")
       }
-      // if (tipoUsuariosSelected.length <= 0) {
-      //   const temp = [...errorList]
-      //   temp[5] = true
-      //   setErrorList(temp)
-      //   throw new Error("Tipo de Usuário autorizado não pode estar vazio.")
-      // }
-
-      // const acoesArray: string[] = []
-
-      // for (let i = 0; i < apiList.length; i++) {
-      //   const a = acoesArray.find(item => {
-      //     item === apiList[i].type
-      //   })
-      //   if (!a) {
-      //     acoesArray.push(apiList[i].type)
-      //   }
-      // }
-
-      // const filteredActions: string[] = []
-      // acoesArray.forEach(element => {
-      //   if (!filteredActions.includes(element)) {
-      //     filteredActions.push(element)
-      //   }
-      // })
-
-      // const tipoUsuarioArray: string[] = []
-
-      // for (let i = 0; i < tipoUsuariosSelected.length; i++) {
-      //   tipoUsuarioArray.push(tipoUsuariosSelected[i]._id)
-      // }
-
-      // const apisRelacionadasArray = apiList.map(api => api._id)
-
       const funcaoObj: funcaoSaveInput = {
         icone: icone,
         nivel: nivel,
         nome: nome,
         root: root,
         tipo: tipo,
-        // acoes: filteredActions,
-        // tipoUsuarioAutorizado: tipoUsuarioArray,
-        // apisRelacionadas: apisRelacionadasArray,
+        checked: false,
         _id: id
       }
 
@@ -205,14 +170,11 @@ export default function FuncaoManagement() {
     if (apiResponse.success) {
       const response = apiResponse.data.funcao
 
-      // searchApi("")
       setNome(response.nome)
       setRoot(response.root)
       setIcone(response.icone)
       setNivel(response.nivel)
       setTipo(response.tipo)
-      // setApiList(apiResponse.data.api)
-      // setTipoUsuariosSelected(apiResponse.data.tipoUsuarios)
     }
   }
 
@@ -287,26 +249,6 @@ export default function FuncaoManagement() {
       Excluir
     </Button>
   )
-
-  // const icon = <CheckBoxOutlineBlankIcon fontSize="small" />
-  // const checkedIcon = <CheckBoxIcon fontSize="small" />
-
-  // const handleTipoUsuarioChange = (
-  //   event: SelectChangeEvent<typeof tipoUsuariosSelected>
-  // ) => {
-  //   const {
-  //     target: { value }
-  //   } = event
-
-  //   const temp = [...errorList]
-  //   temp[5] = false
-  //   setErrorList(temp)
-
-  //   setTipoUsuariosSelected(
-  //     typeof value === "string" ? value.split(",") : value
-  //   )
-  // }
-
   return (
     <ViewPanel
       title="Nova Função"

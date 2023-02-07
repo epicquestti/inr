@@ -1,4 +1,5 @@
 import { defaultResponse } from "@lib/types/defaultResponse"
+import { funcaoBooleanType } from "@lib/types/tipoUsuario"
 import FuncaoRepository from "@usecase/repository/FuncaoRepository"
 import TipoUsuarioFuncoesRepository from "@usecase/repository/TipoUsuarioFuncoesRepository"
 import TipoUsuarioRepository from "@usecase/repository/TipoUsuarioRepository"
@@ -13,6 +14,14 @@ export default class TipoUsuarioService implements ITipoUsuarioService {
     private _tipoUsuarioFuncoesRepository: TipoUsuarioFuncoesRepository,
     private _funcoesRepository: FuncaoRepository
   ) {}
+  tipoUsuarioUpdate(params: {
+    _id?: ObjectId | undefined
+    nome: string
+    funcoes: ObjectId[]
+    super: boolean
+  }): Promise<defaultResponse> {
+    throw new Error("Method not implemented.")
+  }
 
   async tipoUsuarioSave(
     params: tipoUsuarioSaveOutput
@@ -60,19 +69,8 @@ export default class TipoUsuarioService implements ITipoUsuarioService {
             "Nenhum Tipo de Usuário encontrado com o ID fornecido."
           )
 
-        const verifyNome =
-          await this._tipoUsuarioRepository.tipoUsuarioGetByNome(params.nome)
-        if (verifyNome) {
-          throw new Error(
-            "Já existe um Tipo de Usuário cadastrado com o nome fornecido."
-          )
-        }
-
         const updateResponse =
           await this._tipoUsuarioRepository.tipoUsuarioUpdate(params)
-
-        if (updateResponse <= 0)
-          throw new Error("Erro ao editar Tipo de Usuário.")
 
         await this._tipoUsuarioFuncoesRepository.deleteRelations(params._id)
 
@@ -116,20 +114,55 @@ export default class TipoUsuarioService implements ITipoUsuarioService {
           repositoryResponse._id
         )
 
-      const relationArray: ObjectId[] = relationFind.map(item => item.funcaoId)
+      const allFunctions = await this._funcoesRepository.funcoesGetAll()
 
-      const relationList: any = await this._funcoesRepository.funcaoListSearch(
-        relationArray
-      )
+      let functionsArray: funcaoBooleanType[] = []
 
-      for (let i = 0; i < relationList.length; i++) {
-        relationList[i].checked = true
+      if (allFunctions) {
+        for (let i = 0; i < allFunctions.length; i++) {
+          const findItem = relationFind.findIndex(item => {
+            return item.funcaoId.toString() === allFunctions[i]._id.toString()
+          })
+
+          console.log("Item", findItem)
+
+          if (findItem < 0) {
+            functionsArray.push({
+              _id: allFunctions[i]._id,
+              checked: false,
+              icone: allFunctions[i].icone,
+              nivel: allFunctions[i].nivel,
+              nome: allFunctions[i].nome,
+              root: allFunctions[i].root,
+              tipo: allFunctions[i].tipo
+            })
+          } else {
+            functionsArray.push({
+              _id: allFunctions[i]._id,
+              checked: true,
+              icone: allFunctions[i].icone,
+              nivel: allFunctions[i].nivel,
+              nome: allFunctions[i].nome,
+              root: allFunctions[i].root,
+              tipo: allFunctions[i].tipo
+            })
+          }
+        }
       }
-      console.log("LIST", relationList)
+
+      // const relationArray: ObjectId[] = relationFind.map(item => item.funcaoId)
+
+      // const relationList: any = await this._funcoesRepository.funcaoListSearch(
+      //   relationArray
+      // )
+
+      // for (let i = 0; i < relationList.length; i++) {
+      //   relationList[i].checked = true
+      // }
 
       const tipoUsuarioObj: {} = {
         tipoUsuario: repositoryResponse,
-        funcoes: relationList
+        funcoes: functionsArray
       }
 
       return {

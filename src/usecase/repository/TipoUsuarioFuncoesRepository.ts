@@ -1,4 +1,6 @@
-import TipoUsuarioFuncoesModel from "@schema/TipoUsuarioFuncoes"
+import TipoUsuarioFuncoesModel, {
+  TipoUsuarioFuncoesDocument
+} from "@schema/TipoUsuarioFuncoes"
 import { ObjectId } from "mongodb"
 
 export default class TipoUsuarioFuncoesRepository {
@@ -17,7 +19,9 @@ export default class TipoUsuarioFuncoesRepository {
     return dbResponse.deletedCount
   }
 
-  async findRelations(tipoUsuarioId: ObjectId): Promise<any[]> {
+  async findRelations(
+    tipoUsuarioId: ObjectId
+  ): Promise<TipoUsuarioFuncoesDocument[]> {
     return await TipoUsuarioFuncoesModel.find({
       tipoUsuarioId: tipoUsuarioId
     })

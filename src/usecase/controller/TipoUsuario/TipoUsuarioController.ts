@@ -28,41 +28,9 @@ export default class TipoUsuarioController implements ITipoUsuarioController {
 
       return {
         success: true,
-        message: "Tipo de Usuário criado com sucesso."
+        message: "Tipo de Usuário criado com sucesso.",
+        data: serviceResponse
       }
-    } catch (error: any) {
-      return {
-        success: false,
-        message: error.message
-      }
-    }
-  }
-
-  async tipoUsuarioDelete(id: string): Promise<defaultResponse> {
-    try {
-      const validation = await tipoUsuarioIdSchema.safeParseAsync(id)
-
-      if (!validation.success)
-        throw new Error(validation.error.issues[0].message)
-
-      const tipoUsuarioExists =
-        await this._tipoUsuarioService.tipoUsuarioGetbyId(validation.data)
-
-      if (!tipoUsuarioExists)
-        throw new Error("Nenhum Tipo de Usuário encontrado com o ID fornecido.")
-
-      const relationResponse =
-        await this._tipoUsuarioService.tipoUsuarioDeleteRelation(
-          validation.data.id
-        )
-
-      const serviceResponse = await this._tipoUsuarioService.tipoUsuarioDelete(
-        validation.data.id
-      )
-
-      if (!serviceResponse.success) throw new Error(serviceResponse.message)
-
-      return serviceResponse
     } catch (error: any) {
       return {
         success: false,
@@ -80,6 +48,63 @@ export default class TipoUsuarioController implements ITipoUsuarioController {
 
       const serviceResponse = await this._tipoUsuarioService.tipoUsuarioGetbyId(
         validation.data
+      )
+
+      if (!serviceResponse.success) throw new Error(serviceResponse.message)
+
+      return serviceResponse
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error.message
+      }
+    }
+  }
+
+  async tipoUsuarioUpdate(
+    params: tipoUsuarioSaveInput
+  ): Promise<defaultResponse> {
+    try {
+      const validation = await tipoUsuarioSaveSchema.safeParseAsync(params)
+
+      if (!validation.success)
+        throw new Error(validation.error.issues[0].message)
+
+      const serviceResponse = await this._tipoUsuarioService.tipoUsuarioSave(
+        validation.data
+      )
+
+      return serviceResponse
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error.message
+      }
+    }
+  }
+
+  async tipoUsuarioDelete(id: tipoUsuarioIdInput): Promise<defaultResponse> {
+    console.log(id)
+
+    try {
+      const validation = await tipoUsuarioIdSchema.safeParseAsync(id)
+      console.log("Validation", validation)
+
+      if (!validation.success)
+        throw new Error(validation.error.issues[0].message)
+
+      const tipoUsuarioExists =
+        await this._tipoUsuarioService.tipoUsuarioGetbyId(validation.data)
+
+      if (!tipoUsuarioExists)
+        throw new Error("Nenhum Tipo de Usuário encontrado com o ID fornecido.")
+
+      await this._tipoUsuarioService.tipoUsuarioDeleteRelation(
+        validation.data.id
+      )
+
+      const serviceResponse = await this._tipoUsuarioService.tipoUsuarioDelete(
+        validation.data.id
       )
 
       if (!serviceResponse.success) throw new Error(serviceResponse.message)

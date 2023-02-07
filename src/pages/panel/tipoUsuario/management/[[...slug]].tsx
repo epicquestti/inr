@@ -1,5 +1,6 @@
 import { ViewPanel } from "@Components/Panel"
 import { HttpRequest } from "@lib/frontend"
+import { funcaoBooleanType } from "@lib/types/tipoUsuario"
 import { ArrowBack, DeleteForever, Save } from "@mui/icons-material"
 import {
   Button,
@@ -24,7 +25,7 @@ export default function TipoUsuarioManagement() {
   const [id, setId] = useState<string | undefined>(undefined)
   const [nome, setNome] = useState<string>("")
   const [funcoesList, setFuncoesList] = useState<any[]>([])
-  const [funcoesOptions, setFuncoesOptions] = useState<any[]>([])
+  const [funcoesOptions, setFuncoesOptions] = useState<funcaoBooleanType[]>([])
   const [superUser, setSuperUser] = useState<boolean>(false)
 
   const slug = router.query.slug
@@ -36,27 +37,28 @@ export default function TipoUsuarioManagement() {
   const [openDialog, setOpenDialog] = useState<boolean>(false)
   const [dialogText, setDialogText] = useState<string>("")
 
+  const funcoesGetList = async () => {
+    const apiResponse = await HttpRequest.Post("/api/funcoes/search", {
+      searchText: "",
+      page: 0,
+      rowsperpage: 999999
+    })
+
+    if (apiResponse && apiResponse.data.list.length > 0) {
+      setFuncoesOptions(apiResponse.data.list)
+    } else {
+      setFuncoesOptions([])
+    }
+  }
+
   useEffect(() => {
     if (!router.isReady) return
-
-    const funcoesGetList = async () => {
-      const apiResponse = await HttpRequest.Post("/api/funcoes/search", {
-        searchText: "",
-        page: 0,
-        rowsperpage: 999999
-      })
-
-      if (apiResponse && apiResponse.data.list.length > 0) {
-        setFuncoesOptions(apiResponse.data.list)
-      }
-    }
-
-    funcoesGetList()
 
     if (slug) {
       if (slug[0] === "new") {
         setId("")
         setLoading(false)
+        funcoesGetList()
       } else {
         setId(slug[0])
         tipoUsuarioGetById(slug[0])
@@ -65,41 +67,11 @@ export default function TipoUsuarioManagement() {
   }, [router.isReady])
 
   const handleChecked = async (item: any) => {
-    // const findItem = funcoesOptions.find(element => element._id === item._id)
-    // if (!findItem) {
-    //   const temp = [...funcoesOptions]
-    //   item.checked = !item.checked
-    //   temp.push(item)
-    //   setFuncoesOptions(temp)
-    // } else {
-    //   const index = funcoesOptions.findIndex(
-    //     element => element._id === item._id
-    //   )
-    //   const temp = [...funcoesOptions]
-    //   item.checked = false
-    //   temp.splice(index, 1)
-    //   setFuncoesOptions(temp)
-    // }
-    // if (!findItem) {
-    //   const temp = [...funcoesList]
-    //   // item.checked = true
-    //   temp.push(item)
-    //   setFuncoesList(temp)
-    // } else {
-    //   const index = funcoesList.findIndex(element => element._id === item._id)
-    //   const temp = [...funcoesList]
-    //   // item.checked = false
-    //   temp.splice(index, 1)
-    //   setFuncoesList(temp)
-    // }
-    // const result = funcoesList.indexOf(item)
-    // let temp = [...funcoesList]
-    // if (result >= 0) {
-    //   temp.splice(index, 1)
-    // } else {
-    //   temp[index] = item
-    // }
-    // setFuncoesList(temp)
+    const index = funcoesOptions.findIndex(element => element._id === item._id)
+    const temp = [...funcoesOptions]
+    item.checked = !item.checked
+    temp[index] = item
+    setFuncoesOptions(temp)
   }
 
   const salvarTipoUsuario = async () => {
@@ -114,93 +86,81 @@ export default function TipoUsuarioManagement() {
       setLoading(false)
     }
 
-    if (funcoesList.length <= 0) {
-      setDialogText(
-        "Escolha pelo menos 1 Função Associada a este Tipo de Usuário."
+    const funcoesArray = funcoesOptions
+      .filter(item => item.checked)
+      .map(item => item._id)
+
+    if (id) {
+      const apiResponse = await HttpRequest.Post(
+        `/api/tipoUsuario/${id}/update`,
+        {
+          nome: nome,
+          funcoes: superUser ? [] : funcoesArray,
+          super: superUser,
+          _id: id
+        }
       )
-      setOpenDialog(true)
+
+      if (apiResponse.success) {
+        setDialogText("Tipo de Usuário editado com sucesso.")
+        setOpenDialog(true)
+        setLoading(false)
+        setTimeout(() => {
+          router.push("/panel/tipoUsuario")
+        }, 2000)
+      }
+
+      setLoading(false)
+    } else {
+      const apiResponse = await HttpRequest.Post("/api/tipoUsuario/new", {
+        nome: nome,
+        funcoes: funcoesArray,
+        super: superUser
+      })
+
+      if (apiResponse.success) {
+        setDialogText("Tipo de Usuário criado com sucesso.")
+        setOpenDialog(true)
+        setLoading(false)
+        setTimeout(() => {
+          router.push("/panel/tipoUsuario")
+        }, 2000)
+      }
+
       setLoading(false)
     }
-
-    const funcoesArray = funcoesList.map(item => item._id)
-
-    const apiResponse = await HttpRequest.Post("/api/tipoUsuario/new", {
-      nome: nome,
-      funcoes: funcoesArray,
-      super: superUser
-    })
-
-    if (apiResponse.success) {
-      setDialogText("Tipo de Usuário criado com sucesso.")
-      setOpenDialog(true)
-      setLoading(false)
-      setTimeout(() => {
-        router.push("/panel/tipoUsuario")
-      }, 2000)
-    }
-
-    console.log(apiResponse)
-    setLoading(false)
   }
 
-  const deleteFuncao = async () => {
+  const deleteTipoUsuario = async () => {
     setLoading(true)
     const apiResponse = await HttpRequest.Delete(
       `/api/tipoUsuario/${id}/delete`
     )
-
     console.log(apiResponse)
 
-    if (!apiResponse) {
-      setDialogText("Erro ao excluir Tipo de Usuário.")
-      setOpenDialog(true)
-      setLoading(false)
-    } else {
+    if (apiResponse.success) {
       setDialogText("Tipo de Usuário excluído com sucesso.")
       setOpenDialog(true)
       setLoading(false)
-      setTimeout(() => {
-        router.push("/panel/tipoUsuario")
-      }, 2000)
+    } else {
+      setDialogText("Erro ao excluir Tipo de Usuário.")
+      setOpenDialog(true)
+      setLoading(false)
     }
   }
 
   const tipoUsuarioGetById = async (id: string) => {
     const apiResponse = await HttpRequest.Get(`/api/tipoUsuario/${id}`)
-    console.log("API", apiResponse)
+    console.log(apiResponse)
 
     if (apiResponse.success) {
       setNome(apiResponse.data.data.tipoUsuario.nome)
       setSuperUser(apiResponse.data.data.tipoUsuario.super)
-      if (
-        apiResponse.data.data.funcoes &&
-        apiResponse.data.data.funcoes.length > 0
-      ) {
-        const options = await HttpRequest.Post("/api/funcoes/search", {
-          searchText: "",
-          page: 0,
-          rowsperpage: 999999
-        })
-
-        for (let i = 0; i < apiResponse.data.data.funcoes.length; i++) {
-          const elementExists = options.data.list.find(
-            (item: any) => item._id === apiResponse.data.data.funcoes[i]._id
-          )
-          if (elementExists) {
-            options.data.list[i] = apiResponse.data.data.funcoes[i]
-          }
-        }
-
-        setFuncoesOptions(options.data.list)
-      }
+      setFuncoesOptions(apiResponse.data.data.funcoes)
       setFuncoesList(apiResponse.data.data.funcoes)
+    } else {
+      await router.push("/panel/tipoUsuario")
     }
-
-    console.log(apiResponse)
-
-    // if (apiResponse) {
-    //   setNome(apiResponse.data.text)
-    // }
   }
 
   const saveButton = (
@@ -235,7 +195,7 @@ export default function TipoUsuarioManagement() {
       disabled={loading}
       variant="contained"
       startIcon={<DeleteForever />}
-      onClick={deleteFuncao}
+      onClick={deleteTipoUsuario}
     >
       Excluir
     </Button>
@@ -261,7 +221,7 @@ export default function TipoUsuarioManagement() {
         id ? [backButton, saveButton, deleteButton] : [backButton, saveButton]
       }
     >
-      {JSON.stringify(funcoesList)}
+      {JSON.stringify(id)}
       <Paper sx={{ padding: 3 }}>
         <Grid container spacing={2}>
           <Grid item xs={12} sm={12} md={4} lg={4} xl={4}>
@@ -301,6 +261,7 @@ export default function TipoUsuarioManagement() {
                   <ListItemButton dense disableRipple>
                     <ListItemIcon>
                       <Switch
+                        disabled={superUser}
                         disableRipple
                         checked={item.checked}
                         onClick={() => {

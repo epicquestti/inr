@@ -1,3 +1,4 @@
+import { connect } from "@lib/backend"
 import { apiResponse } from "@lib/types/apiResponse"
 import tipoUsuarioController from "@usecase/controller/TipoUsuario"
 import { NextApiRequest, NextApiResponse } from "next"
@@ -7,9 +8,15 @@ const handle = async (
   res: NextApiResponse<apiResponse>
 ): Promise<void> => {
   try {
-    const { id } = req.body
+    const id = req.query.id
 
-    const controllerResponse = await tipoUsuarioController.tipoUsuarioDelete(id)
+    await connect()
+
+    const controllerResponse = await tipoUsuarioController.tipoUsuarioDelete({
+      id: id?.toString() || ""
+    })
+
+    if (!controllerResponse.success) throw new Error(controllerResponse.message)
 
     res.status(200).json({
       success: true,

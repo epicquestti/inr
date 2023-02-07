@@ -1,7 +1,7 @@
 import { connect } from "@lib/backend"
 import { apiResponse } from "@lib/types/apiResponse"
-import funcaoController from "@usecase/controller/Funcao"
-import { funcaoSaveInput } from "@validation/Funcoes/funcaoSave"
+import tipoUsuarioController from "@usecase/controller/TipoUsuario"
+import { tipoUsuarioSaveInput } from "@validation/TipoUsuario/tipoUsuarioSave"
 import { NextApiRequest, NextApiResponse } from "next"
 
 const handle = async (
@@ -9,17 +9,18 @@ const handle = async (
   res: NextApiResponse<apiResponse>
 ): Promise<void> => {
   try {
-    const funcaoObj: funcaoSaveInput = {
-      icone: req.body.icone,
-      nivel: req.body.nivel,
-      nome: req.body.nome,
-      root: req.body.root,
-      tipo: req.body.tipo,
-      checked: req.body.checked
-    }
     await connect()
 
-    const controllerResponse = await funcaoController.funcaoCreate(funcaoObj)
+    const tipoUsuarioObj: tipoUsuarioSaveInput = {
+      funcoes: req.body.funcoes,
+      nome: req.body.nome,
+      super: req.body.super,
+      _id: req.body._id
+    }
+
+    const controllerResponse = await tipoUsuarioController.tipoUsuarioUpdate(
+      tipoUsuarioObj
+    )
 
     if (!controllerResponse.success) {
       return res.status(200).json({
@@ -42,5 +43,3 @@ const handle = async (
 }
 
 export default handle
-
-// export default validateHandle({ post: handle }, { validationLevel: "free" })

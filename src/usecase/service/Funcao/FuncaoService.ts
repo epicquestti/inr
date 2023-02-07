@@ -31,21 +31,6 @@ export default class FuncaoService implements IFuncaoService {
 
         if (!saveResponse) throw new Error("Erro ao criar Função.")
 
-        // if (saveResponse) {
-        //   let apiArray: any[] = []
-        //   if (params.apisRelacionadas && params.apisRelacionadas.length > 0) {
-        //     for (let i = 0; i < params.apisRelacionadas.length; i++) {
-        //       apiArray.push({
-        //         funcao: saveResponse?._id,
-        //         api: new ObjectId(params.apisRelacionadas[i])
-        //       })
-        //     }
-        //   }
-
-        //   const relationResponse =
-        //     await this._funcaoApiRepository.createRelation(apiArray)
-        // }
-
         return {
           success: true,
           message: "Função criada com sucesso.",

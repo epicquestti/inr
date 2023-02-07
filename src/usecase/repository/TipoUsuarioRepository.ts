@@ -8,13 +8,6 @@ export default class TipoUsuarioRepository {
   ): Promise<tipoUsuarioDocument | null> {
     try {
       return await tipoUsuarioModel.findById(tipoUsuarioId)
-
-      // const aa =  await tipoUsuarioModel.aggregate([{
-      //   $lookup: {
-      //     from: "TipoUsuarioFuncoes",
-      //     localField: "ID"
-      //   }
-      // }])
     } catch (error: any) {
       throw new Error(error.message)
     }
@@ -63,6 +56,7 @@ export default class TipoUsuarioRepository {
   }
 
   async tipoUsuarioUpdate(params: tipoUsuarioSaveOutput): Promise<number> {
+    console.log("REPO", params)
     try {
       const dbResponse = await tipoUsuarioModel.updateOne(
         {

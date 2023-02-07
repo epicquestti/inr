@@ -6,6 +6,8 @@ export default async function searchTipoUsuario(
   req: NextApiRequest,
   res: NextApiResponse
 ): Promise<void> {
+  console.log(req.body)
+
   try {
     const { searchText, page, rowsperpage } = req.body
 
@@ -13,14 +15,13 @@ export default async function searchTipoUsuario(
 
     const list = await tipoUsuarioModel.find(
       {
-        text: {
+        nome: {
           $regex: ".*" + searchText + ".*",
           $options: "i"
         }
       },
       { limit: rowsperpage, skip: rowsperpage * page }
     )
-
     console.log(list)
 
     const count = await tipoUsuarioModel.countDocuments({
