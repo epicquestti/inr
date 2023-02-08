@@ -8,7 +8,6 @@ const handle = async (
   req: NextApiRequest,
   res: NextApiResponse<apiResponse>
 ): Promise<void> => {
-  console.log("API Tipo", req.body)
   try {
     const tipoUsuarioObj: tipoUsuarioSaveInput = {
       _id: req.body._id,

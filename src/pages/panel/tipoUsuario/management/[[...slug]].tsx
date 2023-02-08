@@ -136,12 +136,15 @@ export default function TipoUsuarioManagement() {
     const apiResponse = await HttpRequest.Delete(
       `/api/tipoUsuario/${id}/delete`
     )
-    console.log(apiResponse)
 
     if (apiResponse.success) {
       setDialogText("Tipo de Usuário excluído com sucesso.")
       setOpenDialog(true)
       setLoading(false)
+
+      setTimeout(() => {
+        router.push("/panel/tipoUsuario")
+      }, 2000)
     } else {
       setDialogText("Erro ao excluir Tipo de Usuário.")
       setOpenDialog(true)
@@ -151,7 +154,6 @@ export default function TipoUsuarioManagement() {
 
   const tipoUsuarioGetById = async (id: string) => {
     const apiResponse = await HttpRequest.Get(`/api/tipoUsuario/${id}`)
-    console.log(apiResponse)
 
     if (apiResponse.success) {
       setNome(apiResponse.data.data.tipoUsuario.nome)
@@ -221,7 +223,6 @@ export default function TipoUsuarioManagement() {
         id ? [backButton, saveButton, deleteButton] : [backButton, saveButton]
       }
     >
-      {JSON.stringify(id)}
       <Paper sx={{ padding: 3 }}>
         <Grid container spacing={2}>
           <Grid item xs={12} sm={12} md={4} lg={4} xl={4}>

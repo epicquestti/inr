@@ -56,7 +56,6 @@ export default class TipoUsuarioRepository {
   }
 
   async tipoUsuarioUpdate(params: tipoUsuarioSaveOutput): Promise<number> {
-    console.log("REPO", params)
     try {
       const dbResponse = await tipoUsuarioModel.updateOne(
         {

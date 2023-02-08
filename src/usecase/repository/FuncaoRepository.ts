@@ -142,7 +142,6 @@ export default class FuncaoRepository {
         }
       })
 
-      console.log(aa)
       return aa
     } catch (error: any) {
       throw new Error(error.message)

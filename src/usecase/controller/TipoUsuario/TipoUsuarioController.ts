@@ -84,11 +84,8 @@ export default class TipoUsuarioController implements ITipoUsuarioController {
   }
 
   async tipoUsuarioDelete(id: tipoUsuarioIdInput): Promise<defaultResponse> {
-    console.log(id)
-
     try {
       const validation = await tipoUsuarioIdSchema.safeParseAsync(id)
-      console.log("Validation", validation)
 
       if (!validation.success)
         throw new Error(validation.error.issues[0].message)

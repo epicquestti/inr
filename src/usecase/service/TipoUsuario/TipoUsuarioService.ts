@@ -124,8 +124,6 @@ export default class TipoUsuarioService implements ITipoUsuarioService {
             return item.funcaoId.toString() === allFunctions[i]._id.toString()
           })
 
-          console.log("Item", findItem)
-
           if (findItem < 0) {
             functionsArray.push({
               _id: allFunctions[i]._id,

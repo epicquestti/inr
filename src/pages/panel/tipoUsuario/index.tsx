@@ -29,17 +29,13 @@ export default function TipoUsuario() {
   }
 
   const changePage = async (value: number) => {
-    console.log("Page", value)
-
     setPage(value)
 
     const apiResponse = await HttpRequest.Post("/api/tipoUsuario/search", {
       searchText,
-      value,
+      page: value,
       rowsperpage
     })
-
-    console.log("PageChange", apiResponse)
 
     if (apiResponse.success) {
       setTipoUsuarioList(apiResponse.data.list)
@@ -48,8 +44,20 @@ export default function TipoUsuario() {
     } else throw new Error(apiResponse.message)
   }
 
-  const changeRowsPerPage = async (rowsPerPage: number) => {
-    setRowsperpage(rowsPerPage)
+  const changeRowsPerPage = async (value: number) => {
+    setRowsperpage(value)
+
+    const apiResponse = await HttpRequest.Post("/api/tipoUsuario/search", {
+      searchText,
+      page: 0,
+      rowsperpage: value
+    })
+
+    if (apiResponse.success) {
+      setTipoUsuarioList(apiResponse.data.list)
+      setCount(apiResponse.data.count)
+      setLoading(false)
+    } else throw new Error(apiResponse.message)
   }
 
   const actionDecision = async (id: string, actionName: string) => {
@@ -83,14 +91,13 @@ export default function TipoUsuario() {
 
       const apiResponse = await HttpRequest.Post("/api/tipoUsuario/search", {
         searchText,
-        page,
+        page: 0,
         rowsperpage
       })
 
-      console.log(apiResponse)
-
       if (apiResponse.success) {
         setTipoUsuarioList(apiResponse.data.list)
+        setPage(0)
         setCount(apiResponse.data.count)
         setLoading(false)
       } else throw new Error(apiResponse.message)
@@ -106,7 +113,6 @@ export default function TipoUsuario() {
   return (
     <ViewPanel>
       <Paper sx={{ padding: 3 }}>
-        {JSON.stringify(page)}
         <Grid container spacing={2} justifyContent="center" alignItems="center">
           <Grid item xs={12} sm={12} md={8} lg={8} xl={8}>
             <TextField
@@ -151,6 +157,10 @@ export default function TipoUsuario() {
                 {
                   text: "Nome",
                   attrName: "nome"
+                },
+                {
+                  text: "",
+                  attrName: ""
                 }
               ]}
               pagination={{

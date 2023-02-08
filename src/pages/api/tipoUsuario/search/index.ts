@@ -6,8 +6,6 @@ export default async function searchTipoUsuario(
   req: NextApiRequest,
   res: NextApiResponse
 ): Promise<void> {
-  console.log(req.body)
-
   try {
     const { searchText, page, rowsperpage } = req.body
 
@@ -22,7 +20,6 @@ export default async function searchTipoUsuario(
       },
       { limit: rowsperpage, skip: rowsperpage * page }
     )
-    console.log(list)
 
     const count = await tipoUsuarioModel.countDocuments({
       nome: {
