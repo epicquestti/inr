@@ -2,6 +2,8 @@ import { defaultResponse } from "@lib/types/defaultResponse"
 import FuncaoRepository from "@usecase/repository/FuncaoRepository"
 import TipoUsuarioRepository from "@usecase/repository/TipoUsuarioRepository"
 import UsuarioRepository from "@usecase/repository/UsuarioRepository"
+import { usuarioIdOutput } from "@validation/Usuario/usuarioId"
+import { usuarioSaveOutput } from "@validation/Usuario/usuarioSave"
 import { compareSync } from "bcrypt"
 import { sign, verify } from "jsonwebtoken"
 import { ObjectId } from "mongodb"
@@ -180,6 +182,81 @@ export default class UsuarioService implements IUsuarioService {
             permissoes: permissoes
           }
         }
+      }
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error.message
+      }
+    }
+  }
+
+  async usuarioSave(params: usuarioSaveOutput): Promise<defaultResponse> {
+    try {
+      if (!params._id) {
+        //Criar Usuario
+        const usuarioExists = await this._usuarioRepository.getUserByEmail(
+          params.email
+        )
+
+        if (usuarioExists?._id)
+          throw new Error("E-mail fornecido já cadastrado.")
+
+        const repoResponse = await this._usuarioRepository.usuarioCreate(params)
+
+        if (!repoResponse?._id)
+          throw new Error("Erro ao criar Usuário na camada Service.")
+
+        return {
+          success: true,
+          message: "Usuário criado com sucesso.",
+          data: repoResponse
+        }
+      } else {
+        //Editar Usuário.
+        const usuarioExists = await this._usuarioRepository.getUserById(
+          params._id
+        )
+
+        if (!usuarioExists) throw new Error("Usuário não encontrado.")
+
+        const dbResponse = await this._usuarioRepository.usuarioUpdate(params)
+
+        return {
+          success: true,
+          message: "Usuário editado com sucesso.",
+          data: dbResponse
+        }
+      }
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error.message
+      }
+    }
+  }
+
+  async usuarioGetById(params: usuarioIdOutput): Promise<defaultResponse> {
+    try {
+      const repoResponse = await this._usuarioRepository.getUserById(params.id)
+
+      let tipoUsuarioFind
+      if (repoResponse) {
+        const fff = new ObjectId(repoResponse.tipoUsuario)
+
+        // tipoUsuarioFind = await this._tipoUsuarioRepository.getTipoUsuarioById(
+        //   new ObjectId(fff)
+        // )
+
+        // console.log("tipoUsuarioFind", tipoUsuarioFind)
+      }
+
+      // if (!repoResponse?._id) throw new Error("Usuário não encontrado.")
+
+      return {
+        success: true,
+        message: "Exibindo Usuário.",
+        data: { usuario: repoResponse }
       }
     } catch (error: any) {
       return {

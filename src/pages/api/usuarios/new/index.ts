@@ -1,25 +1,27 @@
 import { connect } from "@lib/backend"
 import { apiResponse } from "@lib/types/apiResponse"
-import tipoUsuarioController from "@usecase/controller/TipoUsuario"
-import { tipoUsuarioSaveInput } from "@validation/TipoUsuario/tipoUsuarioSave"
+import usuarioController from "@usecase/controller/Usuario"
+import { usuarioSaveInput } from "@validation/Usuario/usuarioSave"
 import { NextApiRequest, NextApiResponse } from "next"
 
 const handle = async (
   req: NextApiRequest,
   res: NextApiResponse<apiResponse>
 ): Promise<void> => {
-  try {
-    const tipoUsuarioObj: tipoUsuarioSaveInput = {
-      _id: req.body._id,
-      nome: req.body.nome,
-      funcoes: req.body.funcoes,
-      super: req.body.super
-    }
+  console.log("API", req.body)
 
+  try {
     await connect()
 
-    const controllerResponse = await tipoUsuarioController.tipoUsuarioSave(
-      tipoUsuarioObj
+    const controllerObj: usuarioSaveInput = {
+      email: req.body.email,
+      senha: req.body.senha,
+      tipoUsuario: req.body.tipoUsuario,
+      _id: req.body._id
+    }
+
+    const controllerResponse = await usuarioController.usuarioSave(
+      controllerObj
     )
 
     if (!controllerResponse.success) {
@@ -29,9 +31,9 @@ const handle = async (
       })
     }
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
-      message: "Tipo de Usuário criado com sucesso.",
+      message: "Usuário criado com sucesso.",
       data: controllerResponse
     })
   } catch (error: any) {

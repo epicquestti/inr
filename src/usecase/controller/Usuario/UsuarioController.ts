@@ -2,6 +2,12 @@ import { defaultResponse } from "@lib/types/defaultResponse"
 import IUsuarioService from "@usecase/service/Usuario/IUsuarioService"
 import { authenticationPanel } from "@validation/Usuario/authenticationPanel"
 import { authenticationPanelContingencySchema } from "@validation/Usuario/authenticationPanelContingency"
+import { usuarioIdInput, usuarioIdSchema } from "@validation/Usuario/usuarioId"
+import {
+  usuarioSaveInput,
+  usuarioSaveSchema
+} from "@validation/Usuario/usuarioSave"
+
 import IUsuarioController from "./IUsuarioController"
 
 export default class UsuarioController implements IUsuarioController {
@@ -48,6 +54,59 @@ export default class UsuarioController implements IUsuarioController {
       if (!service.success) throw new Error(service.message)
 
       return service
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error.message
+      }
+    }
+  }
+
+  async usuarioSave(params: usuarioSaveInput): Promise<defaultResponse> {
+    console.log("controller", params)
+
+    try {
+      const validation = await usuarioSaveSchema.safeParseAsync(params)
+
+      console.log("validation", validation)
+
+      if (!validation.success)
+        throw new Error(validation.error.issues[0].message)
+
+      const serviceResponse = await this._usuarioService.usuarioSave(
+        validation.data
+      )
+
+      console.log("serviceResponse", serviceResponse)
+
+      if (!serviceResponse.success) throw new Error(serviceResponse.message)
+
+      return serviceResponse
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error.message
+      }
+    }
+  }
+
+  async usuarioGetById(id: usuarioIdInput): Promise<defaultResponse> {
+    try {
+      const validation = await usuarioIdSchema.safeParseAsync(id)
+
+      console.log("validation", validation)
+
+      if (!validation.success) {
+        throw new Error(validation.error.issues[0].message)
+      }
+
+      const serviceResponse = await this._usuarioService.usuarioGetById(
+        validation.data
+      )
+
+      console.log("serviceResponse", serviceResponse)
+
+      return serviceResponse
     } catch (error: any) {
       return {
         success: false,
