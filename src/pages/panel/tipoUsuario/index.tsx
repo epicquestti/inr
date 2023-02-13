@@ -1,6 +1,6 @@
 import { DataGridV2, ViewPanel } from "@Components/Panel"
 import { HttpRequest } from "@lib/frontend"
-import { Add, Search, Visibility } from "@mui/icons-material"
+import { Add, ArrowBack, Search, Visibility } from "@mui/icons-material"
 import { Button, Grid, Paper, TextField } from "@mui/material"
 import { useRouter } from "next/router"
 import { ChangeEvent, useState } from "react"
@@ -13,8 +13,8 @@ export default function TipoUsuario() {
   const [page, setPage] = useState<number>(0)
   const [count, setCount] = useState<number>(0)
 
-  const [openMessage, setOpenMessage] = useState<boolean>(false)
-  const [messageText, setMessageText] = useState<string>("")
+  const [openDialog, setOpenDialog] = useState<boolean>(false)
+  const [dialogText, setDialogText] = useState<string>("")
 
   const router = useRouter()
 
@@ -68,8 +68,8 @@ export default function TipoUsuario() {
           break
       }
     } catch (error: any) {
-      setMessageText(error.message)
-      setOpenMessage(true)
+      setDialogText(error.message)
+      setOpenDialog(true)
       setLoading(false)
     }
   }
@@ -79,8 +79,8 @@ export default function TipoUsuario() {
       setLoading(true)
       router.push(`/panel/tipoUsuario/management/${id}`)
     } catch (error: any) {
-      setMessageText(error.message)
-      setOpenMessage(true)
+      setDialogText(error.message)
+      setOpenDialog(true)
       setLoading(false)
     }
   }
@@ -104,14 +104,56 @@ export default function TipoUsuario() {
 
       setLoading(false)
     } catch (error: any) {
-      setMessageText(error.message)
-      setOpenMessage(true)
+      setDialogText(error.message)
+      setOpenDialog(true)
       setLoading(false)
     }
   }
 
+  const backButton = (
+    <Button
+      fullWidth
+      disabled={loading}
+      variant="contained"
+      startIcon={<ArrowBack />}
+      onClick={() => {
+        router.push("/panel")
+      }}
+    >
+      Sair
+    </Button>
+  )
+
   return (
-    <ViewPanel>
+    <ViewPanel
+      title="Tipo de Usuário"
+      location={[
+        {
+          text: "Home",
+          iconName: "home",
+          href: "/panel"
+        },
+        {
+          text: "Tipo de Usuário",
+          iconName: "person",
+          href: "/panel/tipoUsuario"
+        }
+      ]}
+      loading={{
+        isLoading: loading,
+        onClose: () => {
+          setLoading(false)
+        }
+      }}
+      snack={{
+        open: openDialog,
+        message: dialogText,
+        onClose: () => {
+          setOpenDialog(false)
+        }
+      }}
+      bottonButtons={[backButton]}
+    >
       <Paper sx={{ padding: 3 }}>
         <Grid container spacing={2} justifyContent="center" alignItems="center">
           <Grid item xs={12} sm={12} md={8} lg={8} xl={8}>

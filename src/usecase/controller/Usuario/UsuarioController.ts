@@ -63,12 +63,8 @@ export default class UsuarioController implements IUsuarioController {
   }
 
   async usuarioSave(params: usuarioSaveInput): Promise<defaultResponse> {
-    console.log("controller", params)
-
     try {
       const validation = await usuarioSaveSchema.safeParseAsync(params)
-
-      console.log("validation", validation)
 
       if (!validation.success)
         throw new Error(validation.error.issues[0].message)
@@ -76,8 +72,6 @@ export default class UsuarioController implements IUsuarioController {
       const serviceResponse = await this._usuarioService.usuarioSave(
         validation.data
       )
-
-      console.log("serviceResponse", serviceResponse)
 
       if (!serviceResponse.success) throw new Error(serviceResponse.message)
 
@@ -94,8 +88,6 @@ export default class UsuarioController implements IUsuarioController {
     try {
       const validation = await usuarioIdSchema.safeParseAsync(id)
 
-      console.log("validation", validation)
-
       if (!validation.success) {
         throw new Error(validation.error.issues[0].message)
       }
@@ -103,8 +95,6 @@ export default class UsuarioController implements IUsuarioController {
       const serviceResponse = await this._usuarioService.usuarioGetById(
         validation.data
       )
-
-      console.log("serviceResponse", serviceResponse)
 
       return serviceResponse
     } catch (error: any) {

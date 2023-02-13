@@ -6,9 +6,7 @@ export default class UsuarioRepository {
   async getUserByEmail(email: string): Promise<usuarioDocument | null> {
     try {
       return await usuarioModel.findOne({
-        email: {
-          $eq: email
-        }
+        email: email
       })
     } catch (error: any) {
       throw new Error(error.message)
@@ -30,7 +28,7 @@ export default class UsuarioRepository {
       return await usuarioModel.insertOne({
         email: params.email,
         senha: params.senha,
-        tipoUsuario: params.tipoUsuario.id.toString()
+        tipoUsuario: params.tipoUsuario
       })
     } catch (error: any) {
       throw new Error(error.message)

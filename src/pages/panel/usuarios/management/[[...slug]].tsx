@@ -57,11 +57,11 @@ export default function UsuarioManagement() {
 
   const usuarioGetById = async (id: string) => {
     const apiResponse = await HttpRequest.Get(`/api/usuarios/${id}`)
-    console.log("apiResponse", apiResponse)
 
     if (apiResponse.success) {
       setEmail(apiResponse.data.usuario.email)
       setSenha(apiResponse.data.usuario.senha)
+      setTipoUsuario(apiResponse.data.tipoUsuario)
     }
   }
 
@@ -69,8 +69,6 @@ export default function UsuarioManagement() {
     if (!router.isReady) return
 
     if (slug) {
-      console.log(slug)
-
       if (slug[0] === "new") {
         setId("")
         setLoading(false)
@@ -78,6 +76,7 @@ export default function UsuarioManagement() {
       } else {
         setId(slug[0])
         usuarioGetById(slug[0])
+        getTipoUsuarioList()
       }
     }
   }, [router.isReady, slug])
@@ -147,10 +146,10 @@ export default function UsuarioManagement() {
       tipoUsuario: tipoUsuario._id
     }
 
-    const apiResponse = await HttpRequest.Post("/api/usuarios/new", usuarioObj)
+    const apiResponse = await HttpRequest.Post("/api/usuarios/save", usuarioObj)
 
     if (apiResponse.success) {
-      setDialogText("Usuário criado com sucesso.")
+      setDialogText(apiResponse.message ? apiResponse.message : "Sucesso!!!")
       setOpenDialog(true)
       setLoading(false)
 
@@ -186,7 +185,7 @@ export default function UsuarioManagement() {
       variant="contained"
       startIcon={<ArrowBack />}
       onClick={() => {
-        router.push("/panel/tipoUsuario")
+        router.push("/panel/usuarios")
       }}
     >
       Voltar

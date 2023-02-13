@@ -11,7 +11,6 @@ const handle = async (
     await connect()
 
     const { id } = req.query
-    console.log("ID", id)
 
     if (!id) {
       return res.status(200).json({
@@ -24,9 +23,7 @@ const handle = async (
       id: id.toString() || ""
     })
 
-    console.log("controllerResponse", controllerResponse)
-
-    if (!controllerResponse.data._id) {
+    if (!controllerResponse.data.usuario._id) {
       return res.status(200).json({
         success: false,
         message: "Nenhum usuário encontrado."

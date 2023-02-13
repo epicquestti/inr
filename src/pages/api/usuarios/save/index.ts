@@ -8,8 +8,6 @@ const handle = async (
   req: NextApiRequest,
   res: NextApiResponse<apiResponse>
 ): Promise<void> => {
-  console.log("API", req.body)
-
   try {
     await connect()
 
@@ -31,11 +29,19 @@ const handle = async (
       })
     }
 
-    return res.status(200).json({
-      success: true,
-      message: "Usuário criado com sucesso.",
-      data: controllerResponse
-    })
+    if (req.body._id) {
+      return res.status(200).json({
+        success: true,
+        message: "Usuário editado com sucesso.",
+        data: controllerResponse
+      })
+    } else {
+      return res.status(200).json({
+        success: true,
+        message: "Usuário criado com sucesso.",
+        data: controllerResponse
+      })
+    }
   } catch (error: any) {
     return res.status(200).json({
       success: false,

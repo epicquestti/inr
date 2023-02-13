@@ -194,13 +194,11 @@ export default class UsuarioService implements IUsuarioService {
   async usuarioSave(params: usuarioSaveOutput): Promise<defaultResponse> {
     try {
       if (!params._id) {
-        //Criar Usuario
         const usuarioExists = await this._usuarioRepository.getUserByEmail(
           params.email
         )
 
-        if (usuarioExists?._id)
-          throw new Error("E-mail fornecido já cadastrado.")
+        if (usuarioExists) throw new Error("E-mail fornecido já cadastrado.")
 
         const repoResponse = await this._usuarioRepository.usuarioCreate(params)
 
@@ -213,14 +211,17 @@ export default class UsuarioService implements IUsuarioService {
           data: repoResponse
         }
       } else {
-        //Editar Usuário.
         const usuarioExists = await this._usuarioRepository.getUserById(
           params._id
         )
 
+        console.log("usuarioExists", usuarioExists)
+
         if (!usuarioExists) throw new Error("Usuário não encontrado.")
 
         const dbResponse = await this._usuarioRepository.usuarioUpdate(params)
+
+        console.log("dbResponse", dbResponse)
 
         return {
           success: true,
@@ -244,19 +245,17 @@ export default class UsuarioService implements IUsuarioService {
       if (repoResponse) {
         const fff = new ObjectId(repoResponse.tipoUsuario)
 
-        // tipoUsuarioFind = await this._tipoUsuarioRepository.getTipoUsuarioById(
-        //   new ObjectId(fff)
-        // )
-
-        // console.log("tipoUsuarioFind", tipoUsuarioFind)
+        tipoUsuarioFind = await this._tipoUsuarioRepository.getTipoUsuarioById(
+          new ObjectId(fff)
+        )
       }
 
-      // if (!repoResponse?._id) throw new Error("Usuário não encontrado.")
+      if (!repoResponse?._id) throw new Error("Usuário não encontrado.")
 
       return {
         success: true,
         message: "Exibindo Usuário.",
-        data: { usuario: repoResponse }
+        data: { usuario: repoResponse, tipoUsuario: tipoUsuarioFind }
       }
     } catch (error: any) {
       return {

@@ -5,7 +5,7 @@ const UsuarioSchema = schema(
   {
     email: types.string({ required: true }),
     senha: types.string({ required: true }),
-    tipoUsuario: types.string({ required: true })
+    tipoUsuario: types.objectId({ required: true })
   },
   {
     timestamps: true
