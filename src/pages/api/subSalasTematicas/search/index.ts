@@ -1,8 +1,8 @@
 import { connect } from "@lib/backend"
-import usuarioModel from "@schema/Usuario"
+import subSalasTematicasModel from "@schema/SubSalasTematicas"
 import { NextApiRequest, NextApiResponse } from "next"
 
-export default async function searchUsuarios(
+export default async function searchSubSalasTematicas(
   req: NextApiRequest,
   res: NextApiResponse
 ): Promise<void> {
@@ -11,17 +11,17 @@ export default async function searchUsuarios(
 
     await connect()
 
-    const list = await usuarioModel.find(
+    const list = await subSalasTematicasModel.find(
       {
-        email: {
+        nome: {
           $regex: ".*" + searchText + ".*",
           $options: "i"
         }
       },
       { limit: rowsperpage, skip: rowsperpage * page }
     )
-    const count = await usuarioModel.countDocuments({
-      email: {
+    const count = await subSalasTematicasModel.countDocuments({
+      nome: {
         $regex: ".*" + searchText + ".*",
         $options: "i"
       }

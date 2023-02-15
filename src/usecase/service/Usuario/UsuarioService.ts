@@ -215,13 +215,9 @@ export default class UsuarioService implements IUsuarioService {
           params._id
         )
 
-        console.log("usuarioExists", usuarioExists)
-
         if (!usuarioExists) throw new Error("Usuário não encontrado.")
 
         const dbResponse = await this._usuarioRepository.usuarioUpdate(params)
-
-        console.log("dbResponse", dbResponse)
 
         return {
           success: true,
