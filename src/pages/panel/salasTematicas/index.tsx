@@ -5,10 +5,9 @@ import { Button, Grid, Paper, TextField } from "@mui/material"
 import { useRouter } from "next/router"
 import { ChangeEvent, useState } from "react"
 
-export default function SubSalasTematicas() {
+export default function SalasTematicas() {
   const [searchText, setSearchText] = useState<string>("")
-
-  const [subSalasList, setSubSalasList] = useState<any[]>([])
+  const [salasList, setSalasList] = useState<any[]>([])
 
   const [rowsperpage, setRowsperpage] = useState<number>(5)
   const [page, setPage] = useState<number>(0)
@@ -18,24 +17,20 @@ export default function SubSalasTematicas() {
   const [dialogText, setDialogText] = useState<string>("")
 
   const router = useRouter()
-
   const [loading, setLoading] = useState<boolean>(false)
 
   const makeSearch = async () => {
     try {
       setLoading(true)
 
-      const apiResponse = await HttpRequest.Post(
-        "/api/subSalasTematicas/search",
-        {
-          searchText,
-          page: 0,
-          rowsperpage
-        }
-      )
+      const apiResponse = await HttpRequest.Post("/api/salasTematicas/search", {
+        searchText,
+        page: 0,
+        rowsperpage
+      })
 
       if (apiResponse.success) {
-        setSubSalasList(apiResponse.data.list)
+        setSalasList(apiResponse.data.list)
         setPage(0)
         setCount(apiResponse.data.count)
         setLoading(false)
@@ -50,28 +45,40 @@ export default function SubSalasTematicas() {
     }
   }
 
-  const searchByEnterKeyPress = async (e: any) => {
-    if (e.key === "Enter") await makeSearch()
-  }
-
-  const novaSubSalaTematica = () => {
-    router.push("/panel/subSalasTematicas/management/new")
+  const novaSalaTematica = async () => {
+    router.push("/panel/salasTematicas/management/new")
   }
 
   const changePage = async (value: number) => {
     setPage(value)
 
-    const apiResponse = await HttpRequest.Post(
-      "/api/subSalasTematicas/search",
-      {
-        searchText,
-        page: value,
-        rowsperpage
-      }
-    )
+    const apiResponse = await HttpRequest.Post("/api/salasTematicas/search", {
+      searchText,
+      page: value,
+      rowsperpage
+    })
 
     if (apiResponse.success) {
-      setSubSalasList(apiResponse.data.list)
+      setSalasList(apiResponse.data.list)
+      setCount(apiResponse.data.count)
+      setLoading(false)
+    } else {
+      setLoading(false)
+      throw new Error(apiResponse.message)
+    }
+  }
+
+  const changeRowsPerPage = async (value: number) => {
+    setRowsperpage(value)
+
+    const apiResponse = await HttpRequest.Post("/api/salasTematicas/search", {
+      searchText,
+      page: 0,
+      rowsperpage: value
+    })
+
+    if (apiResponse.success) {
+      setSalasList(apiResponse.data.list)
       setCount(apiResponse.data.count)
       setLoading(false)
     } else {
@@ -84,7 +91,7 @@ export default function SubSalasTematicas() {
     try {
       switch (actionName) {
         case "getById":
-          await visualizarSubSalaTematica(id)
+          await visualizarSalaTematica(id)
           break
       }
     } catch (error: any) {
@@ -94,10 +101,10 @@ export default function SubSalasTematicas() {
     }
   }
 
-  const visualizarSubSalaTematica = (id: string) => {
+  const visualizarSalaTematica = (id: string) => {
     try {
       setLoading(true)
-      router.push(`/panel/subSalasTematicas/management/${id}`)
+      router.push(`/panel/salasTematicas/management/${id}`)
     } catch (error: any) {
       setDialogText(error.message)
       setOpenDialog(true)
@@ -105,26 +112,8 @@ export default function SubSalasTematicas() {
     }
   }
 
-  const changeRowsPerPage = async (value: number) => {
-    setRowsperpage(value)
-
-    const apiResponse = await HttpRequest.Post(
-      "/api/subSalasTematicas/search",
-      {
-        searchText,
-        page: 0,
-        rowsperpage: value
-      }
-    )
-
-    if (apiResponse.success) {
-      setSubSalasList(apiResponse.data.list)
-      setCount(apiResponse.data.count)
-      setLoading(false)
-    } else {
-      setLoading(false)
-      throw new Error(apiResponse.message)
-    }
+  const searchByEnterKeyPress = async (e: any) => {
+    if (e.key === "Enter") await makeSearch()
   }
 
   const backButton = (
@@ -143,7 +132,7 @@ export default function SubSalasTematicas() {
 
   return (
     <ViewPanel
-      title="Sub Salas Temáticas"
+      title="Salas Temáticas"
       location={[
         {
           text: "Home",
@@ -151,9 +140,9 @@ export default function SubSalasTematicas() {
           href: "/panel"
         },
         {
-          text: "Sub Salas Temáticas",
+          text: "Salas Temáticas",
           iconName: "home",
-          href: "/panel/subSalasTematicas"
+          href: "/panel/salasTematicas"
         }
       ]}
       loading={{
@@ -181,7 +170,7 @@ export default function SubSalasTematicas() {
               }}
               onKeyPress={searchByEnterKeyPress}
               disabled={loading}
-              label="Buscar Sub Sala Temática"
+              label="Buscar Sala Temática"
               fullWidth
             />
           </Grid>
@@ -203,7 +192,7 @@ export default function SubSalasTematicas() {
               disabled={loading}
               fullWidth
               startIcon={<Add />}
-              onClick={novaSubSalaTematica}
+              onClick={novaSalaTematica}
             >
               Novo
             </Button>
@@ -211,7 +200,7 @@ export default function SubSalasTematicas() {
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
             <DataGridV2
               loading={loading}
-              data={subSalasList}
+              data={salasList}
               headers={[
                 {
                   text: "Nome",
