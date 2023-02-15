@@ -12,8 +12,6 @@ const handle = async (
 
     const { id } = req.query
 
-    console.log(id)
-
     if (!id) {
       return res.status(200).json({
         success: false,

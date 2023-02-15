@@ -34,8 +34,6 @@ export default function SubSalasTematicas() {
         }
       )
 
-      console.log("apiResponse", apiResponse)
-
       if (apiResponse.success) {
         setSubSalasList(apiResponse.data.list)
         setPage(0)

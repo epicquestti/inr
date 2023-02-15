@@ -20,8 +20,6 @@ export default function SubSalasTematicasManagement() {
   const subSalaTematicaGetById = async (id: string) => {
     const apiResponse = await HttpRequest.Get(`/api/subSalasTematicas/${id}`)
 
-    console.log(apiResponse)
-
     if (apiResponse.success) {
       setNome(apiResponse.data.data.nome)
     }

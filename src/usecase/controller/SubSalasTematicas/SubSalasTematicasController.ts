@@ -55,8 +55,6 @@ export default class SubSalasTematicasController
           validation.data
         )
 
-      console.log("serviceResponse", serviceResponse)
-
       return serviceResponse
     } catch (error: any) {
       return {

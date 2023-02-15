@@ -6,8 +6,6 @@ export default class TipoUsuarioRepository {
   async getTipoUsuarioById(
     tipoUsuarioId: ObjectId
   ): Promise<tipoUsuarioDocument | null> {
-    console.log("tipoUsuarioId", tipoUsuarioId)
-
     try {
       return await tipoUsuarioModel.findById(tipoUsuarioId)
     } catch (error: any) {
