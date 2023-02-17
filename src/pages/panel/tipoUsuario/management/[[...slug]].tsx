@@ -30,8 +30,6 @@ export default function TipoUsuarioManagement() {
 
   const slug = router.query.slug
 
-  const [checked, setChecked] = useState<boolean[]>([])
-
   const [loading, setLoading] = useState<boolean>(false)
   const [errorList, setErrorList] = useState<boolean[]>([false])
   const [openDialog, setOpenDialog] = useState<boolean>(false)

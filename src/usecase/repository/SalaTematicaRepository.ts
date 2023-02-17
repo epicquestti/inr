@@ -1,23 +1,48 @@
-import { salaTematicaDocument } from "@schema/SalaTematica"
+import salaTematicaModel, { salaTematicaDocument } from "@schema/SalaTematica"
+import { salaTematicaSaveOutput } from "@validation/SalaTematica/salaTematicaSave"
+import { ObjectId } from "mongodb"
 
 export default class SalaTematicaRepository {
-  async salaTematicaCreate(): Promise<salaTematicaDocument | null> {
-    return null
+  async salaTematicaCreate(
+    params: salaTematicaSaveOutput
+  ): Promise<salaTematicaDocument | null> {
+    return await salaTematicaModel.insertOne({
+      nome: params.nome
+    })
   }
 
-  async salaTematicaUpdate(): Promise<number> {
-    return 0
+  async salaTematicaUpdate(params: salaTematicaSaveOutput): Promise<number> {
+    const dbResponse = await salaTematicaModel.updateOne(
+      {
+        _id: params._id
+      },
+      {
+        $set: {
+          nome: params.nome
+        }
+      }
+    )
+
+    return dbResponse.modifiedCount
   }
 
   async salaTematicaDelete(): Promise<number> {
     return 0
   }
 
-  async salaTematicaGetById(): Promise<salaTematicaDocument | null> {
-    return null
+  async salaTematicaGetById(
+    id: ObjectId
+  ): Promise<salaTematicaDocument | null> {
+    return await salaTematicaModel.findOne({
+      _id: id
+    })
   }
 
-  async salaTematicaGetByNome(): Promise<salaTematicaDocument | null> {
-    return null
+  async salaTematicaGetByNome(
+    nome: string
+  ): Promise<salaTematicaDocument | null> {
+    return await salaTematicaModel.findOne({
+      nome: nome
+    })
   }
 }
