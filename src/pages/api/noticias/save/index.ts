@@ -1,7 +1,7 @@
 import { connect } from "@lib/backend"
 import { apiResponse } from "@lib/types/apiResponse"
-import salaTematicaController from "@usecase/controller/SalaTematica"
-import { salaTematicaSaveInput } from "@validation/SalaTematica/salaTematicaSave"
+import noticiasController from "@usecase/controller/Noticias"
+import { noticiaSaveInput } from "@validation/Noticia/noticiaSave"
 import { NextApiRequest, NextApiResponse } from "next"
 
 const handle = async (
@@ -9,14 +9,11 @@ const handle = async (
   res: NextApiResponse<apiResponse>
 ): Promise<void> => {
   try {
-    const salaTematicaObj: salaTematicaSaveInput =
-      req.body as salaTematicaSaveInput
+    const noticiaObj: noticiaSaveInput = req.body as noticiaSaveInput
 
     await connect()
 
-    const controllerResponse = await salaTematicaController.salaTematicaSave(
-      salaTematicaObj
-    )
+    const controllerResponse = await noticiasController.noticiaSave(noticiaObj)
 
     if (!controllerResponse.success) {
       return res.status(200).json({
@@ -28,7 +25,7 @@ const handle = async (
     res.status(200).json({
       success: true,
       message: controllerResponse.message,
-      data: controllerResponse
+      data: controllerResponse.data
     })
   } catch (error: any) {
     return res.status(200).json({

@@ -1,4 +1,5 @@
 import { ViewPanel } from "@Components/Panel"
+import { HttpRequest } from "@lib/frontend"
 import {
   ArrowBack,
   DeleteForever,
@@ -17,50 +18,46 @@ import {
   Typography
 } from "@mui/material"
 import Stack from "@mui/material/Stack"
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs"
 import { DesktopDatePicker } from "@mui/x-date-pickers/DesktopDatePicker"
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider"
-// import type {} from "@mui/x-date-pickers-pro/themeAugmentation"
-import { HttpRequest } from "@lib/frontend"
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs"
 import type {} from "@mui/x-date-pickers/themeAugmentation"
-import { Dayjs } from "dayjs"
+import { noticiaSaveInput } from "@validation/Noticia/noticiaSave"
+import { salaTematicaSaveInput } from "@validation/SalaTematica/salaTematicaSave"
 import dynamic from "next/dynamic"
 import { useRouter } from "next/router"
 import { ChangeEvent, useEffect, useRef, useState } from "react"
-import { buttonList } from "suneditor-react"
 import "suneditor/dist/css/suneditor.min.css" // Import Sun Editor's CSS File
 import SunEditorCore from "suneditor/src/lib/core"
 
-const SunEditor = dynamic(() => import("suneditor-react"), {
+const SunEditor = dynamic(() => import("../../../../components/SunEditor"), {
   ssr: false
 })
 
 export default function NoticiasManagement() {
-  const [id, setId] = useState<string>("")
-  const [titulo, setTitulo] = useState<string>("")
-  const [tituloSecundario, setTituloSecundario] = useState<string>("")
-  const [fonte, setFonte] = useState<string>("")
-  const [dataPublicacaoFonte, setDataPublicacaoFonte] = useState<Dayjs | null>(
-    null
-  )
-  const [imagemDestaque, setImagemDestaque] = useState<any>(null)
+  const [noticia, setNoticia] = useState<
+    noticiaSaveInput & { _id: string | undefined }
+  >({
+    _id: "",
+    conteudoHtml: "",
+    conteudoTexto: "",
+    dataPublicacaoFonte: new Date(),
+    fonte: "",
+    titulo: "",
+    tituloSecundario: "",
+    imagemDestaque: "",
+    salasTematicas: []
+  })
 
   const [salasTematicasList, setSalasTematicasList] = useState<
-    {
-      nome: string
-      _id: string
-      checked: boolean
-    }[]
+    (salaTematicaSaveInput & { checked: boolean })[]
   >([])
   const [salasTematicasSelected, setSalasTematicasSelected] = useState<
-    {
-      nome: string
-      _id: string
-      checked: boolean
-    }[]
+    (salaTematicaSaveInput & { checked: boolean })[]
   >([])
 
   const router = useRouter()
+  const slug = router.query.slug
   const [loading, setLoading] = useState<boolean>(false)
   const [openDialog, setOpenDialog] = useState<boolean>(false)
   const [dialogText, setDialogText] = useState<string>("")
@@ -73,24 +70,60 @@ export default function NoticiasManagement() {
       rowsPerpage: 99999
     })
 
+    const checkedArray: (salaTematicaSaveInput & { checked: boolean })[] = []
+
     if (apiResponse.success) {
-      setSalasTematicasList(apiResponse.data.list)
+      for (let i = 0; i < apiResponse.data.list.length; i++) {
+        checkedArray.push({
+          _id: apiResponse.data.list[i]._id,
+          checked: false,
+          nome: apiResponse.data.list[i].nome
+        })
+      }
+      setSalasTematicasList(checkedArray)
     }
+  }
+
+  const noticiaGetById = async (id: string) => {}
+
+  const salvarNoticia = async () => {
+    const salasArray: (string | undefined)[] = salasTematicasSelected.map(
+      item => item._id
+    )
+
+    const noticiaObj: noticiaSaveInput = {
+      ...noticia,
+      salasTematicas: salasArray
+    }
+
+    const apiResponse = await HttpRequest.Post("/api/noticias/save")
 
     console.log(apiResponse)
   }
 
+  const deleteNoticia = async () => {}
+
   useEffect(() => {
-    getSalasTematicasList()
-  }, [])
+    if (!router.isReady) return
+
+    if (slug) {
+      if (slug[0] === "new") {
+        getSalasTematicasList()
+        setLoading(false)
+      } else {
+        setNoticia({
+          ...noticia,
+          _id: slug[0]
+        })
+        noticiaGetById(slug[0])
+      }
+    }
+  }, [router.isReady, noticia, slug])
 
   const editor = useRef<SunEditorCore>()
   const getSunEditorInstance = (sunEditor: SunEditorCore) => {
     editor.current = sunEditor
   }
-
-  const salvarNoticia = async () => {}
-  const deleteNoticia = async () => {}
 
   const saveButton = (
     <Button
@@ -130,15 +163,20 @@ export default function NoticiasManagement() {
     </Button>
   )
 
-  const handleDataPublicacaoFonteChange = (newValue: Dayjs | null) => {
-    setDataPublicacaoFonte(newValue)
+  const handleDataPublicacaoFonteChange = (newValue: Date | null) => {
+    setNoticia({
+      ...noticia,
+      dataPublicacaoFonte: newValue
+    })
   }
 
   const handleImagemDestaqueChange = ({ target }: any) => {
-    setImagemDestaque(target.files[0])
+    setNoticia({ ...noticia, imagemDestaque: target.files[0] })
   }
 
-  const updateSalasTematicas = (item: any) => {
+  const updateSalasTematicas = (
+    item: salaTematicaSaveInput & { checked: boolean }
+  ) => {
     const findSala = salasTematicasSelected.find(
       element => element._id.toString() === item._id.toString()
     )
@@ -169,7 +207,9 @@ export default function NoticiasManagement() {
         }
       }}
       bottonButtons={
-        id ? [backButton, saveButton, deleteButton] : [backButton, saveButton]
+        noticia._id
+          ? [backButton, saveButton, deleteButton]
+          : [backButton, saveButton]
       }
     >
       <Paper sx={{ padding: 3 }}>
@@ -178,52 +218,61 @@ export default function NoticiasManagement() {
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
             <TextField
               disabled={loading}
-              value={titulo}
+              value={noticia.titulo}
               onChange={(e: ChangeEvent<HTMLInputElement>) => {
                 const tmp = [...errorList]
                 tmp[0] = false
                 setErrorList(tmp)
-                setTitulo(e.target.value)
+                setNoticia({
+                  ...noticia,
+                  titulo: e.target.value
+                })
               }}
               error={errorList[0]}
               label="Título"
               fullWidth
-              InputLabelProps={{ shrink: titulo !== "" ? true : false }}
+              InputLabelProps={{ shrink: noticia.titulo !== "" ? true : false }}
             />
           </Grid>
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
             <TextField
               disabled={loading}
-              value={tituloSecundario}
+              value={noticia.tituloSecundario}
               onChange={(e: ChangeEvent<HTMLInputElement>) => {
                 const tmp = [...errorList]
                 tmp[1] = false
                 setErrorList(tmp)
-                setTituloSecundario(e.target.value)
+                setNoticia({
+                  ...noticia,
+                  tituloSecundario: e.target.value
+                })
               }}
               error={errorList[1]}
               label="Título Secundário"
               fullWidth
               InputLabelProps={{
-                shrink: tituloSecundario !== "" ? true : false
+                shrink: noticia.tituloSecundario !== "" ? true : false
               }}
             />
           </Grid>
           <Grid item xs={12} sm={12} md={5} lg={5} xl={5}>
             <TextField
               disabled={loading}
-              value={fonte}
+              value={noticia.fonte}
               onChange={(e: ChangeEvent<HTMLInputElement>) => {
                 const tmp = [...errorList]
                 tmp[2] = false
                 setErrorList(tmp)
-                setFonte(e.target.value)
+                setNoticia({
+                  ...noticia,
+                  fonte: e.target.value
+                })
               }}
               error={errorList[2]}
               label="Fonte"
               fullWidth
               InputLabelProps={{
-                shrink: tituloSecundario !== "" ? true : false
+                shrink: noticia.fonte !== "" ? true : false
               }}
             />
           </Grid>
@@ -233,7 +282,7 @@ export default function NoticiasManagement() {
                 <DesktopDatePicker
                   label="Data de Publicação na Fonte"
                   inputFormat="MM/DD/YYYY"
-                  value={dataPublicacaoFonte}
+                  value={noticia.dataPublicacaoFonte}
                   onChange={handleDataPublicacaoFonteChange}
                   renderInput={(params: any) => <TextField {...params} />}
                 />
@@ -266,15 +315,13 @@ export default function NoticiasManagement() {
             <Typography fontWeight="bold">Conteúdo da Notícia:</Typography>
             <SunEditor
               getSunEditorInstance={getSunEditorInstance}
-              lang="pt_br"
-              name="my-editor"
+              name="content"
               width="100%"
               height="300"
               setOptions={{
-                height: "100",
-                buttonList: buttonList.complex
+                height: "100"
               }}
-              onChange={content => {
+              onChange={(content: string) => {
                 console.log("content", content)
                 const text = editor.current?.getText()
                 console.log("text", text)
@@ -285,15 +332,13 @@ export default function NoticiasManagement() {
             <Typography fontWeight="bold">Nota da Redação INR:</Typography>
             <SunEditor
               getSunEditorInstance={getSunEditorInstance}
-              lang="pt_br"
               name="editorsNote"
               width="100%"
               height="100"
               setOptions={{
-                height: "100",
-                buttonList: buttonList.complex
+                height: "100"
               }}
-              onChange={content => {
+              onChange={(content: any) => {
                 console.log("content", content)
                 const text = editor.current?.getText()
                 console.log("text", text)
@@ -302,9 +347,11 @@ export default function NoticiasManagement() {
           </Grid>
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
             <Typography fontWeight="bold">Salas Temáticas:</Typography>
-            {salasTematicasList &&
-              salasTematicasList.map(item => (
-                <FormGroup key={item.id}>
+          </Grid>
+          {salasTematicasList &&
+            salasTematicasList.map(item => (
+              <Grid item xs={12} sm={12} md={12} lg={12} xl={12} key={item._id}>
+                <FormGroup>
                   <FormControlLabel
                     control={
                       <Checkbox
@@ -321,8 +368,8 @@ export default function NoticiasManagement() {
                     label={item.nome}
                   />
                 </FormGroup>
-              ))}
-          </Grid>
+              </Grid>
+            ))}
         </Grid>
       </Paper>
     </ViewPanel>
