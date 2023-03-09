@@ -8,6 +8,8 @@ const handle = async (
   req: NextApiRequest,
   res: NextApiResponse<apiResponse>
 ): Promise<void> => {
+  console.log(req.body)
+
   try {
     const noticiaObj: noticiaSaveInput = req.body as noticiaSaveInput
 

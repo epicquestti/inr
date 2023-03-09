@@ -84,22 +84,25 @@ export default function NoticiasManagement() {
     }
   }
 
-  const noticiaGetById = async (id: string) => {}
-
   const salvarNoticia = async () => {
     const salasArray: (string | undefined)[] = salasTematicasSelected.map(
       item => item._id
     )
+
+    const aa = editor.current?.getContents(true)
+    console.log("aaa", aa)
 
     const noticiaObj: noticiaSaveInput = {
       ...noticia,
       salasTematicas: salasArray
     }
 
-    const apiResponse = await HttpRequest.Post("/api/noticias/save")
+    const apiResponse = await HttpRequest.Post("/api/noticias/save", noticiaObj)
 
     console.log(apiResponse)
   }
+
+  const noticiaGetById = async (id: string) => {}
 
   const deleteNoticia = async () => {}
 
@@ -178,7 +181,7 @@ export default function NoticiasManagement() {
     item: salaTematicaSaveInput & { checked: boolean }
   ) => {
     const findSala = salasTematicasSelected.find(
-      element => element._id.toString() === item._id.toString()
+      element => element._id === item._id
     )
     if (!findSala) {
       salasTematicasSelected.push(item)
@@ -213,7 +216,6 @@ export default function NoticiasManagement() {
       }
     >
       <Paper sx={{ padding: 3 }}>
-        {JSON.stringify(salasTematicasSelected)}
         <Grid container spacing={2} alignItems="center">
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
             <TextField

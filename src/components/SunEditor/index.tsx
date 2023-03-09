@@ -4,7 +4,9 @@ const CustomSunEditor = ({ ...props }) => {
   return (
     <SunEditor
       lang="pt_br"
-      setOptions={{ buttonList: buttonList.complex }}
+      setOptions={{
+        buttonList: buttonList.formatting
+      }}
       {...props}
     />
   )
