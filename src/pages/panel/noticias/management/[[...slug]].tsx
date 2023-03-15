@@ -46,13 +46,13 @@ export default function NoticiasManagement() {
     titulo: "",
     tituloSecundario: "",
     imagemDestaque: "",
+    notaRedacao: "",
     salasTematicas: []
   })
 
+  const [conteudo, setConteudo] = useState<string>("")
+
   const [salasTematicasList, setSalasTematicasList] = useState<
-    (salaTematicaSaveInput & { checked: boolean })[]
-  >([])
-  const [salasTematicasSelected, setSalasTematicasSelected] = useState<
     (salaTematicaSaveInput & { checked: boolean })[]
   >([])
 
@@ -85,12 +85,15 @@ export default function NoticiasManagement() {
   }
 
   const salvarNoticia = async () => {
-    const salasArray: (string | undefined)[] = salasTematicasSelected.map(
-      item => item._id
-    )
+    const salasArray: (string | undefined)[] = []
 
-    const aa = editor.current?.getContents(true)
-    console.log("aaa", aa)
+    for (let i = 0; i < salasTematicasList.length; i++) {
+      if (salasTematicasList[i].checked)
+        salasArray.push(salasTematicasList[i]._id)
+    }
+
+    const aa = editor.current?.getText()
+    console.log(aa)
 
     const noticiaObj: noticiaSaveInput = {
       ...noticia,
@@ -121,7 +124,7 @@ export default function NoticiasManagement() {
         noticiaGetById(slug[0])
       }
     }
-  }, [router.isReady, noticia, slug])
+  }, [router.isReady])
 
   const editor = useRef<SunEditorCore>()
   const getSunEditorInstance = (sunEditor: SunEditorCore) => {
@@ -180,17 +183,13 @@ export default function NoticiasManagement() {
   const updateSalasTematicas = (
     item: salaTematicaSaveInput & { checked: boolean }
   ) => {
-    const findSala = salasTematicasSelected.find(
+    const index = salasTematicasList.findIndex(
       element => element._id === item._id
     )
-    if (!findSala) {
-      salasTematicasSelected.push(item)
-    } else {
-      const salaIndex = salasTematicasSelected.findIndex(
-        element => element._id === item._id
-      )
-      console.log(salaIndex)
-    }
+    const temp = [...salasTematicasList]
+    item.checked = !item.checked
+    temp[index] = item
+    setSalasTematicasList(temp)
   }
 
   return (
@@ -217,6 +216,7 @@ export default function NoticiasManagement() {
     >
       <Paper sx={{ padding: 3 }}>
         <Grid container spacing={2} alignItems="center">
+          {JSON.stringify(salasTematicasList)}
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
             <TextField
               disabled={loading}
@@ -319,14 +319,18 @@ export default function NoticiasManagement() {
               getSunEditorInstance={getSunEditorInstance}
               name="content"
               width="100%"
-              height="300"
-              setOptions={{
-                height: "100"
-              }}
+              content={noticia.conteudoHtml}
               onChange={(content: string) => {
-                console.log("content", content)
-                const text = editor.current?.getText()
-                console.log("text", text)
+                setNoticia({
+                  ...noticia,
+                  conteudoHtml: content
+                })
+                // const temp = { ...noticia }
+                // temp.conteudoHtml = content
+                // setNoticia(temp)
+                // console.log("content", content)
+                // const text = editor.current?.getText()
+                // console.log("text", text)
               }}
             />
           </Grid>
@@ -337,13 +341,8 @@ export default function NoticiasManagement() {
               name="editorsNote"
               width="100%"
               height="100"
-              setOptions={{
-                height: "100"
-              }}
               onChange={(content: any) => {
-                console.log("content", content)
-                const text = editor.current?.getText()
-                console.log("text", text)
+                setConteudo(content)
               }}
             />
           </Grid>
@@ -360,7 +359,7 @@ export default function NoticiasManagement() {
                         onChange={(
                           event: React.ChangeEvent<HTMLInputElement>
                         ) => {
-                          item.checked = event.target.checked
+                          item.checked = !event.target.checked
 
                           updateSalasTematicas(item)
                         }}

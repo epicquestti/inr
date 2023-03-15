@@ -5,8 +5,10 @@ const CustomSunEditor = ({ ...props }) => {
     <SunEditor
       lang="pt_br"
       setOptions={{
-        buttonList: buttonList.formatting
+        buttonList: buttonList.complex,
+        height: "300"
       }}
+      setContents={props.content}
       {...props}
     />
   )

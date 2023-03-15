@@ -39,6 +39,11 @@ export const noticiaSaveSchema = z.object({
     invalid_type_error: "Conteúdo em HTML deve ser uma string.",
     required_error: "Conteúdo em HTML é obrigatório."
   }),
+  notaRedacao: z
+    .string({
+      invalid_type_error: "Nota da Redação deve ser uma string."
+    })
+    .optional(),
   salasTematicas: z.array(
     z
       .string({

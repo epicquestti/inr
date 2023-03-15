@@ -8,7 +8,8 @@ const NoticiaSchema = schema({
   dataPublicacaoFonte: types.date || types.null({ required: false }),
   imagemDestaque: types.string({ required: true }),
   conteudoTexto: types.string({ required: true }),
-  conteudoHtml: types.string({ required: true })
+  conteudoHtml: types.string({ required: true }),
+  notaRedacao: types.string({ required: true })
 })
 
 const noticiaModel = papr.model("Noticia", NoticiaSchema)
