@@ -96,32 +96,6 @@ export default class FuncaoService implements IFuncaoService {
 
       if (!repositoryResponse) throw new Error("Nenhuma Função encontrada.")
 
-      // const apisRelacionadas = await this._funcaoApiRepository.funcaoApiGetApis(
-      //   id.id
-      // )
-
-      // let apisCompletas
-      // if (apisRelacionadas && apisRelacionadas?.length > 0) {
-      //   const apiArray: ObjectId[] = []
-
-      //   for (let i = 0; i < apisRelacionadas.length; i++) {
-      //     apiArray.push(apisRelacionadas[i].api)
-      //   }
-
-      //   apisCompletas = await this._apiRepository.getApiList(apiArray)
-      // }
-
-      // let tipoUsuarioCompleto
-      // if (
-      //   repositoryResponse?.tipoUsuarioAutorizado &&
-      //   repositoryResponse?.tipoUsuarioAutorizado?.length > 0
-      // ) {
-      //   tipoUsuarioCompleto =
-      //     await this._tipoUsuarioRepository.tipoUsuarioGetList(
-      //       repositoryResponse?.tipoUsuarioAutorizado
-      //     )
-      // }
-
       return {
         success: true,
         message: "Exibindo Função.",
