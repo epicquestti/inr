@@ -8,7 +8,7 @@ module.exports = {
     secretAccessKey: process.env.SECRET_ACCESS_KEY
   },
   images: {
-    domains: ["object.epicquestti.com.br"]
+    domains: ["object.epicquestti.com.br", "inrpublicacoes.com.br"]
   },
   async headers() {
     return [

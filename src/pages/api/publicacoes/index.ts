@@ -54,6 +54,7 @@ export default async function Search(
         "type.text": tipo
       },
       {
+        sort: { createdAt: -1 },
         limit: parsedRowsPerPage,
         skip: offset
       }
