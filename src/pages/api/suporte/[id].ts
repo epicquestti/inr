@@ -1,6 +1,7 @@
 import { connect } from "@lib/backend"
 import Reportes from "@schema/Reportes"
 import ReportesLifeCicle from "@schema/ReportesLifeCicle"
+import { ObjectId } from "mongodb"
 import { NextApiRequest, NextApiResponse } from "next"
 
 export default async function getReportById(
@@ -12,9 +13,11 @@ export default async function getReportById(
       query: { id }
     } = req
 
+    if (!id) throw new Error("Identificador ausente.")
+
     await connect()
 
-    const report = await Reportes.findById(id)
+    const report = await Reportes.findById(new ObjectId(id.toString()))
     const events = await ReportesLifeCicle.find({
       reporte: report?._id
     })

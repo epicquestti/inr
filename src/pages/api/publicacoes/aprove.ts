@@ -1,6 +1,7 @@
-import connect from "@lib/backend/database"
 import PublicacaoModel from "@schema/Publicacao"
+import { ObjectId } from "mongodb"
 import { NextApiRequest, NextApiResponse } from "next"
+import { connect } from "../../../lib/backend/database"
 
 export default async function aprovePublicacao(
   req: NextApiRequest,
@@ -23,7 +24,7 @@ export default async function aprovePublicacao(
 
     if (method === "GET") {
       await PublicacaoModel.updateOne(
-        { _id: id },
+        { _id: new ObjectId(id.toString()) },
         {
           aproved: true,
           aprovedAt: new Date(new Date().setHours(new Date().getHours() - 3))

@@ -8,7 +8,7 @@ export default async function getPublicacaoById(
 ): Promise<void> {
   try {
     await connect()
-    const response = await ReportDestinatario.find()
+    const response = await ReportDestinatario.find({})
     res.status(200).send({
       success: true,
       data: {

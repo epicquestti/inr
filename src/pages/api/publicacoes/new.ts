@@ -1,4 +1,4 @@
-import connect from "@lib/backend/database"
+import { connect } from "@lib/backend/database"
 import PublicacaoModel from "@schema/Publicacao"
 import PublicacaoContentsModel from "@schema/PublicacaoContents"
 import PublicIdentifierModel from "@schema/PublicIdentifier"
@@ -36,12 +36,12 @@ export default async function novoPublicacao(
         })
       }
 
-      let hasPublicIdentifier = await PublicIdentifierModel.find()
+      let hasPublicIdentifier = await PublicIdentifierModel.find({})
 
       let publicIdentifier: any | null = null
 
       if (hasPublicIdentifier.length <= 0) {
-        publicIdentifier = await PublicIdentifierModel.create({
+        publicIdentifier = await PublicIdentifierModel.insertOne({
           boletim: 0,
           classificador: 0
         })
@@ -54,23 +54,21 @@ export default async function novoPublicacao(
           ? publicIdentifier.boletim + 1
           : publicIdentifier.classificador + 1
 
-      console.log(newPublicId)
-
-      const newPublic = await PublicacaoModel.create({
+      const newPublic = await PublicacaoModel.insertOne({
         publicId: newPublicId,
         title: titulo,
         type: {
           id: tipo,
           text: tipo === 1 ? "Boletim" : "Classificador"
         },
-        createdAt: new Date().setHours(new Date().getHours() - 3),
+        createdAt: new Date(new Date().setHours(new Date().getHours() - 3)),
         aproved: false,
         published: false
       })
 
       for (let i = 0; i < conteudoList.length; i++) {
         try {
-          await PublicacaoContentsModel.create({
+          await PublicacaoContentsModel.insertOne({
             title: conteudoList[i].titulo,
             url: conteudoList[i].url,
             tipo: conteudoList[i].tipo,

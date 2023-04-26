@@ -1,5 +1,8 @@
 import { ViewPanel } from "@Components/Panel"
-import RequestApi from "@lib/frontend/HttpRequest"
+import {
+  default as HttpRequest,
+  default as RequestApi
+} from "@lib/frontend/HttpRequest"
 import {
   ArrowBack,
   Check,
@@ -178,11 +181,8 @@ export default function GetPublicacaoById() {
       setOpenBackDrop(true)
       const { id } = router.query
       try {
-        const publicacao = await RequestApi.Get(
-          "/api/publicacoes/get-publish",
-          {
-            id
-          }
+        const publicacao = await HttpRequest.Get(
+          `/api/publicacoes/get-publish?id=${id}`
         )
 
         if (publicacao.success) {
@@ -371,7 +371,6 @@ export default function GetPublicacaoById() {
 
     const requestResponse = await RequestApi.Put(
       `/api/publicacoes/update?id=${id}`,
-      undefined,
       {
         titulo,
         tipo,
@@ -396,9 +395,9 @@ export default function GetPublicacaoById() {
     const { id } = router.query
     setLoading(true)
 
-    const requestResponse = await RequestApi.Get(`/api/publicacoes/aprove`, {
-      id
-    })
+    const requestResponse = await RequestApi.Get(
+      `/api/publicacoes/aprove?id=${id}`
+    )
 
     if (requestResponse.success) {
       setshowSave(true)
@@ -416,9 +415,9 @@ export default function GetPublicacaoById() {
     const { id } = router.query
     setLoading(true)
 
-    const requestResponse = await RequestApi.Get(`/api/publicacoes/publish`, {
-      id
-    })
+    const requestResponse = await RequestApi.Get(
+      `/api/publicacoes/publish?id=${id}`
+    )
 
     if (requestResponse.success) {
       setshowSave(false)

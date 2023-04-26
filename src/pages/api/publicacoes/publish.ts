@@ -1,6 +1,7 @@
-import connect from "@lib/backend/database"
+import { connect } from "@lib/backend/database"
 import LastPublishes from "@schema/LasPublishes"
 import PublicacaoModel from "@schema/Publicacao"
+import { ObjectId } from "mongodb"
 import { NextApiRequest, NextApiResponse } from "next"
 
 export default async function publishPublicacao(
@@ -23,7 +24,9 @@ export default async function publishPublicacao(
     }
 
     if (method === "GET") {
-      const publishToAprove = await PublicacaoModel.findById(id)
+      const publishToAprove = await PublicacaoModel.findById(
+        new ObjectId(id.toString())
+      )
 
       if (publishToAprove) {
         publishToAprove.published = true
@@ -31,26 +34,29 @@ export default async function publishPublicacao(
           new Date().setHours(new Date().getHours() - 3)
         )
 
-        await PublicacaoModel.updateOne({ _id: id }, publishToAprove)
+        await PublicacaoModel.updateOne(
+          { _id: new ObjectId(id.toString()) },
+          publishToAprove
+        )
 
-        const lp = await LastPublishes.find()
+        const lp = await LastPublishes.find({})
 
         if (lp.length !== 1) {
-          await LastPublishes.deleteMany()
-          if (publishToAprove.type.id === 1) {
-            await LastPublishes.create({
+          await LastPublishes.deleteMany({})
+          if (publishToAprove.type?.id === 1) {
+            await LastPublishes.insertOne({
               boletim: publishToAprove.publicId,
               classificador: 0
             })
           } else {
-            await LastPublishes.create({
+            await LastPublishes.insertOne({
               boletim: 0,
               classificador: publishToAprove.publicId
             })
           }
         } else {
           const lpToBeUpdated = lp[0]
-          if (publishToAprove.type.id === 1)
+          if (publishToAprove.type?.id === 1)
             lpToBeUpdated.boletim = publishToAprove.publicId
           else lpToBeUpdated.classificador = publishToAprove.publicId
 

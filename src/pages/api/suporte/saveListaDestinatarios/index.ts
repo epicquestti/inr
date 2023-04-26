@@ -13,10 +13,10 @@ export default async function saveListaDestinatarios(
 
     await connect()
 
-    await ReportDestinatario.deleteMany()
+    await ReportDestinatario.deleteMany({})
 
     for (let i = 0; i < destinatarios.length; i++) {
-      await ReportDestinatario.create({
+      await ReportDestinatario.insertOne({
         nome: destinatarios[i].nome,
         email: destinatarios[i].email
       })

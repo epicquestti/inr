@@ -64,10 +64,12 @@ const DownloadPage = ({
   })
   const [downloadAreaShow, setDownloadAreaShow] = useState<boolean>(false)
   const [loadingAreaShow, setLoadingAreaShow] = useState<boolean>(true)
+  const [loading, setLoading] = useState<boolean>(false)
 
   useEffect(() => {
     if (!router.isReady) return
 
+    setLoading(true)
     const finded = versions.find(v => v.type === "W")
 
     if (
@@ -113,8 +115,9 @@ const DownloadPage = ({
       setLoadingAreaShow(false)
       setTimeout(() => {
         setDownloadAreaShow(true)
+        setLoading(false)
       }, 500)
-    }, 3000)
+    }, 2000)
   }, [router.isReady])
 
   return (
@@ -188,6 +191,7 @@ const DownloadPage = ({
             }}
           >
             <Button
+              disabled={loading}
               fullWidth
               variant="contained"
               size="large"
