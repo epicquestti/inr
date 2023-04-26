@@ -8,7 +8,7 @@ module.exports = {
     jwt_key: process.env.JWT_KEY
   },
   images: {
-    domains: ["object.epicquestti.com.br"]
+    domains: ["object.epicquestti.com.br", "inrpublicacoes.com.br"]
   },
   async headers() {
     return [

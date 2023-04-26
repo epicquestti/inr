@@ -80,9 +80,9 @@ const SecurityContextControll: FC<{ children?: React.ReactNode }> = ({
     }
   }
 
-  useEffect(() => {
-    initContext()
-  }, [])
+  // useEffect(() => {
+  //   initContext()
+  // }, [])
 
   useEffect(() => {
     if (usuario) {
