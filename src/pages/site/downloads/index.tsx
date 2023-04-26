@@ -23,6 +23,7 @@ export const getServerSideProps: GetServerSideProps<{
     buttonText?: string
     hasExe?: boolean
     endereco: string
+    type: "W" | "WS" | "L" | "MC"
   }[]
 }> = async context => {
   return {
@@ -30,19 +31,22 @@ export const getServerSideProps: GetServerSideProps<{
       versions: [
         {
           downloadSpecification: "WINDOWS",
-          version: "0.2.99",
+          version: "0.2.72",
           buttonText: "DOWNLOAD",
           hasExe: true,
           icone: "desktop_windows",
           endereco:
-            "https://object.epicquestti.com.br/inr/leitorinr/releases/Instalador_Leitor_INR_0.2.72.exe"
+            "https://object.epicquestti.com.br/inr/leitorinr/releases/Instalador_Leitor_INR_0.2.72.exe",
+          type: "W"
         },
         {
           downloadSpecification: "WIN STORE",
-          version: "0.2.99",
+          version: "0.2.72",
           buttonText: "ACESSAR",
           icone: "desktop_windows",
-          endereco: "ms-windows-store://navigatetopage/?Id=Gaming"
+          hasExe: false,
+          endereco: "ms-windows-store://navigatetopage/?Id=Gaming",
+          type: "WS"
         }
       ]
     }
@@ -53,11 +57,57 @@ const DownloadPage = ({
   versions
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter()
+  const [op, setOp] = useState<{ texto: string; type: string; link: string }>({
+    texto: "Download",
+    type: "W",
+    link: ""
+  })
   const [downloadAreaShow, setDownloadAreaShow] = useState<boolean>(false)
   const [loadingAreaShow, setLoadingAreaShow] = useState<boolean>(true)
 
   useEffect(() => {
     if (!router.isReady) return
+
+    const finded = versions.find(v => v.type === "W")
+
+    if (
+      window.navigator.platform === "Win32" ||
+      window.navigator.platform === "Windows"
+    ) {
+      setOp({
+        texto: "Download Windows",
+        type: "W",
+        link: finded?.endereco || ""
+      })
+    }
+
+    if (
+      window.navigator.platform === "Linux" ||
+      window.navigator.platform === "Linux x86_64" ||
+      window.navigator.platform === "Linux i686 X11" ||
+      window.navigator.platform === "Linux x86_64 X11"
+    ) {
+      setOp({
+        texto: "Download Linux",
+        type: "L",
+        link: finded?.endereco || ""
+      })
+    }
+
+    if (
+      window.navigator.platform === "iPhone " ||
+      window.navigator.platform === "iPod" ||
+      window.navigator.platform === "iPad" ||
+      window.navigator.platform === "Macintosh" ||
+      window.navigator.platform === "MacIntel" ||
+      window.navigator.platform === "MacPPC"
+    ) {
+      setOp({
+        texto: "Download MAC",
+        type: "MC",
+        link: finded?.endereco || ""
+      })
+    }
 
     setTimeout(() => {
       setLoadingAreaShow(false)
@@ -141,9 +191,11 @@ const DownloadPage = ({
               fullWidth
               variant="contained"
               size="large"
-              onClick={async () => {}}
+              onClick={async () => {
+                router.push(op.link)
+              }}
             >
-              Plataforma
+              {op.texto}
             </Button>
           </Box>
         </Container>
