@@ -38,16 +38,16 @@ export const getServerSideProps: GetServerSideProps<{
           endereco:
             "https://object.epicquestti.com.br/inr/leitorinr/releases/Instalador_Leitor_INR_0.2.72.exe",
           type: "W"
-        },
-        {
-          downloadSpecification: "WIN STORE",
-          version: "0.2.72",
-          buttonText: "ACESSAR",
-          icone: "desktop_windows",
-          hasExe: false,
-          endereco: "ms-windows-store://navigatetopage/?Id=Gaming",
-          type: "WS"
         }
+        // {
+        //   downloadSpecification: "WIN STORE",
+        //   version: "0.2.72",
+        //   buttonText: "ACESSAR",
+        //   icone: "desktop_windows",
+        //   hasExe: false,
+        //   endereco: "ms-windows-store://navigatetopage/?Id=Gaming",
+        //   type: "WS"
+        // }
       ]
     }
   }
@@ -377,99 +377,55 @@ const DownloadPage = ({
             <Grid container spacing={1} justifyContent="center">
               <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
                 <Typography variant="h6" color="GrayText">
-                  NOTA: Título
+                  Leitor INR
                 </Typography>
               </Grid>
 
               <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
                 <Typography variant="caption" color="black">
+                  <p>Versão atual: 0.2.72</p>
                   <p>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
-                    do eiusmod tempor incididunt ut labore et dolore magna
-                    aliqua. Elit ut aliquam purus sit amet. Nulla pellentesque
-                    dignissim enim sit amet. Accumsan tortor posuere ac ut
-                    consequat semper viverra nam libero. Id diam maecenas
-                    ultricies mi eget mauris pharetra et. Vitae nunc sed velit
-                    dignissim sodales ut eu sem. Quam viverra orci sagittis eu
-                    volutpat odio facilisis mauris. Scelerisque viverra mauris
-                    in aliquam sem fringilla ut. Pharetra diam sit amet nisl
-                    suscipit. Ornare lectus sit amet est placerat in egestas
-                    erat. Vel eros donec ac odio tempor. Pellentesque massa
-                    placerat duis ultricies lacus. Malesuada pellentesque elit
-                    eget gravida. Rhoncus aenean vel elit scelerisque mauris
-                    pellentesque pulvinar pellentesque habitant. Tincidunt augue
-                    interdum velit euismod in. Sagittis orci a scelerisque purus
-                    semper eget duis at tellus.
+                    Leitor INR é um aplicativo para distribuição livre e
+                    gratuita destinada a Assinantes INR.
                   </p>
-
                   <p>
-                    Pellentesque adipiscing commodo elit at imperdiet dui
-                    accumsan sit. Ultrices dui sapien eget mi proin sed libero
-                    enim sed. Cursus euismod quis viverra nibh cras pulvinar
-                    mattis nunc sed. Cursus metus aliquam eleifend mi in nulla
-                    posuere. Diam ut venenatis tellus in metus vulputate. Sit
-                    amet volutpat consequat mauris. Quis enim lobortis
-                    scelerisque fermentum dui. Nisl rhoncus mattis rhoncus urna
-                    neque viverra. Consequat ac felis donec et odio
-                    pellentesque. Ornare arcu odio ut sem nulla pharetra diam
-                    sit amet. Arcu felis bibendum ut tristique et. Felis
-                    bibendum ut tristique et egestas quis ipsum suspendisse
-                    ultrices.
+                    O Leitor INR não coleta quaisquer dados pessoais do seu
+                    usuário.
                   </p>
-
                   <p>
-                    Lectus sit amet est placerat in. Cras fermentum odio eu
-                    feugiat pretium nibh. Gravida in fermentum et sollicitudin
-                    ac. Lectus arcu bibendum at varius vel. Blandit massa enim
-                    nec dui nunc mattis. Habitant morbi tristique senectus et
-                    netus et malesuada. Pellentesque habitant morbi tristique
-                    senectus. At imperdiet dui accumsan sit. Odio ut sem nulla
-                    pharetra diam sit amet nisl. Euismod lacinia at quis risus
-                    sed. Tortor at auctor urna nunc id cursus metus aliquam
-                    eleifend. Vitae congue eu consequat ac felis donec. Mi
-                    tempus imperdiet nulla malesuada pellentesque elit eget
-                    gravida cum.
+                    O Leitor INR é livre de vírus e ou dispositivos maliciosos.
                   </p>
-
                   <p>
-                    Eget aliquet nibh praesent tristique magna. Id aliquet risus
-                    feugiat in ante metus dictum. Pellentesque dignissim enim
-                    sit amet venenatis urna cursus eget nunc. Eget arcu dictum
-                    varius duis. Ultrices dui sapien eget mi proin. Id semper
-                    risus in hendrerit gravida rutrum quisque non tellus.
-                    Viverra aliquet eget sit amet tellus cras adipiscing.
-                    Consequat ac felis donec et odio pellentesque diam volutpat
-                    commodo. Vulputate odio ut enim blandit volutpat maecenas.
-                    Et ligula ullamcorper malesuada proin libero nunc. Tellus
-                    pellentesque eu tincidunt tortor aliquam nulla facilisi.
-                    Blandit aliquam etiam erat velit scelerisque in dictum.
-                    Tincidunt dui ut ornare lectus. Massa vitae tortor
-                    condimentum lacinia quis vel eros. Mauris nunc congue nisi
-                    vitae suscipit tellus. Mattis ullamcorper velit sed
-                    ullamcorper morbi tincidunt. Et malesuada fames ac turpis
-                    egestas maecenas pharetra convallis. Velit laoreet id donec
-                    ultrices tincidunt arcu non sodales. Consectetur libero id
-                    faucibus nisl tincidunt.
+                    Após a instalação do Leitor INR no computador com sistema
+                    Windows © (marca registrada Microsoft Corporation), haverá
+                    notificação a cada nova publicação de Boletins Eletrônicos
+                    INR e Classificadores INR.
                   </p>
-
                   <p>
-                    Est placerat in egestas erat imperdiet sed euismod nisi.
-                    Pulvinar neque laoreet suspendisse interdum. Urna id
-                    volutpat lacus laoreet non curabitur gravida. Odio aenean
-                    sed adipiscing diam donec adipiscing tristique. Etiam sit
-                    amet nisl purus in mollis nunc sed id. In nibh mauris cursus
-                    mattis molestie a iaculis. Eu ultrices vitae auctor eu augue
-                    ut lectus. Sollicitudin nibh sit amet commodo nulla
-                    facilisi. Morbi tincidunt augue interdum velit euismod in
-                    pellentesque massa placerat. Sit amet aliquam id diam
-                    maecenas ultricies. Feugiat in fermentum posuere urna nec
-                    tincidunt praesent semper feugiat. Amet massa vitae tortor
-                    condimentum lacinia quis. Viverra tellus in hac habitasse
-                    platea dictumst vestibulum. Ac feugiat sed lectus vestibulum
-                    mattis ullamcorper. Eleifend quam adipiscing vitae proin.
-                    Magna fringilla urna porttitor rhoncus dolor purus. Sed
-                    euismod nisi porta lorem.
+                    O Leitor INR, nesta versão, destina-se à notificação
+                    boletins distribuídos pelo INR, revelando ao seu usuário a
+                    respectiva publicação no Portal INR
+                    (https://inrpublicacoes.com.br/site/inicio).
                   </p>
+                  <p>
+                    A leitura integral do conteúdo dos boletins se dará pelo
+                    acesso ao Portal INR, onde serão solicitados login e senha
+                    exclusivos do Assinante INR (os mesmos já utilizados para a
+                    obtenção de todo o conteúdo do portal).
+                  </p>
+                  <p>
+                    Ao acessar o Portal INR, o Assinante INR concorda com os
+                    termos de uso vigentes no site.
+                  </p>
+                  <p>
+                    O aplicativo Leitor INR é propriedade intelectual da
+                    Boletins Informativos Ltda, editora das Publicações INR.
+                  </p>
+                  <p>
+                    Em caso de dúvidas, favor enviar e-mail para
+                    faleconosco@inr.com.br.
+                  </p>
+                  <p>Publicações INR © 2023. Todos os direitos reservados.</p>
                 </Typography>
               </Grid>
             </Grid>
