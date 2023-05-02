@@ -8,7 +8,9 @@ import {
   Grid,
   Icon,
   Paper,
-  Typography
+  Typography,
+  useMediaQuery,
+  useTheme
 } from "@mui/material"
 import { GetServerSideProps, InferGetServerSidePropsType } from "next"
 import Image from "next/image"
@@ -65,6 +67,8 @@ const DownloadPage = ({
   const [downloadAreaShow, setDownloadAreaShow] = useState<boolean>(false)
   const [loadingAreaShow, setLoadingAreaShow] = useState<boolean>(true)
   const [loading, setLoading] = useState<boolean>(false)
+  const theme = useTheme()
+  const matches = useMediaQuery(theme.breakpoints.up("sm"))
 
   useEffect(() => {
     if (!router.isReady) return
@@ -177,9 +181,15 @@ const DownloadPage = ({
               alignItems: "center"
             }}
           >
-            <Typography variant="h4" color="GrayText">
-              VERSÃO RECOMENDADA PARA O SEU SISTEMA OPERACIONAL
-            </Typography>
+            {matches ? (
+              <Typography variant="h4" color="GrayText">
+                VERSÃO RECOMENDADA PARA O SEU SISTEMA OPERACIONAL
+              </Typography>
+            ) : (
+              <Typography variant="body2" color="GrayText">
+                VERSÃO RECOMENDADA PARA O SEU SISTEMA OPERACIONAL
+              </Typography>
+            )}
           </Box>
 
           <Box
@@ -383,49 +393,62 @@ const DownloadPage = ({
 
               <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
                 <Typography variant="caption" color="black">
+                  <p>
+                    <strong>Leitor INR</strong>
+                  </p>
                   <p>Versão atual: 0.2.72</p>
                   <p>
-                    Leitor INR é um aplicativo para distribuição livre e
-                    gratuita destinada a Assinantes INR.
+                    O <strong>Leitor INR</strong> é um aplicativo para
+                    distribuição livre e gratuita destinada a{" "}
+                    <strong>Assinantes INR.</strong>
                   </p>
                   <p>
-                    O Leitor INR não coleta quaisquer dados pessoais do seu
-                    usuário.
+                    O <strong>Leitor INR</strong> não coleta quaisquer dados
+                    pessoais do seu usuário.
                   </p>
                   <p>
-                    O Leitor INR é livre de vírus e ou dispositivos maliciosos.
+                    O <strong>Leitor INR</strong> é livre de vírus e ou
+                    dispositivos maliciosos.
                   </p>
                   <p>
-                    Após a instalação do Leitor INR no computador com sistema
-                    Windows © (marca registrada Microsoft Corporation), haverá
-                    notificação a cada nova publicação de Boletins Eletrônicos
-                    INR e Classificadores INR.
+                    Após a instalação do <strong>Leitor INR</strong> no
+                    computador com sistema Windows © (marca registrada Microsoft
+                    Corporation), o usuário será notificado a cada nova
+                    publicação dos <strong>Boletins Eletrônicos INR</strong> e{" "}
+                    <strong>Classificadores INR</strong>.
                   </p>
                   <p>
-                    O Leitor INR, nesta versão, destina-se à notificação
-                    boletins distribuídos pelo INR, revelando ao seu usuário a
-                    respectiva publicação no Portal INR
+                    O <strong>Leitor INR</strong>, nesta versão, destina-se,
+                    exclusivamente, à notificação dos boletins distribuídos pelo{" "}
+                    <strong>INR</strong>, revelando ao seu usuário a respectiva
+                    publicação no <strong>Portal INR</strong>
                     (https://inrpublicacoes.com.br/site/inicio).
                   </p>
                   <p>
                     A leitura integral do conteúdo dos boletins se dará pelo
-                    acesso ao Portal INR, onde serão solicitados login e senha
-                    exclusivos do Assinante INR (os mesmos já utilizados para a
-                    obtenção de todo o conteúdo do portal).
+                    acesso ao <strong>Portal INR</strong>, onde serão
+                    solicitados login e senha exclusivos do
+                    <strong>Assinante INR</strong> (os mesmos já utilizados para
+                    a obtenção de todo o conteúdo do portal).
                   </p>
                   <p>
-                    Ao acessar o Portal INR, o Assinante INR concorda com os
-                    termos de uso vigentes no site.
+                    Ao acessar o <strong>Portal INR</strong>, o{" "}
+                    <strong>Assinante INR</strong> concorda com os termos de uso
+                    vigentes no site.
                   </p>
                   <p>
-                    O aplicativo Leitor INR é propriedade intelectual da
-                    Boletins Informativos Ltda, editora das Publicações INR.
+                    O aplicativo <strong>Leitor INR</strong> é propriedade
+                    intelectual da Boletins Informativos Ltda., editora das{" "}
+                    <strong>Publicações INR</strong>.
                   </p>
                   <p>
                     Em caso de dúvidas, favor enviar e-mail para
                     faleconosco@inr.com.br.
                   </p>
-                  <p>Publicações INR © 2023. Todos os direitos reservados.</p>
+                  <p>
+                    <strong>Publicações INR</strong> © 2023. Todos os direitos
+                    reservados.
+                  </p>
                 </Typography>
               </Grid>
             </Grid>
