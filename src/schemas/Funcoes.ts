@@ -4,9 +4,9 @@ import { papr } from "../lib/backend"
 const FuncoesSchema = schema({
   nome: types.string({ required: true, minLength: 3, maxLength: 100 }),
   label: types.string({ required: true, minLength: 3, maxLength: 30 }),
-  location: types.string({ required: true, minLength: 3, maxLength: 16 }),
+  posicao: types.string({ required: true, minLength: 3, maxLength: 16 }),
   root: types.string({ required: true, minLength: 3, maxLength: 200 }),
-  icon: types.string({ required: false, minLength: 3, maxLength: 20 }),
+  icone: types.string({ required: false, minLength: 3, maxLength: 20 }),
   actions: types.array(types.string(), { required: true }),
   ativo: types.boolean({ required: true }),
   free: types.boolean({ required: true }),
