@@ -55,11 +55,8 @@ export default async function searchAtualizacoes(
 
     const destinatariosList = await ReportDestinatario.find({})
 
-    console.log(host)
-
     const mailGenerator = new Mailgen({
       theme: "default",
-
       product: {
         logo: "https://object.epicquestti.com.br/inr/assets/inr-logo-mail.png",
         name: "INR Publicações",
