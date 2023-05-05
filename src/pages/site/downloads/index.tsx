@@ -142,12 +142,14 @@ const DownloadPage = ({
               flexGrow: 1
             }}
           >
-            <Image
-              alt="INR Publicações"
-              width={140}
-              height={80}
-              src="https://inrpublicacoes.com.br/site/img/topo/logo_inr.svg"
-            />
+            <a href="https://inrpublicacoes.com.br/site/inicio">
+              <Image
+                alt="INR Publicações"
+                width={140}
+                height={80}
+                src="https://inrpublicacoes.com.br/site/img/topo/logo_inr.svg"
+              />
+            </a>
 
             <Box sx={{ display: "inline-flex", alignItems: "center" }}>
               <Box sx={{ m: 1 }}>
