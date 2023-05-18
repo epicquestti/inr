@@ -1,5 +1,5 @@
 import { schema, types } from "papr"
-import { papr } from "../lib/backend"
+import papr from "../lib/backend/database"
 
 const FuncoesSchema = schema({
   nome: types.string({ required: true, minLength: 3, maxLength: 100 }),

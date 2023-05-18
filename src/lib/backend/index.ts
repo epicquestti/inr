@@ -1,1 +1,1 @@
-export { connect, default as papr, disconnect } from "./database"
+export { connect, discconect, default as papr } from "./database"

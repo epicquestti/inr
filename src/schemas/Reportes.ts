@@ -1,5 +1,5 @@
 import { schema, types } from "papr"
-import { papr } from "../lib/backend"
+import papr from "../lib/backend/database"
 
 const reportesSchema = schema({
   createdAt: types.date({ required: true }),

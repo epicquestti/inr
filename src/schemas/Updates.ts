@@ -1,6 +1,5 @@
 import { schema, types } from "papr"
-
-import { papr } from "../lib/backend"
+import papr from "../lib/backend/database"
 
 const updatesSchema = schema({
   version: types.number({ required: true }),
