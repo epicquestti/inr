@@ -70,10 +70,16 @@ const DownloadPage = ({
   versions
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter()
-  const [op, setOp] = useState<{ texto: string; type: string; link: string }>({
+  const [op, setOp] = useState<{
+    texto: string
+    type: string
+    link: string
+    _id: string
+  }>({
     texto: "Download",
     type: "W",
-    link: ""
+    link: "",
+    _id: ""
   })
   const [downloadAreaShow, setDownloadAreaShow] = useState<boolean>(false)
   const [loadingAreaShow, setLoadingAreaShow] = useState<boolean>(true)
@@ -94,7 +100,8 @@ const DownloadPage = ({
       setOp({
         texto: "Download Windows",
         type: "W",
-        link: finded?.endereco || ""
+        link: finded?.endereco || "",
+        _id: finded?._id || ""
       })
     }
 
@@ -107,7 +114,8 @@ const DownloadPage = ({
       setOp({
         texto: "Download Linux",
         type: "L",
-        link: finded?.endereco || ""
+        link: finded?.endereco || "",
+        _id: finded?._id || ""
       })
     }
 
@@ -122,7 +130,8 @@ const DownloadPage = ({
       setOp({
         texto: "Download MAC",
         type: "MC",
-        link: finded?.endereco || ""
+        link: finded?.endereco || "",
+        _id: finded?._id || ""
       })
     }
 
@@ -219,9 +228,7 @@ const DownloadPage = ({
               variant="contained"
               size="large"
               onClick={async () => {
-                await HttpRequest.Get(
-                  `/api/v1/atualizacoes/${item._id}/register`
-                )
+                await HttpRequest.Get(`/api/v1/atualizacoes/${op._id}/register`)
                 router.push(op.link)
               }}
             >
