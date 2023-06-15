@@ -219,6 +219,9 @@ const DownloadPage = ({
               variant="contained"
               size="large"
               onClick={async () => {
+                await HttpRequest.Get(
+                  `/api/v1/atualizacoes/${item._id}/register`
+                )
                 router.push(op.link)
               }}
             >
