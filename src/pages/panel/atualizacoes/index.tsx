@@ -40,6 +40,8 @@ export default function SearchAtualizacoes() {
   const changeRowsPerPage = async (rpp: number) => {}
   const makeSearch = async () => {
     try {
+      if (!severity) throw new Error("Escolha a severidade.")
+
       setLoading(true)
 
       const res = await HttpRequest.Get(
