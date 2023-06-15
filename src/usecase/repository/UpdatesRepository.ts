@@ -71,7 +71,6 @@ export default class UpdatesRepository {
 
       return result.modifiedCount
     } catch (error: any) {
-      console.log(JSON.stringify(error))
       throw new Error(error.message)
     }
   }
@@ -107,7 +106,8 @@ export default class UpdatesRepository {
         minor,
         link,
         severity,
-        vigent
+        vigent,
+        downloads: 0
       })
     } catch (error: any) {
       throw new Error(error.message)
@@ -129,6 +129,24 @@ export default class UpdatesRepository {
           $ne: _id
         }
       })
+    } catch (error: any) {
+      throw new Error(error.message)
+    }
+  }
+
+  async registerDownload(_id: ObjectId, downloads: number): Promise<number> {
+    try {
+      const response = await updatesModel.updateOne(
+        {
+          _id: _id
+        },
+        {
+          $set: {
+            downloads: downloads
+          }
+        }
+      )
+      return response.modifiedCount
     } catch (error: any) {
       throw new Error(error.message)
     }

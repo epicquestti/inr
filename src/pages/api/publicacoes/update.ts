@@ -82,7 +82,6 @@ export default async function updatePublicacao(
             idBoletim: new ObjectId(id.toString())
           })
         } catch (error) {
-          console.log(error)
           res.status(200).send({
             success: false,
             message: "Erro ao inserir o conteúdo do boletim."

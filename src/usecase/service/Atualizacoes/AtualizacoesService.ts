@@ -78,7 +78,8 @@ export default class AtualizacoesService implements IAtualizacoesService {
               minor: params.minor,
               severity: params.severity,
               link: params.link,
-              vigent: justPublished.vigent
+              vigent: justPublished.vigent,
+              downloads: justPublished.downloads
             }
           }
         } else {
@@ -90,7 +91,8 @@ export default class AtualizacoesService implements IAtualizacoesService {
       }
     } catch (error: any) {
       return {
-        success: error.message
+        success: false,
+        message: error.message
       }
     }
   }
@@ -152,12 +154,14 @@ export default class AtualizacoesService implements IAtualizacoesService {
           minor: atualizacao.minor,
           severity: atualizacao.severity,
           link: atualizacao.link,
-          vigent: atualizacao.vigent
+          vigent: atualizacao.vigent,
+          downloads: atualizacao.downloads
         }
       }
     } catch (error: any) {
       return {
-        success: error.message
+        success: false,
+        message: error.message
       }
     }
   }
@@ -188,6 +192,26 @@ export default class AtualizacoesService implements IAtualizacoesService {
           atualizacoes: list,
           count: count
         }
+      }
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error.message
+      }
+    }
+  }
+
+  async registerDownload(params: { id: string }): Promise<defaultResponse> {
+    try {
+      const att = await this._updatesRepository.getUpdateById(
+        new ObjectId(params.id)
+      )
+      if (!att) throw new Error("")
+      const newQtd = typeof att.downloads === "number" ? att.downloads + 1 : 0
+      await this._updatesRepository.registerDownload(att._id, newQtd)
+
+      return {
+        success: true
       }
     } catch (error: any) {
       return {

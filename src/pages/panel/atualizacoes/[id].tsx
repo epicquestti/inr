@@ -14,7 +14,8 @@ import {
   Select,
   SelectChangeEvent,
   Snackbar,
-  TextField
+  TextField,
+  Typography
 } from "@mui/material"
 import { useRouter } from "next/router"
 import { ChangeEvent, useEffect, useState } from "react"
@@ -36,6 +37,7 @@ export default function GetAtualizacoesById() {
   const [openDialog, setOpenDialog] = useState<boolean>(false)
   const [dialogText, setDialogText] = useState<string>("")
   const [openBackDrop, setOpenBackDrop] = useState<boolean>(false)
+  const [downloads, setDownloads] = useState<number>(0)
   const [errorList, setErrorList] = useState<boolean[]>([
     false,
     false,
@@ -75,6 +77,7 @@ export default function GetAtualizacoesById() {
         setSeverity(atualizacao.data.severity)
         setLink(atualizacao.data.link)
         setVigente(atualizacao.data.vigent)
+        setDownloads(atualizacao.data.downloads)
 
         if (atualizacao.data.vigent) {
           setShowPublish(false)
@@ -327,6 +330,22 @@ export default function GetAtualizacoesById() {
               label="Link do executável."
               fullWidth
             />
+          </Grid>
+          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+            <Box
+              sx={{
+                width: "100%",
+                display: "flex",
+                justifyContent: "space-between"
+              }}
+            >
+              <Typography variant="body2">
+                Número de downloads até o momento desta versão:
+              </Typography>
+              <Typography variant="body1">
+                <strong>{downloads}</strong>
+              </Typography>
+            </Box>
           </Grid>
 
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>

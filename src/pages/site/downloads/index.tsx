@@ -1,4 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
+import { connect } from "@lib/backend"
+import { HttpRequest } from "@lib/frontend"
 import {
   Box,
   Button,
@@ -12,6 +14,7 @@ import {
   useMediaQuery,
   useTheme
 } from "@mui/material"
+import updatesModel from "@schema/Updates"
 import { GetServerSideProps, InferGetServerSidePropsType } from "next"
 import Image from "next/image"
 import { useRouter } from "next/router"
@@ -19,6 +22,7 @@ import { FC, ReactNode, useEffect, useState } from "react"
 
 export const getServerSideProps: GetServerSideProps<{
   versions: {
+    _id: string
     icone?: string
     downloadSpecification: string
     version: string
@@ -28,17 +32,24 @@ export const getServerSideProps: GetServerSideProps<{
     type: "W" | "WS" | "L" | "MC"
   }[]
 }> = async context => {
+  await connect()
+  const res = await updatesModel.findOne({
+    vigent: true
+  })
+
+  if (!res) return { props: { versions: [] } }
+
   return {
     props: {
       versions: [
         {
+          _id: res._id.toString(),
           downloadSpecification: "WINDOWS",
-          version: "0.2.72",
+          version: `${res.version}.${res.major}.${res.minor}`,
           buttonText: "DOWNLOAD",
           hasExe: true,
           icone: "desktop_windows",
-          endereco:
-            "https://object.epicquestti.com.br/inr/leitorinr/releases/Instalador_Leitor_INR_0.2.72.exe",
+          endereco: res.link,
           type: "W"
         }
         // {
@@ -342,7 +353,10 @@ const DownloadPage = ({
                               variant="contained"
                               color="success"
                               size="large"
-                              onClick={() => {
+                              onClick={async () => {
+                                await HttpRequest.Get(
+                                  `/api/v1/atualizacoes/${item._id}/register`
+                                )
                                 router.push(item.endereco)
                               }}
                             >

@@ -10,4 +10,5 @@ export interface IAtualizacoesController {
   atualizacaoList(params: any): Promise<defaultResponse>
   publicar(params: getByIdInput): Promise<defaultResponse>
   salvarAtualizacao(params: salvarAtualizacaoInput): Promise<defaultResponse>
+  registerDownload(params: getAtualizacoesByIdInput): Promise<defaultResponse>
 }

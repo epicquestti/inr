@@ -85,7 +85,6 @@ export default async function Search(
       }
     })
   } catch (error: any) {
-    console.log(error)
     res.status(200).send({
       success: false,
       message: error.message

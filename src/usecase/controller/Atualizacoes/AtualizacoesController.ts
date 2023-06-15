@@ -112,7 +112,32 @@ export default class AtualizacoesController implements IAtualizacoesController {
 
       if (!service.success) throw new Error(service.message)
 
-      console.log(service)
+      return {
+        success: true,
+        data: service.data
+      }
+    } catch (error: any) {
+      return {
+        success: true,
+        message: error.message
+      }
+    }
+  }
+
+  async registerDownload(
+    params: getAtualizacoesByIdInput
+  ): Promise<defaultResponse> {
+    try {
+      const validation = await getAtualizacoesById.safeParseAsync(params)
+
+      if (!validation.success)
+        throw new Error(validation.error.issues[0].message)
+
+      const service = await this._AtualizacaoService.registerDownload(
+        validation.data
+      )
+
+      if (!service.success) throw new Error(service.message)
 
       return {
         success: true,

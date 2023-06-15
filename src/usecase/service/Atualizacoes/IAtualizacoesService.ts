@@ -11,4 +11,5 @@ export default interface IAtualizacoesService {
   atualizacaoList(params: atualizacaoListOutput): Promise<defaultResponse>
   publish(params: getByIdOutput): Promise<defaultResponse>
   salvarAtualizacao(params: salvarAtualizacaoOutput): Promise<defaultResponse>
+  registerDownload(params: { id: string }): Promise<defaultResponse>
 }

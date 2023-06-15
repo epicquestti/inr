@@ -8,7 +8,8 @@ const updatesSchema = schema({
   minor: types.number({ required: true }),
   severity: types.string({ required: true }),
   link: types.string({ required: true }),
-  vigent: types.boolean({ required: false })
+  vigent: types.boolean({ required: false }),
+  downloads: types.number({ required: false })
 })
 
 const updatesModel = papr.model("Updates", updatesSchema)
