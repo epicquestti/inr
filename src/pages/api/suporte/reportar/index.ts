@@ -17,9 +17,7 @@ export default async function searchAtualizacoes(
 ): Promise<void> {
   try {
     await connect()
-
     const ca = new Date()
-
     const reporteRes = await Reportes.insertOne({
       createdAt: ca,
       type: req.body.reportType,

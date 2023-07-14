@@ -447,7 +447,7 @@ const DownloadPage = ({
                     O <strong>Leitor INR</strong>, nesta versão, destina-se,
                     exclusivamente, à notificação dos boletins distribuídos pelo{" "}
                     <strong>INR</strong>, revelando ao seu usuário a respectiva
-                    publicação no <strong>Portal INR</strong>
+                    publicação no <strong>Portal INR</strong>{" "}
                     (https://inrpublicacoes.com.br/site/inicio).
                   </p>
                   <p>
@@ -492,7 +492,13 @@ const DownloadPage = ({
         }}
       >
         <Container>
-          <Grid container spacing={2} alignContent={"center"}>
+          <Grid
+            container
+            spacing={1}
+            alignContent="center"
+            justifyContent="center"
+            alignItems="center"
+          >
             <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
               <img
                 src="https://inrpublicacoes.com.br/site/img/rodape/logo_inr_branco.svg"
@@ -501,16 +507,21 @@ const DownloadPage = ({
               />
             </Grid>
             <Grid item xs={12} sm={12} md={5} lg={5} xl={5}>
-              <p style={{ color: "white", fontSize: 15 }}>
-                Central do Assinante: (11) 2959-0220
-                faleconosco@inrpublicacoes.com.br
+              <p style={{ color: "white", fontSize: 17, lineHeight: 0.5 }}>
+                <p>Central do Assinante:</p>
+                <p>(11) 2959-0220</p>
+                <p>faleconosco@inrpublicacoes.com.br</p>
               </p>
             </Grid>
             <Grid item xs={12} sm={12} md={5} lg={5} xl={5}>
-              <p style={{ color: "white", fontSize: 15 }}>
-                Localização:
-                <span>Rua Voluntários da Pátria, 2.468 - 23º andar</span>
-                <span>Santana - São Paulo/SP - CEP.02402-000</span>
+              <p style={{ color: "white", fontSize: 17, lineHeight: 0.5 }}>
+                <p>Localização:</p>
+                <p>
+                  <span>Rua Voluntários da Pátria, 2.468 - 23º andar</span>
+                </p>
+                <p>
+                  <span>Santana - São Paulo/SP - CEP.02402-000</span>
+                </p>
               </p>
             </Grid>
           </Grid>
