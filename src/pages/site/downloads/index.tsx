@@ -19,7 +19,36 @@ import { GetServerSideProps, InferGetServerSidePropsType } from "next"
 import Image from "next/image"
 import { useRouter } from "next/router"
 import { FC, ReactNode, useEffect, useState } from "react"
-
+import Outras1 from "../../../public/pageassets/Outras01.png"
+import Outras2 from "../../../public/pageassets/Outras02.png"
+import Outras3 from "../../../public/pageassets/Outras03.png"
+import Outras4 from "../../../public/pageassets/Outras04.png"
+import Outras5 from "../../../public/pageassets/Outras05.png"
+import Outras6 from "../../../public/pageassets/Outras06.png"
+import Outras7 from "../../../public/pageassets/Outras07.png"
+import Outras8 from "../../../public/pageassets/Outras08.png"
+import Outras9 from "../../../public/pageassets/Outras09.png"
+import Outras10 from "../../../public/pageassets/Outras10.png"
+import Outras11 from "../../../public/pageassets/Outras11.png"
+import Outras12 from "../../../public/pageassets/Outras12.png"
+import Outras13 from "../../../public/pageassets/Outras13.png"
+import Outras14 from "../../../public/pageassets/Outras14.png"
+import Outras15 from "../../../public/pageassets/Outras15.png"
+import img0 from "../../../public/pageassets/img00.png"
+import img1 from "../../../public/pageassets/img01.png"
+import img2 from "../../../public/pageassets/img02.png"
+import img3 from "../../../public/pageassets/img03.png"
+import img4 from "../../../public/pageassets/img04.png"
+import img5 from "../../../public/pageassets/img05.png"
+import img6 from "../../../public/pageassets/img06.png"
+import img7 from "../../../public/pageassets/img07.png"
+import img8 from "../../../public/pageassets/img08.png"
+import img9 from "../../../public/pageassets/img09.png"
+import img10 from "../../../public/pageassets/img10.png"
+import img11 from "../../../public/pageassets/img11.png"
+import img12 from "../../../public/pageassets/img12.png"
+import img13 from "../../../public/pageassets/img13.png"
+// import img13 from "../../../public/pageassets/img13.png"
 export const getServerSideProps: GetServerSideProps<{
   versions: {
     _id: string
@@ -410,72 +439,319 @@ const DownloadPage = ({
       >
         <Container>
           <Paper sx={{ p: 3 }}>
-            <Grid container spacing={1} justifyContent="center">
+            <Grid
+              container
+              spacing={3}
+              justifyContent="center"
+              justifyItems="center"
+              alignItems="center"
+            >
               <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-                <Typography variant="h6" color="GrayText">
-                  Leitor INR
+                <img
+                  src={img0.src}
+                  alt="Bem vindo ao aplicativo Inr"
+                  style={{ width: "100%" }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                <img
+                  src={Outras1.src}
+                  alt="O aplicativo Leitor INR foi criado para facilitar a leitura de todos os textos
+                  divulgados pelo INR por meio dos Classificadores INR e Boletins Eletrônicos INR,
+                  sendo, assim, substituto ideal ao e-mail, evitando a instabilidade e o acúmulo
+                  de mensagens, além de agilizar a leitura com notificações em tempo real de
+                  divulgação"
+                  style={{ width: "100%" }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                <img
+                  src={Outras2.src}
+                  alt="Download e instalação"
+                  style={{ width: "100%" }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                <Typography variant="body1">
+                  <strong>Veja como é simples, rápido e seguro.</strong>
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                <Typography variant="body1">
+                  Para fazer o download do <strong>Leitor INR</strong> sugerimos
+                  que siga as instruções (o passo a passo) que indicamos a
+                  seguir:
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                <img
+                  src={Outras3.src}
+                  alt="Primeiros passos"
+                  style={{ width: "100%" }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                <Typography variant="body1">
+                  Acesse{" "}
+                  <a href="https://production.publicacoesinr.com.br/site/downloads">
+                    https://production.publicacoesinr.com.br/site/downloads
+                  </a>
+                  .
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                <Typography variant="body1">
+                  Na tela apresentada, selecione “DOWNLOAD WINDOWS” ou
+                  “DOWNLOAD”
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                <img
+                  src={img1.src}
+                  alt="Tela de Download"
+                  style={{ width: "100%" }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                <img
+                  src={Outras4.src}
+                  alt="Segundo Passo"
+                  style={{ width: "100%" }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                <Typography variant="body1">
+                  Encerrado o download, basta localizar o arquivo
+                  “Instalador_Leitor_Inr...” (geralmente na pasta “Downloads”) e
+                  executá-lo.
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                <img
+                  src={img2.src}
+                  alt="indicador de download realizado."
+                  style={{
+                    display: "block",
+                    marginLeft: "auto",
+                    marginRight: "auto",
+                    width: "50%"
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                <img
+                  src={Outras5.src}
+                  alt="Terceiro Passo"
+                  style={{ width: "100%" }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                <Typography variant="body1">
+                  Leia os termos de licença e selecione “Eu Concordo”.
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                <img
+                  src={img3.src}
+                  alt="Tela 'Eu Concordo' da instalação."
+                  style={{ width: "100%" }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                <img
+                  src={Outras6.src}
+                  alt="Quarto passo"
+                  style={{ width: "100%" }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                <Typography variant="body1">
+                  Selecione quem utilizará o aplicativo, e vá à tela seguinte.
                 </Typography>
               </Grid>
 
               <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-                <Typography variant="caption" color="black">
-                  <p>
-                    <strong>Leitor INR</strong>
-                  </p>
-                  <p>Versão atual: 0.2.72</p>
-                  <p>
-                    O <strong>Leitor INR</strong> é um aplicativo para
-                    distribuição livre e gratuita destinada a{" "}
-                    <strong>Assinantes INR.</strong>
-                  </p>
-                  <p>
-                    O <strong>Leitor INR</strong> não coleta quaisquer dados
-                    pessoais do seu usuário.
-                  </p>
-                  <p>
-                    O <strong>Leitor INR</strong> é livre de vírus e ou
-                    dispositivos maliciosos.
-                  </p>
-                  <p>
-                    Após a instalação do <strong>Leitor INR</strong> no
-                    computador com sistema Windows © (marca registrada Microsoft
-                    Corporation), o usuário será notificado a cada nova
-                    publicação dos <strong>Boletins Eletrônicos INR</strong> e{" "}
-                    <strong>Classificadores INR</strong>.
-                  </p>
-                  <p>
-                    O <strong>Leitor INR</strong>, nesta versão, destina-se,
-                    exclusivamente, à notificação dos boletins distribuídos pelo{" "}
-                    <strong>INR</strong>, revelando ao seu usuário a respectiva
-                    publicação no <strong>Portal INR</strong>{" "}
-                    (https://inrpublicacoes.com.br/site/inicio).
-                  </p>
-                  <p>
-                    A leitura integral do conteúdo dos boletins se dará pelo
-                    acesso ao <strong>Portal INR</strong>, onde serão
-                    solicitados login e senha exclusivos do
-                    <strong>Assinante INR</strong> (os mesmos já utilizados para
-                    a obtenção de todo o conteúdo do portal).
-                  </p>
-                  <p>
-                    Ao acessar o <strong>Portal INR</strong>, o{" "}
-                    <strong>Assinante INR</strong> concorda com os termos de uso
-                    vigentes no site.
-                  </p>
-                  <p>
-                    O aplicativo <strong>Leitor INR</strong> é propriedade
-                    intelectual da Boletins Informativos Ltda., editora das{" "}
-                    <strong>Publicações INR</strong>.
-                  </p>
-                  <p>
-                    Em caso de dúvidas, favor enviar e-mail para
-                    faleconosco@inr.com.br.
-                  </p>
-                  <p>
-                    <strong>Publicações INR</strong> © 2023. Todos os direitos
-                    reservados.
-                  </p>
+                <img
+                  src={img4.src}
+                  alt="Tela de seleção de quem ultilizará o aplicativo."
+                  style={{ width: "100%" }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                <img
+                  src={Outras7.src}
+                  alt="Tela 'Quinto Passo"
+                  style={{ width: "100%" }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                <Typography variant="body1">
+                  Em seguida, opte por instalar. Em segundos a instalação estará
+                  finalizada. Clique em “Concluir”!
                 </Typography>
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                <img
+                  src={img5.src}
+                  alt="Tela Instalação completa"
+                  style={{ width: "100%" }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                <Typography variant="body1">
+                  Pronto! Você já tem este ícone em sua barra de tarefas e
+                  receberá notificações automaticamente quando houver novas
+                  publicações.
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                <img
+                  src={img6.src}
+                  alt="Logo Inr"
+                  style={{
+                    display: "block",
+                    marginLeft: "auto",
+                    marginRight: "auto",
+                    width: "10%"
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                <img
+                  src={Outras8.src}
+                  alt="Depois da instalação"
+                  style={{ width: "100%" }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                <Typography variant="body1">
+                  Após baixar e fazer a instalação, um ícone estará sempre
+                  disponível em sua barra de tarefas.
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                <img
+                  src={img7.src}
+                  alt="Notificações"
+                  style={{
+                    display: "block",
+                    marginLeft: "auto",
+                    marginRight: "auto",
+                    width: "30%"
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                <img
+                  src={Outras9.src}
+                  alt="Fique sempre de olho nas novidades, acessando as notificações"
+                  style={{ width: "100%" }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                <img
+                  src={img8.src}
+                  alt="Notificações"
+                  style={{
+                    display: "block",
+                    marginLeft: "auto",
+                    marginRight: "auto",
+                    width: "25%"
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                <img
+                  src={Outras10.src}
+                  alt="Funcionalidades"
+                  style={{ width: "100%" }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                <Typography variant="body1">
+                  Com a tela do Leitor INR aberta, é possível pesquisar um
+                  Boletim ou Classificador por data, ou apenas selecionar na
+                  parte superior a opção desejada e ver a lista completa de
+                  itens acumulados.
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                <img
+                  src={Outras11.src}
+                  alt="Página Principal"
+                  style={{ width: "100%" }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                <img
+                  src={img9.src}
+                  alt="Página Principal"
+                  style={{ width: "100%" }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                <img
+                  src={Outras12.src}
+                  alt="Página Principal"
+                  style={{ width: "100%" }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                <Typography variant="body1">
+                  Nesta aba, além de selecionar um Boletim ou Classificador para
+                  leitura, é possível “favoritar” determinada(s) edição(ões)
+                  para leitura posterior, e ela(s) ficará(ão) disponível(eis) na
+                  lista de “Favoritos”.
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                <img
+                  src={img10.src}
+                  alt="Página Principal"
+                  style={{ width: "100%" }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                <img
+                  src={Outras13.src}
+                  alt="Página Principal"
+                  style={{ width: "100%" }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                <img
+                  src={img11.src}
+                  alt="Página Principal"
+                  style={{ width: "100%" }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                <img
+                  src={Outras14.src}
+                  alt="Página Principal"
+                  style={{ width: "100%" }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                <img
+                  src={img12.src}
+                  alt="Página Principal"
+                  style={{ width: "100%" }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                <img
+                  src={Outras15.src}
+                  alt="Página Principal"
+                  style={{ width: "100%" }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                <img
+                  src={img13.src}
+                  alt="Página Principal"
+                  style={{ width: "100%" }}
+                />
               </Grid>
             </Grid>
           </Paper>
